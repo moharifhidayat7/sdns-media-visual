@@ -26,23 +26,6 @@ const menuStyles = createStyles((theme) => ({
       display: "none",
     },
   },
-  itemHovered: {
-    "&:hover": {
-      backgroundColor:
-        theme.colorScheme === "dark"
-          ? theme.colors.dark[5]
-          : theme.colors.gray[1],
-    },
-  },
-  itemLogout: {
-    "&:hover": {
-      color: theme.colorScheme === "dark" ? theme.white : theme.colors.red[7],
-      backgroundColor:
-        theme.colorScheme === "dark"
-          ? theme.colors.red[9]
-          : theme.colors.red[2],
-    },
-  },
 }));
 
 const useStyles = createStyles((theme) => ({

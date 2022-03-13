@@ -29,24 +29,24 @@ export default function App({
         />
       </Head>
 
-      <ColorSchemeProvider
-        colorScheme={colorScheme}
-        toggleColorScheme={toggleColorScheme}
+      <MantineProvider
+        withGlobalStyles
+        withNormalizeCSS
+        theme={{
+          colorScheme: colorScheme,
+        }}
       >
-        <MantineProvider
-          withGlobalStyles
-          withNormalizeCSS
-          theme={{
-            colorScheme: colorScheme,
-          }}
+        <ColorSchemeProvider
+          colorScheme={colorScheme}
+          toggleColorScheme={toggleColorScheme}
         >
           <SessionProvider session={session}>
             <GlobalContextProvider>
               <Component {...pageProps} />
             </GlobalContextProvider>
           </SessionProvider>
-        </MantineProvider>
-      </ColorSchemeProvider>
+        </ColorSchemeProvider>
+      </MantineProvider>
     </>
   );
 }
