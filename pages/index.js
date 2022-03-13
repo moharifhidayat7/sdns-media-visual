@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { Title, Box } from "@mantine/core";
+import { Title, Box, Button } from "@mantine/core";
 
 import Layout from "@components/views/Layout";
 
@@ -25,7 +25,7 @@ export default function Home() {
               : theme.colors.gray[4],
         })}
       >
-        this is box
+        <Button>My compact button</Button>
       </Box>
     </Layout>
   );
