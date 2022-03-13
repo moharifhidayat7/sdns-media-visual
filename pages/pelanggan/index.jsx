@@ -1,9 +1,10 @@
 import Head from "next/head";
 import { Title, Box } from "@mantine/core";
+import Layout from "@components/views/Layout";
 
 export default function Index() {
   return (
-    <>
+    <Layout>
       <Head>
         <title>Master Pelanggan</title>
       </Head>
@@ -25,6 +26,6 @@ export default function Index() {
       >
         this is box
       </Box>
-    </>
+    </Layout>
   );
 }

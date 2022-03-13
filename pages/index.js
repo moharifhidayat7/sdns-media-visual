@@ -1,9 +1,11 @@
 import Head from "next/head";
 import { Title, Box } from "@mantine/core";
 
+import Layout from "@components/views/Layout";
+
 export default function Home() {
   return (
-    <>
+    <Layout>
       <Head>
         <title>Dashboard</title>
       </Head>
@@ -25,6 +27,6 @@ export default function Home() {
       >
         this is box
       </Box>
-    </>
+    </Layout>
   );
 }

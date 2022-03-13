@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Head from "next/head";
-import Layout from "@components/views/Layout";
 import {
   MantineProvider,
   ColorSchemeProvider,
@@ -43,9 +42,7 @@ export default function App({
         >
           <SessionProvider session={session}>
             <GlobalContextProvider>
-              <Layout>
-                <Component {...pageProps} />
-              </Layout>
+              <Component {...pageProps} />
             </GlobalContextProvider>
           </SessionProvider>
         </MantineProvider>
