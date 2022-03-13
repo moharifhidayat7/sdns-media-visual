@@ -6,13 +6,16 @@ import {
   ColorSchemeProvider,
   ColorScheme,
 } from "@mantine/core";
+import { SessionProvider } from "next-auth/react";
 
 import { GlobalContextProvider } from "@components/contexts/GlobalContext";
 
 import "@styles/globals.css";
 
-export default function App(props) {
-  const { Component, pageProps } = props;
+export default function App({
+  Component,
+  pageProps: { session, ...pageProps },
+}) {
   const [colorScheme, setColorScheme] = useState("light");
 
   const toggleColorScheme = (value) =>
@@ -38,11 +41,13 @@ export default function App(props) {
             colorScheme: colorScheme,
           }}
         >
-          <GlobalContextProvider>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
-          </GlobalContextProvider>
+          <SessionProvider session={session}>
+            <GlobalContextProvider>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </GlobalContextProvider>
+          </SessionProvider>
         </MantineProvider>
       </ColorSchemeProvider>
     </>
