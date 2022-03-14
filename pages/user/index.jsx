@@ -3,33 +3,16 @@ import Link from "next/link";
 import Head from "next/head";
 import {
   Title,
-  Box,
-  Pagination,
   Text,
   Button,
-  Group,
   MultiSelect,
-  SimpleGrid,
-  Select,
-  Input,
-  Collapse,
-  ActionIcon,
 } from "@mantine/core";
 import {
-  Search,
-  Plus,
-  Trash,
-  Pencil,
-  Refresh,
-  Filter,
   ChevronRight,
   ChevronLeft,
   ChevronsLeft,
   ChevronsRight,
   Dots,
-  X,
-  TableExport,
-  TableImport,
 } from "tabler-icons-react";
 
 import { CustomTable } from "@components/Table/CustomTable";

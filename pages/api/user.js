@@ -19,7 +19,7 @@ export default async (req, res) => {
          res.statusCode = 400;
          res.json({
             message: "User not created",
-            error:error.message,
+            error: error.message,
          });
       }
    }
@@ -29,7 +29,9 @@ export default async (req, res) => {
             include: {
                createdProduk: true,
                updatedProduk: true
-            }
+            }, where: {
+               isDeleted: false,
+            },
          });
          res.status(200).json(result);
       } catch (err) {

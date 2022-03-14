@@ -29,11 +29,14 @@ export default async (req, res) => {
    }
    else if (req.method == "GET") {
       try {
-         //join produk dengan user
+         //join produk dengan user && where isDeleted = 0
+
          const result = await prisma.produk.findMany({
             include: {
                updatedBy: true, createdBy: true
-            }
+            }, where: {
+               isDeleted: false,
+            },
          });
          res.status(200).json(result);
       } catch (err) {
