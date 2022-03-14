@@ -1,5 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import prisma from "lib/prisma";
 
 export default async function handler(req, res) {
   if (req.method === "GET") {
@@ -9,6 +8,9 @@ export default async function handler(req, res) {
           id: req.query.id,
         },
       });
+
+      delete result.password;
+      delete result.resetPasswordToken;
 
       res.status(200).json(result);
     } catch (error) {
@@ -23,6 +25,10 @@ export default async function handler(req, res) {
         },
         data: req.body,
       });
+
+      delete user.password;
+      delete user.resetPasswordToken;
+
       res.statusCode(200).json({
         message: "User updated",
         user,
