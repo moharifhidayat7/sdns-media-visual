@@ -166,7 +166,23 @@ export default function Index() {
             />
           </div>
         </DataTable.Filter>
-        <CustomTable data={data} header={header} />
+        <CustomTable header={header}>
+          {data.map((row) => {
+            return (
+              <CustomTable.Row key={row.id}>
+                <CustomTable.Col>
+                  <Text>COBA</Text>
+                </CustomTable.Col>
+                <CustomTable.Col>
+                  <Text>COBA</Text>
+                </CustomTable.Col>
+                <CustomTable.Col>
+                  <Text>COBA</Text>
+                </CustomTable.Col>
+              </CustomTable.Row>
+            );
+          })}
+        </CustomTable>
         <DataTable.Footer />
       </DataTable>
     </Layout>
