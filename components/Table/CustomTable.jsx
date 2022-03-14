@@ -96,7 +96,7 @@ function sortData(data, payload) {
   );
 }
 
-export function CustomTable({
+const CustomTable = ({
   data,
   header,
   controls = {
@@ -116,7 +116,7 @@ export function CustomTable({
       action: () => {},
     },
   },
-}) {
+}) => {
   const { classes, cx } = useStyles();
   const [selection, setSelection] = useState(["1"]);
 
@@ -236,4 +236,53 @@ export function CustomTable({
       </Table>
     </ScrollArea>
   );
-}
+};
+
+const Row = ({ children, controls }) => {
+  return (
+    <tr key={item.id} className={cx({ [classes.rowSelected]: selected })}>
+      <td>
+        <Checkbox
+          checked={selection.includes(item.id)}
+          onChange={() => toggleRow(item.id)}
+          transitionDuration={0}
+        />
+      </td>
+      {children}
+      {(controls.update.visible || controls.delete.visible) && (
+        <td>
+          <Group spacing="xs" className="justify-end">
+            {controls.update.visible && (
+              <ActionIcon
+                color="yellow"
+                variant="filled"
+                onClick={controls.update.action}
+              >
+                <Pencil size={16} />
+              </ActionIcon>
+            )}
+            {controls.delete.visible && (
+              <ActionIcon
+                color="red"
+                variant="filled"
+                onClick={controls.delete.action}
+              >
+                <Trash size={16} />
+              </ActionIcon>
+            )}
+          </Group>
+        </td>
+      )}
+    </tr>
+  );
+};
+
+CustomTable.Row = Row;
+
+const Col = ({ children }) => {
+  return <td>{children}</td>;
+};
+
+CustomTable.Col = Col;
+
+export { CustomTable };
