@@ -19,16 +19,16 @@ const Layout = ({ children }) => {
   const [state, dispatch] = useGlobalContext();
 
   const menu = [
-    { label: "Dashboard", icon: Gauge, link: "/Dashboard" },
+    { label: "Dashboard", icon: Gauge, link: "/" },
     {
-      label: "Market news",
+      label: "Master",
       icon: Notes,
       initiallyOpened: true,
       links: [
-        { label: "Overview", link: "/" },
-        { label: "Forecasts", link: "/" },
-        { label: "Outlook", link: "/" },
-        { label: "Real time", link: "/" },
+        { label: "Produk", link: "/produk" },
+        { label: "Inventori", link: "/" },
+        { label: "Suppliers", link: "/" },
+        { label: "Gudang", link: "/" },
       ],
     },
     {

@@ -77,7 +77,6 @@ export function LinksGroup({
       <Text
         component="a"
         className={classes.link}
-        onClick={(event) => event.preventDefault()}
       >
         {link.label}
       </Text>
