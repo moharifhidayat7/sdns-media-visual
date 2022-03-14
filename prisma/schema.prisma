@@ -10,6 +10,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Status {
+  MENUNGGU
+  DITERIMA
+  SELESAI
+  ACTIVE
+  INACTIVE
+}
+
 model User {
   id                 Int       @id @default(autoincrement())
   email              String    @unique
@@ -19,5 +27,24 @@ model User {
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
   deletedAt          DateTime?
+  isDeleted          Boolean?  @default(false)
+  updatedBy          Int?
+  createdBy          Int?
+  // produk             Produk[]
 }
 
+model Produk {
+  id        Int       @id @default(autoincrement())
+  kode      String    @unique
+  nama      String
+  harga     BigInt
+  status    Status    @default(ACTIVE)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  isDeleted Boolean?  @default(false)
+  updatedId Int
+  createdId Int
+  // updatedBy User      @relation(fields: [updatedId], references: [id])
+  // createdBy User      @relation(fields: [createdId], references: [id])
+}

@@ -1,18 +1,27 @@
 import { PrismaClient } from "@prisma/client";
-
 const prisma = new PrismaClient();
 
 export default async (req, res) => {
    const data = req.body;
    if (req.method == "POST") {
-      const user = await prisma.user.create({
-         data: {
-            email: data.email,
-            password: data.password,
-            username:data.username
-         }
-      });
-      res.json(user);
+      try {
+         const user = await prisma.user.create({
+            data: {
+               ...data,
+            },
+         });
+         res.statusCode = 200;
+         res.json({
+            message: "User created",
+            user,
+         });
+      } catch (error) {
+         res.statusCode = 400;
+         res.json({
+            message: "User not created",
+            error:error.message,
+         });
+      }
    }
    else if (req.method == "GET") {
       try {
