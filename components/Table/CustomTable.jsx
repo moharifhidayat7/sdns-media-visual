@@ -71,34 +71,10 @@ function Th({ children, reversed, sorted, onSort, ...props }) {
   );
 }
 
-function filterData(data, search) {
-  const keys = Object.keys(data[0]);
-  const query = search.toLowerCase().trim();
-  return data.filter((item) =>
-    keys.some((key) => item[key].toLowerCase().includes(query))
-  );
-}
-
-function sortData(data, payload) {
-  if (!payload.sortBy) {
-    return filterData(data, payload.search);
-  }
-
-  return filterData(
-    [...data].sort((a, b) => {
-      if (payload.reversed) {
-        return b[payload.sortBy].localeCompare(a[payload.sortBy]);
-      }
-
-      return a[payload.sortBy].localeCompare(b[payload.sortBy]);
-    }),
-    payload.search
-  );
-}
-
 const CustomTable = ({
   data,
   header,
+  children,
   controls = {
     read: {
       visible: false,
@@ -118,163 +94,25 @@ const CustomTable = ({
   },
 }) => {
   const { classes, cx } = useStyles();
-  const [selection, setSelection] = useState(["1"]);
-
-  const [search, setSearch] = useState("");
-  const [sortedData, setSortedData] = useState(data);
-  const [sortBy, setSortBy] = useState(null);
-  const [reverseSortDirection, setReverseSortDirection] = useState(false);
-
-  const setSorting = (field) => {
-    const reversed = field === sortBy ? !reverseSortDirection : false;
-    setReverseSortDirection(reversed);
-    setSortBy(field);
-    setSortedData(sortData(data, { sortBy: field, reversed, search }));
-  };
-
-  const handleSearchChange = (event) => {
-    const { value } = event.currentTarget;
-    setSearch(value);
-    setSortedData(
-      sortData(data, { sortBy, reversed: reverseSortDirection, search: value })
-    );
-  };
-
-  const toggleRow = (id) =>
-    setSelection((current) =>
-      current.includes(id)
-        ? current.filter((item) => item !== id)
-        : [...current, id]
-    );
-  const toggleAll = () =>
-    setSelection((current) =>
-      current.length === data.length ? [] : data.map((item) => item.id)
-    );
-
-  const rows = sortedData.map((item) => {
-    const selected = selection.includes(item.id);
-    return (
-      <tr key={item.id} className={cx({ [classes.rowSelected]: selected })}>
-        <td>
-          <Checkbox
-            checked={selection.includes(item.id)}
-            onChange={() => toggleRow(item.id)}
-            transitionDuration={0}
-          />
-        </td>
-        <td>
-          <Group spacing="sm">
-            <Avatar size={26} src={item.avatar} radius={26} />
-            <Text size="sm" weight={500}>
-              {item.name}
-            </Text>
-          </Group>
-        </td>
-        <td>{item.email}</td>
-        <td>{item.job}</td>
-        {(controls.update.visible || controls.delete.visible) && (
-          <td>
-            <Group spacing="xs" className="justify-end">
-              {controls.update.visible && (
-                <ActionIcon
-                  color="yellow"
-                  variant="filled"
-                  onClick={controls.update.action}
-                >
-                  <Pencil size={16} />
-                </ActionIcon>
-              )}
-              {controls.delete.visible && (
-                <ActionIcon
-                  color="red"
-                  variant="filled"
-                  onClick={controls.delete.action}
-                >
-                  <Trash size={16} />
-                </ActionIcon>
-              )}
-            </Group>
-          </td>
-        )}
-      </tr>
-    );
-  });
 
   return (
     <ScrollArea>
       <Table sx={{ minWidth: 800 }} verticalSpacing="sm">
         <thead>
           <tr>
-            <th style={{ width: 40 }}>
-              <Checkbox
-                onChange={toggleAll}
-                checked={selection.length === data.length}
-                indeterminate={
-                  selection.length > 0 && selection.length !== data.length
-                }
-                transitionDuration={0}
-              />
-            </th>
             {header.map((th) => {
-              return (
-                <Th
-                  sorted={sortBy === th.key}
-                  reversed={reverseSortDirection}
-                  onSort={() => setSorting(th.key)}
-                  key={th.key}
-                >
-                  {th.label}
-                </Th>
-              );
+              return <Th key={th.key}>{th.label}</Th>;
             })}
-            {(controls.update.visible || controls.delete.visible) && (
-              <th style={{ textAlign: "center" }}>Action</th>
-            )}
           </tr>
         </thead>
-        <tbody>{rows}</tbody>
+        <tbody>{children}</tbody>
       </Table>
     </ScrollArea>
   );
 };
 
-const Row = ({ children, controls }) => {
-  return (
-    <tr key={item.id} className={cx({ [classes.rowSelected]: selected })}>
-      <td>
-        <Checkbox
-          checked={selection.includes(item.id)}
-          onChange={() => toggleRow(item.id)}
-          transitionDuration={0}
-        />
-      </td>
-      {children}
-      {(controls.update.visible || controls.delete.visible) && (
-        <td>
-          <Group spacing="xs" className="justify-end">
-            {controls.update.visible && (
-              <ActionIcon
-                color="yellow"
-                variant="filled"
-                onClick={controls.update.action}
-              >
-                <Pencil size={16} />
-              </ActionIcon>
-            )}
-            {controls.delete.visible && (
-              <ActionIcon
-                color="red"
-                variant="filled"
-                onClick={controls.delete.action}
-              >
-                <Trash size={16} />
-              </ActionIcon>
-            )}
-          </Group>
-        </td>
-      )}
-    </tr>
-  );
+const Row = ({ children }) => {
+  return <tr>{children}</tr>;
 };
 
 CustomTable.Row = Row;

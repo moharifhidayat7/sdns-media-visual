@@ -23,6 +23,8 @@ import {
   Filter as FilterIcon,
 } from "tabler-icons-react";
 
+import { useRouter } from "next/router";
+
 import {
   useDataTableContext,
   DataTableProvider,
@@ -110,6 +112,7 @@ const Action = ({
   },
 }) => {
   const [state, dispatch] = useDataTableContext();
+  const router = useRouter();
   return (
     <div className="mb-4">
       <Group
@@ -126,7 +129,7 @@ const Action = ({
               leftIcon={<Plus size={16} />}
               color="green"
               variant="filled"
-              onClick={controls.create.action}
+              onClick={() => router.push(router.asPath + "/tambah")}
               disabled={controls.create.disabled}
             >
               Tambah
