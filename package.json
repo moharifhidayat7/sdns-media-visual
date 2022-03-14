@@ -20,6 +20,7 @@
     "@mantine/rte": "^4.0.1",
     "@mantine/spotlight": "^4.0.1",
     "@prisma/client": "^3.10.0",
+    "bcrypt": "^5.0.1",
     "dayjs": "^1.10.8",
     "next": "12.1.0",
     "next-auth": "^4.2.1",
