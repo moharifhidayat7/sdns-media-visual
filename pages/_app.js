@@ -28,25 +28,24 @@ export default function App({
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
       </Head>
-
-      <MantineProvider
-        withGlobalStyles
-        withNormalizeCSS
-        theme={{
-          colorScheme: colorScheme,
-        }}
-      >
+      <SessionProvider session={session}>
         <ColorSchemeProvider
           colorScheme={colorScheme}
           toggleColorScheme={toggleColorScheme}
         >
-          <SessionProvider session={session}>
+          <MantineProvider
+            withGlobalStyles
+            withNormalizeCSS
+            theme={{
+              colorScheme: colorScheme,
+            }}
+          >
             <GlobalContextProvider>
               <Component {...pageProps} />
             </GlobalContextProvider>
-          </SessionProvider>
+          </MantineProvider>
         </ColorSchemeProvider>
-      </MantineProvider>
+      </SessionProvider>
     </>
   );
 }
