@@ -96,7 +96,27 @@ function sortData(data, payload) {
   );
 }
 
-export function CustomTable({ data }) {
+export function CustomTable({
+  data,
+  header,
+  controls = {
+    read: {
+      visible: false,
+      disabled: false,
+      action: () => {},
+    },
+    update: {
+      visible: false,
+      disabled: false,
+      action: () => {},
+    },
+    delete: {
+      visible: false,
+      disabled: false,
+      action: () => {},
+    },
+  },
+}) {
   const { classes, cx } = useStyles();
   const [selection, setSelection] = useState(["1"]);
 
@@ -151,18 +171,31 @@ export function CustomTable({ data }) {
           </Group>
         </td>
         <td>{item.email}</td>
-        <td>{item.email}</td>
         <td>{item.job}</td>
-        <td>
-          <Group spacing="xs" className="justify-end">
-            <ActionIcon color="yellow" variant="filled">
-              <Pencil size={16} />
-            </ActionIcon>
-            <ActionIcon color="red" variant="filled">
-              <Trash size={16} />
-            </ActionIcon>
-          </Group>
-        </td>
+        {(controls.update.visible || controls.delete.visible) && (
+          <td>
+            <Group spacing="xs" className="justify-end">
+              {controls.update.visible && (
+                <ActionIcon
+                  color="yellow"
+                  variant="filled"
+                  onClick={controls.update.action}
+                >
+                  <Pencil size={16} />
+                </ActionIcon>
+              )}
+              {controls.delete.visible && (
+                <ActionIcon
+                  color="red"
+                  variant="filled"
+                  onClick={controls.delete.action}
+                >
+                  <Trash size={16} />
+                </ActionIcon>
+              )}
+            </Group>
+          </td>
+        )}
       </tr>
     );
   });
@@ -182,35 +215,21 @@ export function CustomTable({ data }) {
                 transitionDuration={0}
               />
             </th>
-            <Th
-              sorted={sortBy === "name"}
-              reversed={reverseSortDirection}
-              onSort={() => setSorting("name")}
-            >
-              Nama
-            </Th>
-            <Th
-              sorted={sortBy === "email"}
-              reversed={reverseSortDirection}
-              onSort={() => setSorting("email")}
-            >
-              Username
-            </Th>
-            <Th
-              sorted={sortBy === "email"}
-              reversed={reverseSortDirection}
-              onSort={() => setSorting("email")}
-            >
-              Email
-            </Th>
-            <Th
-              sorted={sortBy === "job"}
-              reversed={reverseSortDirection}
-              onSort={() => setSorting("job")}
-            >
-              Role
-            </Th>
-            <th style={{ textAlign: "center" }}>Action</th>
+            {header.map((th) => {
+              return (
+                <Th
+                  sorted={sortBy === th.key}
+                  reversed={reverseSortDirection}
+                  onSort={() => setSorting(th.key)}
+                  key={th.key}
+                >
+                  {th.label}
+                </Th>
+              );
+            })}
+            {(controls.update.visible || controls.delete.visible) && (
+              <th style={{ textAlign: "center" }}>Action</th>
+            )}
           </tr>
         </thead>
         <tbody>{rows}</tbody>

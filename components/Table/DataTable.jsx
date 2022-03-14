@@ -157,7 +157,6 @@ const Action = ({
           {controls.refresh.visible && (
             <ActionIcon
               size={36}
-              color="blue"
               variant="filled"
               onClick={controls.refresh.action}
               disabled={controls.refresh.disabled}
