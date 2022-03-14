@@ -55,6 +55,21 @@ const PaginationItem = ({ page, active, onClick = () => {}, ...props }) => {
 };
 
 export default function Index() {
+  const header = [
+    {
+      key: "name",
+      label: "Nama",
+    },
+    {
+      key: "email",
+      label: "Email",
+    },
+    {
+      key: "job",
+      label: "Job",
+    },
+  ];
+
   const data = [
     {
       id: "1",
@@ -151,7 +166,7 @@ export default function Index() {
             />
           </div>
         </DataTable.Filter>
-        <CustomTable data={data} />
+        <CustomTable data={data} header={header} />
         <DataTable.Footer />
       </DataTable>
     </Layout>
