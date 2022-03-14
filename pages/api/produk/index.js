@@ -1,34 +1,38 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
-
+//prisma create produk
 export default async (req, res) => {
    const data = req.body;
    if (req.method == "POST") {
       try {
-         const user = await prisma.user.create({
+         const produk = await prisma.produk.create({
             data: {
-               ...data,
-            },
+               nama: data.nama,
+               harga: parseInt(data.harga),
+               kode: data.kode,
+               createdId: parseInt(data.createdId),
+               updatedId: parseInt(data.updatedId),
+            }
          });
          res.statusCode = 200;
          res.json({
-            message: "User created",
-            user,
+            message: "Produk created",
+            produk,
          });
       } catch (error) {
          res.statusCode = 400;
          res.json({
-            message: "User not created",
-            error:error.message,
+            message: "Produk not created",
+            error: error.message,
          });
       }
    }
    else if (req.method == "GET") {
       try {
-         const result = await prisma.user.findMany({
+         //join produk dengan user
+         const result = await prisma.produk.findMany({
             include: {
-               createdProduk: true,
-               updatedProduk: true
+               updatedBy: true, createdBy: true
             }
          });
          res.status(200).json(result);
@@ -37,6 +41,4 @@ export default async (req, res) => {
          res.status(403).json({ err: "Error occured." });
       }
    }
-
-
-};
+}
