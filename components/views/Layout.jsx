@@ -1,7 +1,7 @@
 import CustomHeader from "./CustomHeader";
 import CustomNavbar from "./CustomNavbar";
 
-import { AppShell, Container } from "@mantine/core";
+import { AppShell, Container, Loader } from "@mantine/core";
 
 import {
   Gauge,
