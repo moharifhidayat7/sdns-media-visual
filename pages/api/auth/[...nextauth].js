@@ -1,35 +1,45 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import prisma from "lib/prisma";
+import bcrypt from "bcrypt";
 
 export default NextAuth({
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        username: { label: "Username", type: "text", placeholder: "jsmith" },
+        username: {
+          label: "Email",
+          type: "text",
+          placeholder: "Username/Email",
+        },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials, req) {
-        const user = { id: 1, name: "J Smith", email: "jsmith@example.com" };
+        const user = await prisma.user.findUnique({
+          where: {
+            email: credentials.username,
+          },
+        });
 
-        if (user) {
-          return user;
+        const match = await bcrypt.compare(credentials.password, user.password);
+
+        if (match) {
+          const { password, resetPasswordToken, ...other } = user;
+          return other;
         } else {
           return null;
         }
       },
     }),
   ],
+  session: { strategy: "jwt", maxAge: 12 * 60 * 60 },
   callbacks: {
-    async jwt({ token, account }) {
-      if (account) {
-        token.accessToken = account.access_token;
-      }
+    async jwt({ token, user }) {
       return token;
     },
     async session({ session, token, user }) {
-      session.accessToken = token.accessToken;
-      return session;
+      return token;
     },
   },
 });
