@@ -1,8 +1,12 @@
 import bcrypt from "bcrypt";
 import prisma from "lib/prisma";
+import { getToken } from "next-auth/jwt";
 
 export default async function handler(req, res) {
+  const secret = process.env.NEXTAUTH_SECRET;
   if (req.method === "GET") {
+    const token = await getToken({ req, secret });
+    console.log(token);
     try {
       const result = await prisma.user.findMany();
       const userWithoutPassword = result.map((user) => {
@@ -18,13 +22,7 @@ export default async function handler(req, res) {
     try {
       const { password } = req.body;
       const saltRounds = 10;
-      const hash = bcrypt.hash(
-        password,
-        saltRounds,
-        async function (err, hash) {
-          return hash;
-        }
-      );
+      const hash = await bcrypt.hash(password, saltRounds);
       const user = await prisma.user.create({
         data: {
           ...req.body,

@@ -10,6 +10,9 @@ import {
   Anchor,
 } from "@mantine/core";
 
+import { useForm } from "@mantine/form";
+import { signIn } from "next-auth/react";
+
 const useStyles = createStyles((theme) => ({
   wrapper: {
     position: "fixed",
@@ -50,6 +53,25 @@ const useStyles = createStyles((theme) => ({
 
 export default function Login() {
   const { classes } = useStyles();
+
+  const form = useForm({
+    initialValues: {
+      email: "",
+      password: "",
+    },
+    validate: {
+      email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
+    },
+  });
+
+  const handleSubmit = async (values) => {
+    await signIn("credentials", {
+      ...values,
+      redirect: false,
+      callbackUrl: "https://google.com",
+    });
+  };
+
   return (
     <div className={classes.wrapper}>
       <Paper className={classes.form} radius={0} p={30}>
@@ -62,22 +84,27 @@ export default function Login() {
         >
           Welcome back to Mantine!
         </Title>
-
-        <TextInput
-          label="Email address"
-          placeholder="hello@gmail.com"
-          size="md"
-        />
-        <PasswordInput
-          label="Password"
-          placeholder="Your password"
-          mt="md"
-          size="md"
-        />
-        <Checkbox label="Keep me logged in" mt="xl" size="md" />
-        <Button fullWidth mt="xl" size="md">
-          Login
-        </Button>
+        <form onSubmit={form.onSubmit(handleSubmit)}>
+          <TextInput
+            label="Email address"
+            placeholder="hello@gmail.com"
+            size="md"
+            required
+            {...form.getInputProps("email")}
+          />
+          <PasswordInput
+            label="Password"
+            placeholder="Your password"
+            mt="md"
+            size="md"
+            required
+            {...form.getInputProps("password")}
+          />
+          {/* <Checkbox label="Keep me logged in" mt="xl" size="md" /> */}
+          <Button fullWidth mt="xl" size="md" type="submit">
+            Login
+          </Button>
+        </form>
       </Paper>
     </div>
   );
