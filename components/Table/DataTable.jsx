@@ -129,7 +129,7 @@ const Action = ({
               leftIcon={<Plus size={16} />}
               color="green"
               variant="filled"
-              onClick={() => router.push(router.asPath + "/tambah")}
+              onClick={() => router.push(router.asPath + "/form")}
               disabled={controls.create.disabled}
             >
               Tambah

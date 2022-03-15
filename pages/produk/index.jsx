@@ -48,7 +48,7 @@ export default function Index({ produk }) {
       <Head>
         <title>Master Produk</title>
       </Head>
-      <Title order={1} style={{ marginBottom: "1.5rem" }}>
+      <Title order={2} style={{ marginBottom: "1.5rem" }}>
         Data Produk
       </Title>
       <DataTable>

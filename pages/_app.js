@@ -4,6 +4,7 @@ import {
   MantineProvider,
   ColorSchemeProvider,
   ColorScheme,
+  Loader,
 } from "@mantine/core";
 import { SessionProvider } from "next-auth/react";
 

@@ -30,7 +30,6 @@ model Produk {
   id        Int       @id @default(autoincrement())
   kode      String    @unique
   nama      String
-  harga     Int?
   status    Status    @default(ACTIVE)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
