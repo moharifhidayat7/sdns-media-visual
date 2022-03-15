@@ -8,7 +8,7 @@ export default NextAuth({
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        username: {
+        email: {
           label: "Email",
           type: "text",
           placeholder: "Username/Email",
@@ -18,7 +18,7 @@ export default NextAuth({
       async authorize(credentials, req) {
         const user = await prisma.user.findUnique({
           where: {
-            email: credentials.username,
+            email: credentials.email,
           },
         });
 
@@ -41,5 +41,8 @@ export default NextAuth({
     async session({ session, token, user }) {
       return token;
     },
+  },
+  pages: {
+    signIn: "/login",
   },
 });

@@ -5,7 +5,7 @@ import { getToken } from "next-auth/jwt";
 export default async function handler(req, res) {
   const secret = process.env.NEXTAUTH_SECRET;
   if (req.method === "GET") {
-    const token = await getToken({ req, secret, raw: true });
+    const token = await getToken({ req, secret });
     console.log(token);
     try {
       const result = await prisma.user.findMany();
