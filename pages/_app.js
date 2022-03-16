@@ -5,6 +5,8 @@ import {
   ColorSchemeProvider,
   ColorScheme,
 } from "@mantine/core";
+import { ModalsProvider } from "@mantine/modals";
+import { NotificationsProvider } from "@mantine/notifications";
 import { SessionProvider } from "next-auth/react";
 
 import { GlobalContextProvider } from "@components/contexts/GlobalContext";
@@ -22,7 +24,6 @@ export default function App({
   return (
     <>
       <Head>
-        <title>Page title</title>
         <meta
           name="viewport"
           content="minimum-scale=1, initial-scale=1, width=device-width"
@@ -40,9 +41,13 @@ export default function App({
               colorScheme: colorScheme,
             }}
           >
-            <GlobalContextProvider>
-              <Component {...pageProps} />
-            </GlobalContextProvider>
+            <NotificationsProvider>
+              <GlobalContextProvider>
+                <ModalsProvider>
+                  <Component {...pageProps} />
+                </ModalsProvider>
+              </GlobalContextProvider>
+            </NotificationsProvider>
           </MantineProvider>
         </ColorSchemeProvider>
       </SessionProvider>
