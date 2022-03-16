@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Group,
   Collapse,
@@ -74,42 +73,9 @@ const Footer = () => {
 DataTable.Footer = Footer;
 
 const Action = ({
-  children,
-  controls = {
-    create: {
-      visible: true,
-      disabled: false,
-      action: () => {},
-    },
-    read: {
-      visible: true,
-      disabled: false,
-      action: () => {},
-    },
-    update: {
-      visible: true,
-      disabled: false,
-      action: () => {},
-    },
-    delete: {
-      visible: true,
-      disabled: false,
-      action: () => {},
-    },
-    refresh: { visible: true, disabled: false, action: () => {} },
-    export: { visible: true, disabled: false, action: () => {} },
-    import: { visible: true, disabled: false, action: () => {} },
-    search: {
-      visible: true,
-      disabled: false,
-      action: () => {},
-    },
-    filter: {
-      visible: true,
-      disabled: false,
-      action: () => {},
-    },
-  },
+  onRefresh = () => {},
+  onEdit = () => {},
+  onDelete = () => {},
 }) => {
   const [state, dispatch] = useDataTableContext();
   const router = useRouter();
@@ -124,69 +90,60 @@ const Action = ({
         })}
       >
         <Group spacing="xs">
-          {controls.create.visible && (
-            <Button
-              leftIcon={<Plus size={16} />}
-              color="green"
-              variant="filled"
-              onClick={() => router.push(router.asPath + "/tambah")}
-              disabled={controls.create.disabled}
-            >
-              Tambah
-            </Button>
-          )}
-          {controls.update.visible && (
-            <ActionIcon
-              size={36}
-              color="yellow"
-              variant="filled"
-              onClick={controls.update.action}
-              disabled={controls.update.disabled}
-            >
-              <Pencil />
-            </ActionIcon>
-          )}
-          {controls.delete.visible && (
-            <ActionIcon
-              size={36}
-              color="red"
-              variant="filled"
-              onClick={controls.delete.action}
-              disabled={controls.delete.disabled}
-            >
-              <Trash />
-            </ActionIcon>
-          )}
-          {controls.refresh.visible && (
-            <ActionIcon
-              size={36}
-              variant="filled"
-              onClick={controls.refresh.action}
-              disabled={controls.refresh.disabled}
-            >
-              <Refresh />
-            </ActionIcon>
-          )}
-          {controls.export.visible && (
-            <Button
-              leftIcon={<TableExport size={16} />}
-              variant="default"
-              onClick={controls.export.action}
-              disabled={controls.export.disabled}
-            >
-              Export
-            </Button>
-          )}
-          {controls.export.visible && (
-            <Button
-              leftIcon={<TableImport size={16} />}
-              variant="default"
-              onClick={controls.import.action}
-              disabled={controls.import.disabled}
-            >
-              Import
-            </Button>
-          )}
+          <Button
+            leftIcon={<Plus size={16} />}
+            color="green"
+            variant="filled"
+            onClick={() => {
+              router.push(router.asPath + "/form");
+            }}
+            disabled={false}
+          >
+            Tambah
+          </Button>
+          <ActionIcon
+            size={36}
+            color="yellow"
+            variant="filled"
+            onClick={() => onEdit(state.selection)}
+            disabled={false}
+          >
+            <Pencil />
+          </ActionIcon>
+          <ActionIcon
+            size={36}
+            color="red"
+            variant="filled"
+            onClick={() => onDelete(state.selection)}
+            disabled={state.selection.length == 0}
+          >
+            <Trash />
+          </ActionIcon>
+          <ActionIcon
+            size={36}
+            variant="filled"
+            onClick={() => {
+              dispatch({ type: "set", payload: { loading: !state.loading } });
+            }}
+          >
+            <Refresh />
+          </ActionIcon>
+          <Button
+            leftIcon={<TableExport size={16} />}
+            variant="default"
+            onClick={() => {}}
+            disabled={false}
+          >
+            Export
+          </Button>
+          <Button
+            leftIcon={<TableImport size={16} />}
+            variant="default"
+            onClick={() => {}}
+            disabled={false}
+          >
+            Import
+          </Button>
         </Group>
         <Group
           spacing="xs"
