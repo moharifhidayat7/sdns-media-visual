@@ -2,12 +2,15 @@ import { createContext, useContext, useReducer } from "react";
 
 const initialState = {
   showSidebar: false,
+  data: [],
 };
 
 const reducer = (state, action) => {
   switch (action.type) {
     case "toggle_sidebar":
       return { ...state, showSidebar: !state.showSidebar };
+    case "set_data":
+      return { ...state, data: action.payload };
     default:
       return state;
   }

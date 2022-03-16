@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useDataTableContext } from "@components/contexts/DataTableContext";
 import {
   createStyles,
   Table,
@@ -8,10 +8,14 @@ import {
   Pagination,
   UnstyledButton,
   Center,
+  Skeleton,
   Avatar,
   Text,
+  LoadingOverlay,
   ActionIcon,
 } from "@mantine/core";
+
+import { useModals } from "@mantine/modals";
 
 import {
   Selector,
@@ -21,7 +25,9 @@ import {
   Pencil,
   Trash,
 } from "tabler-icons-react";
-
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { useGlobalContext } from "@components/contexts/GlobalContext";
 const useStyles = createStyles((theme) => ({
   rowSelected: {
     backgroundColor:
@@ -71,38 +77,97 @@ function Th({ children, reversed, sorted, onSort, ...props }) {
   );
 }
 
+function filterData(data, search) {
+  const keys = Object.keys(data[0]);
+  const query = search.toLowerCase().trim();
+  return data.filter((item) =>
+    keys.some((key) => item[key].toLowerCase().includes(query))
+  );
+}
+
+function sortData(data, payload = { sortBy: "", reversed: false, search: "" }) {
+  if (!payload.sortBy) {
+    return filterData(data, payload.search);
+  }
+
+  return filterData(
+    [...data].sort((a, b) => {
+      if (payload.reversed) {
+        return b[payload.sortBy].localeCompare(a[payload.sortBy]);
+      }
+
+      return a[payload.sortBy].localeCompare(b[payload.sortBy]);
+    }),
+    payload.search
+  );
+}
+
 const CustomTable = ({
-  data,
   header,
   children,
-  controls = {
-    read: {
-      visible: false,
-      disabled: false,
-      action: () => {},
-    },
-    update: {
-      visible: false,
-      disabled: false,
-      action: () => {},
-    },
-    delete: {
-      visible: false,
-      disabled: false,
-      action: () => {},
-    },
-  },
+  withAction,
+  withSelection,
+  name = "",
 }) => {
-  const { classes, cx } = useStyles();
+  const [state, dispatch] = useDataTableContext();
+  const [globalState, globalDispatch] = useGlobalContext();
+
+  const [sortBy, setSortBy] = useState(null);
+  const [reverseSortDirection, setReverseSortDirection] = useState(false);
+
+  useEffect(() => {
+    dispatch({ type: "set", payload: { withAction, withSelection, name } });
+  }, []);
+
+  const setSorting = (field) => {
+    const reversed = field === sortBy ? !reverseSortDirection : false;
+    setReverseSortDirection(reversed);
+    setSortBy(field);
+    globalDispatch({
+      type: "set_data",
+      payload: sortData(globalState.data, {
+        sortBy: field,
+        reversed,
+        search: state.search,
+      }),
+    });
+  };
 
   return (
-    <ScrollArea>
+    <ScrollArea style={{ position: "relative" }}>
+      <LoadingOverlay visible={state.loading} radius="sm" />
       <Table sx={{ minWidth: 800 }} verticalSpacing="sm">
         <thead>
           <tr>
+            {state.withSelection && (
+              <th style={{ width: 40 }}>
+                <Checkbox
+                  onChange={() =>
+                    dispatch({ type: "toggle_all", payload: globalState.data })
+                  }
+                  checked={state.selection.length === globalState.data.length}
+                  indeterminate={
+                    state.selection.length > 0 &&
+                    state.selection.length !== globalState.data.length
+                  }
+                  transitionDuration={0}
+                />
+              </th>
+            )}
+
             {header.map((th) => {
-              return <Th key={th.key}>{th.label}</Th>;
+              return (
+                <Th
+                  key={th.key}
+                  sorted={sortBy === th.key}
+                  reversed={reverseSortDirection}
+                  onSort={() => setSorting(th.key)}
+                >
+                  {th.label}
+                </Th>
+              );
             })}
+            {state.withAction && <th style={{ textAlign: "right" }}>Action</th>}
           </tr>
         </thead>
         <tbody>{children}</tbody>
@@ -111,8 +176,71 @@ const CustomTable = ({
   );
 };
 
-const Row = ({ children }) => {
-  return <tr>{children}</tr>;
+const Row = ({
+  children,
+  id,
+  editLink = "",
+  onDelete = () => {},
+  deleteField,
+}) => {
+  const [state, dispatch] = useDataTableContext();
+  const { classes, cx } = useStyles();
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const modals = useModals();
+
+  const openDeleteModal = () => {
+    return modals.openConfirmModal({
+      title: `Delete ${state.name}`,
+      centered: true,
+      children: (
+        <Text size="sm">
+          Anda yakin ingin menghapus
+          {deleteField ? <strong> {deleteField}</strong> : ` ${state.name}`}?
+          Anda harus menghubungi administrator untuk memulihkan data Anda.
+        </Text>
+      ),
+      labels: { confirm: "Delete", cancel: "Batalkan" },
+      confirmProps: { color: "red", loading: loading },
+      onConfirm: onDelete,
+    });
+  };
+
+  const selected = state.selection.includes(id);
+
+  return (
+    <tr className={cx({ [classes.rowSelected]: selected })}>
+      {state.withSelection && (
+        <td>
+          <Checkbox
+            checked={state.selection.includes(id)}
+            onChange={() => dispatch({ type: "toogle_row", payload: id })}
+            transitionDuration={0}
+          />
+        </td>
+      )}
+      {children}
+      {state.withAction && (
+        <td>
+          <Group spacing="xs" className="justify-end">
+            <ActionIcon
+              color="yellow"
+              variant="filled"
+              onClick={() =>
+                router.push(router.asPath.split("?")[0] + editLink)
+              }
+            >
+              <Pencil size={16} />
+            </ActionIcon>
+            <ActionIcon color="red" variant="filled" onClick={openDeleteModal}>
+              <Trash size={16} />
+            </ActionIcon>
+          </Group>
+        </td>
+      )}
+    </tr>
+  );
 };
 
 CustomTable.Row = Row;
