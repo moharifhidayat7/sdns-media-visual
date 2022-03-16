@@ -4,6 +4,7 @@ import {
   MantineProvider,
   ColorSchemeProvider,
   ColorScheme,
+  Loader,
 } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
 import { NotificationsProvider } from "@mantine/notifications";
