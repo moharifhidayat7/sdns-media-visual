@@ -13,13 +13,13 @@ import { SessionProvider } from "next-auth/react";
 import { GlobalContextProvider } from "@components/contexts/GlobalContext";
 
 import "@styles/globals.css";
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function App({
   Component,
   pageProps: { session, ...pageProps },
 }) {
   const [colorScheme, setColorScheme] = useState("light");
-
   const toggleColorScheme = (value) =>
     setColorScheme(value || (colorScheme === "dark" ? "light" : "dark"));
   return (

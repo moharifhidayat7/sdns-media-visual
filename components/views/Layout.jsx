@@ -26,7 +26,7 @@ const Layout = ({ children }) => {
       initiallyOpened: true,
       links: [
         { label: "Produk", link: "/produk" },
-        { label: "Inventori", link: "/" },
+        { label: "Inventori", link: "/inventori" },
         { label: "Suppliers", link: "/" },
         { label: "Gudang", link: "/" },
       ],

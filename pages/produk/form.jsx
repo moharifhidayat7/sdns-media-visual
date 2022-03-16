@@ -1,11 +1,9 @@
 import { Title, Box, Grid, InputWrapper, Input, Group, Switch, Button, TextInput, Loader, Notification, Alert } from "@mantine/core";
 import Head from "next/head";
 import Layout from "@components/views/Layout";
-import { inputNumberOnly } from "helpers/functions";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useForm } from "@mantine/form";
-import { AlertCircle, X } from "tabler-icons-react";
 
 function Form({ produk, action }) {
    const form = useForm({
@@ -14,7 +12,6 @@ function Form({ produk, action }) {
       }
    });
    const [loading, setLoading] = useState(true);
-   const [error, setError] = useState(true);
    const router = useRouter();
    useEffect(() => {
       if (action === "edit") {
@@ -25,7 +22,7 @@ function Form({ produk, action }) {
          })
       } else {
          const codeInt = produk.id ? produk.id : 0;
-         const code = "PROD-" + (parseInt(codeInt) + 1);
+         const code = "PROD" + (parseInt(codeInt) + 1);
          form.setValues({
             kode: code,
             nama: "",
@@ -47,23 +44,27 @@ function Form({ produk, action }) {
          },
          body: JSON.stringify({ ...data, updatedId: 1, createdId: 1 })
       }).then(res => {
-         console.log(res)
-         if(res.status === 200) {
-            router.push("/produk");
-         }else{
+         if (res.status === 200) {
+       
+            router.push({
+               pathname: "/produk"
+            });
+         } else {
             setLoading(true);
-            setError(true);
+            setNotif({
+               show: true,
+               message: res.statusText,
+               title: "Error"
+            })
          }
       })
+
    }
    return (
       <Layout>
          <div className="loader" hidden={loading}>
             <Loader size="xl" variant="bars" color="orange" />;
          </div>
-         <Alert hidden={error} icon={<AlertCircle size={16} />} title="Error!" color="red">
-            Terjadi error tidak diketahui, mohon refresh halaman ini!
-         </Alert>
          <Head>
             <title>Master Produk</title>
          </Head>
@@ -95,7 +96,7 @@ function Form({ produk, action }) {
                         <InputWrapper label="Status">
                            <Switch name="status" checked={form.values.status === "ACTIVE"} onChange={(e) => form.setFieldValue("status", e.currentTarget.checked ? "ACTIVE" : "INACTIVE")} onLabel="ON" offLabel="OFF" size="lg" radius="lg" />
                         </InputWrapper>
-                        <div> <Button type="button" onClick={() => router.back()} color="red">Back</Button> <Button type="submit">Submit</Button></div>
+                        <div> <Button type="button" onClick={() => router.push("/produk")} color="red">Back</Button> <Button type="submit">Submit</Button></div>
                      </Group>
                   </Grid.Col>
                </Grid></form>
@@ -105,7 +106,7 @@ function Form({ produk, action }) {
 }
 export async function getServerSideProps(context) {
    const id = context.query.id;
-   let produk;
+   let produk = {};
    let action;
    if (id) {
       let res = await fetch(`http://localhost:3000/api/produk/${id}`);
@@ -114,20 +115,20 @@ export async function getServerSideProps(context) {
       if (res.status === 403) {
          let res = await fetch(`http://localhost:3000/api/produk`);
          const produks = await res.json();
-         produk = produks?produks[0]:produks;
+         produk = produks.length > 0 ? produks[0] : produks;
          action = "add";
       }
    } else {
       let res = await fetch(`http://localhost:3000/api/produk`);
       const produks = await res.json();
-      produk = produks?produks[0]:produks;
+      produk = produks.length > 0 ? produks[0] : produks;
       action = "add";
    }
 
    return {
       props: {
-         produk,
-         action
+         action,
+         produk
       }
    }
 }

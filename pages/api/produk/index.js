@@ -9,6 +9,7 @@ export default async (req, res) => {
             data: {
                nama: data.nama,
                kode: data.kode,
+               status: data.status,
                createdId: parseInt(data.createdId),
                updatedId: parseInt(data.updatedId),
             }
@@ -39,7 +40,6 @@ export default async (req, res) => {
          });
          res.status(200).json(result);
       } catch (err) {
-         console.log(err);
          res.status(403).json({ err: "Error occured." });
       }
    }

@@ -30,7 +30,6 @@ export default async (req, res) => {
             data: {
                nama: data.nama,
                status: data.status,
-               harga: parseInt(data.harga),
                updatedId: parseInt(data.updatedId),
             },
          });
