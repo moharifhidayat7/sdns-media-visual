@@ -14,6 +14,7 @@ function Form({ produk, action }) {
    const [loading, setLoading] = useState(true);
    const router = useRouter();
    useEffect(() => {
+
       if (action === "edit") {
          form.setValues({
             kode: produk.kode,
@@ -45,7 +46,6 @@ function Form({ produk, action }) {
          body: JSON.stringify({ ...data, updatedId: 1, createdId: 1 })
       }).then(res => {
          if (res.status === 200) {
-       
             router.push({
                pathname: "/produk"
             });
@@ -99,7 +99,8 @@ function Form({ produk, action }) {
                         <div> <Button type="button" onClick={() => router.push("/produk")} color="red">Back</Button> <Button type="submit">Submit</Button></div>
                      </Group>
                   </Grid.Col>
-               </Grid></form>
+               </Grid>
+            </form>
          </Box>
       </Layout>
    );
@@ -107,22 +108,34 @@ function Form({ produk, action }) {
 export async function getServerSideProps(context) {
    const id = context.query.id;
    let produk = {};
-   let action;
-   if (id) {
-      let res = await fetch(`http://localhost:3000/api/produk/${id}`);
-      action = "edit";
+   let action = "add";
+   if (Array.isArray(id)) {
+      const res = await fetch("http://localhost:3000/api/produk");
       produk = await res.json();
-      if (res.status === 403) {
+      produk = produk.filter((item, i) => {
+         for (let i = 0; i < id.length; i++) {
+            if (item.id == id[i]) {
+               return item;
+            }
+         }
+      });
+   } else {
+      if (id) {
+         let res = await fetch(`http://localhost:3000/api/produk/${id}`);
+         action = "edit";
+         produk = await res.json();
+         if (res.status === 403) {
+            let res = await fetch(`http://localhost:3000/api/produk`);
+            const produks = await res.json();
+            produk = produks.length > 0 ? produks[0] : produks;
+            action = "add";
+         }
+      } else {
          let res = await fetch(`http://localhost:3000/api/produk`);
          const produks = await res.json();
          produk = produks.length > 0 ? produks[0] : produks;
          action = "add";
       }
-   } else {
-      let res = await fetch(`http://localhost:3000/api/produk`);
-      const produks = await res.json();
-      produk = produks.length > 0 ? produks[0] : produks;
-      action = "add";
    }
 
    return {
