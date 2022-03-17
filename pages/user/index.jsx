@@ -54,8 +54,7 @@ export default function Index({ users }) {
           onDelete={(selected, isLoading) => {
             // fetch delete many
             console.log("fetch delete many: ", selected);
-            console.log(state.data);
-            console.log(selected);
+
             // if error set loading to false
             setTimeout(() => isLoading(false), 3000);
 

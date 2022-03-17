@@ -6,7 +6,6 @@ export default async function handler(req, res) {
   const secret = process.env.NEXTAUTH_SECRET;
   if (req.method === "GET") {
     const token = await getToken({ req, secret });
-    console.log(token);
     try {
       const result = await prisma.user.findMany();
       const userWithoutPassword = result.map((user) => {
