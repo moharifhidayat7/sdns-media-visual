@@ -5,7 +5,7 @@ import { useLocalStorage } from "@mantine/hooks";
 import { ModalsProvider } from "@mantine/modals";
 import { NotificationsProvider } from "@mantine/notifications";
 import { SessionProvider } from "next-auth/react";
-
+import DeleteModal from "@components/Modals/DeleteModal";
 import { GlobalContextProvider } from "@components/contexts/GlobalContext";
 
 import "@styles/globals.css";
@@ -43,7 +43,7 @@ export default function App({
           >
             <NotificationsProvider>
               <GlobalContextProvider>
-                <ModalsProvider>
+                <ModalsProvider modals={{ delete: DeleteModal }}>
                   <Component {...pageProps} />
                 </ModalsProvider>
               </GlobalContextProvider>

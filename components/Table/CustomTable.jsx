@@ -78,11 +78,13 @@ function Th({ children, reversed, sorted, onSort, ...props }) {
 }
 
 function filterData(data, search) {
-  const keys = Object.keys(data[0]);
-  const query = search.toLowerCase().trim();
-  return data.filter((item) =>
-    keys.some((key) => item[key].toLowerCase().includes(query))
-  );
+  return data;
+  // const keys = Object.keys(data[0]);
+
+  // const query = search.toLowerCase().trim();
+  // return data.filter((item) =>
+  //   keys.some((key) => item[key].toLowerCase().includes(query))
+  // );
 }
 
 function sortData(data, payload = { sortBy: "", reversed: false, search: "" }) {
@@ -184,6 +186,7 @@ const Row = ({
   deleteField,
 }) => {
   const [state, dispatch] = useDataTableContext();
+  const [globalState, globalDispatch] = useGlobalContext();
   const { classes, cx } = useStyles();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -202,8 +205,11 @@ const Row = ({
         </Text>
       ),
       labels: { confirm: "Delete", cancel: "Batalkan" },
-      confirmProps: { color: "red", loading: loading },
-      onConfirm: onDelete,
+      confirmProps: { color: "red" },
+      onConfirm: () => {
+        setLoading(true);
+        onDelete((s) => setLoading(s));
+      },
     });
   };
 
@@ -230,10 +236,16 @@ const Row = ({
               onClick={() =>
                 router.push(router.asPath.split("?")[0] + editLink)
               }
+              disabled={loading}
             >
               <Pencil size={16} />
             </ActionIcon>
-            <ActionIcon color="red" variant="filled" onClick={openDeleteModal}>
+            <ActionIcon
+              color="red"
+              variant="filled"
+              onClick={openDeleteModal}
+              loading={loading}
+            >
               <Trash size={16} />
             </ActionIcon>
           </Group>
