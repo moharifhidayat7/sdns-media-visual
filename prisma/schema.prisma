@@ -22,12 +22,12 @@ model User {
   isDeleted          Boolean?    @default(false)
   updatedBy          Int?
   createdBy          Int?
-  createdProduk      Produk[]    @relation("createdBy")
-  updatedProduk      Produk[]    @relation("updatedBy")
-  createdInventori   Inventori[] @relation("createdBy")
-  updatedInventori   Inventori[] @relation("updatedBy")
-  createdLogstok     Logstok[]   @relation("createdBy")
-  updatedLogstok     Logstok[]   @relation("updatedBy")
+  createdProduk      Produk[]    @relation("produkcreatedBy")
+  updatedProduk      Produk[]    @relation("produkupdatedBy")
+  createdInventori   Inventori[] @relation("userInventoriCreate")
+  updatedInventori   Inventori[] @relation("userInventoriUpdate")
+  createdLogstok     Logstok[]   @relation("logstokcreatedBy")
+  updatedLogstok     Logstok[]   @relation("logstokupdatedBy")
 }
 
 model Produk {
@@ -39,12 +39,13 @@ model Produk {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
   isDeleted Boolean?  @default(false)
-  updatedBy User?     @relation(fields: [updatedId], references: [id], name: "updatedBy")
-  createdBy User?     @relation(fields: [createdId], references: [id], name: "createdBy")
+  updatedBy User?     @relation(fields: [updatedId], references: [id], name: "produkupdatedBy")
+  createdBy User?     @relation(fields: [createdId], references: [id], name: "produkcreatedBy")
   updatedId Int?
   createdId Int?
 }
 
+//
 model Inventori {
   id         Int       @id @default(autoincrement())
   kode       String
@@ -53,15 +54,15 @@ model Inventori {
   harga_jual Int
   stok_awal  Int
   stok_final Int
-  logstok    Logstok[] @relation(name: "inventori")
+  logstok    Logstok[] @relation("inventori")
   satuan     String    @unique
   status     Status    @default(INACTIVE)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
   isDeleted  Boolean?  @default(false)
-  updatedBy  User?     @relation(fields: [updatedId], references: [id], name: "updatedBy")
-  createdBy  User?     @relation(fields: [createdId], references: [id], name: "createdBy")
+  updatedBy  User?     @relation(fields: [updatedId], references: [id], name: "userInventoriCreate")
+  createdBy  User?     @relation(fields: [createdId], references: [id], name: "userInventoriUpdate")
   updatedId  Int?
   createdId  Int?
 }
@@ -69,14 +70,14 @@ model Inventori {
 model Logstok {
   id          Int        @id @default(autoincrement())
   stok        Int
-  tanggal     BigInt  
+  tanggal     BigInt
   Inventori   Inventori? @relation("inventori", fields: [inventoriId], references: [id])
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   deletedAt   DateTime?
   isDeleted   Boolean?   @default(false)
-  updatedBy   User?      @relation(fields: [updatedId], references: [id], name: "updatedBy")
-  createdBy   User?      @relation(fields: [createdId], references: [id], name: "createdBy")
+  updatedBy   User?      @relation(fields: [updatedId], references: [id], name: "logstokupdatedBy")
+  createdBy   User?      @relation(fields: [createdId], references: [id], name: "logstokcreatedBy")
   updatedId   Int?
   createdId   Int?
   inventoriId Int?
