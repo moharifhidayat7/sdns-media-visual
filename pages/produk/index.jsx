@@ -31,7 +31,10 @@ export default function Index({ produk }) {
     const url = type == 'delete' ? `/api/produk/${selected}` : `/api/produk`;
     await fetch(url, {
       method: "DELETE",
-      data: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
     }).then((res) => {
       isLoading(false);
       if (res.status === 200) {
@@ -111,7 +114,10 @@ export default function Index({ produk }) {
           {state.data &&
             state.data.map((row) => {
               return (
-                <CustomTable.Row key={row.id} id={row.id} editLink={`/form?id=${row.id}`}
+                <CustomTable.Row
+                  key={row.id} id={row.id}
+                  readLink={`produk/form?id=${row.id}&read=true`}
+                  editLink={`/form?id=${row.id}`}
                   deleteField={row.nama}
                   onDelete={(isLoading) => deleteHandler(row.id, isLoading)} >
                   <CustomTable.Col>

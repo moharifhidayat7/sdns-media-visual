@@ -1,12 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-const inventori = async (req, res) => {
+const logstok = async (req, res) => {
    const data = req.body;
    const method = req.method;
    if (method == "POST") {
       try {
-         const inventori = await prisma.inventori.create({
+         const logstok = await prisma.logstok.create({
             data: {
                ...data,
                createdId: parseInt(data.createdId),
@@ -15,21 +15,21 @@ const inventori = async (req, res) => {
          });
          res.statusCode = 200;
          res.json({
-            message: "Inventori created",
-            inventori,
+            message: "Logstok created",
+            logstok,
          });
       } catch (error) {
          res.statusCode = 400;
          res.json({
-            message: "Inventori not created",
+            message: "Logstok not created",
             error: error.message,
          });
       }
    } else if (method == "GET") {
       try {
-         const result = await prisma.inventori.findMany({
+         const result = await prisma.logstok.findMany({
             include: {
-               updatedBy: true, createdBy: true, logstok: true
+               updatedBy: true, createdBy: true, inventori: true
             }, where: {
                isDeleted: false,
             }, orderBy: {
@@ -42,7 +42,7 @@ const inventori = async (req, res) => {
       }
    } else if (method == "DELETE") {
       try {
-         const result = await prisma.inventori.updateMany({
+         const result = await prisma.logstok.updateMany({
             where: {
                id: { in: data.id }
             }, data: {
@@ -57,4 +57,4 @@ const inventori = async (req, res) => {
       }
    }
 }
-export default inventori;
+export default logstok;

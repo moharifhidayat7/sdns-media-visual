@@ -45,20 +45,21 @@ model Produk {
   createdId Int?
 }
 
-//
 model Inventori {
   id         Int       @id @default(autoincrement())
   kode       String
+  tipe       String
+  merek     String
   nama       String
   harga_beli Int
   harga_jual Int
   stok_awal  Int
-  stok_final Int
+  stok Int
   logstok    Logstok[] @relation("inventori")
   satuan     String    @unique
   status     Status    @default(INACTIVE)
   createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  updatedAt  DateTime?  @updatedAt
   deletedAt  DateTime?
   isDeleted  Boolean?  @default(false)
   updatedBy  User?     @relation(fields: [updatedId], references: [id], name: "userInventoriCreate")
@@ -70,8 +71,8 @@ model Inventori {
 model Logstok {
   id          Int        @id @default(autoincrement())
   stok        Int
-  tanggal     BigInt
-  Inventori   Inventori? @relation("inventori", fields: [inventoriId], references: [id])
+  tanggal     Int @default(19700101)
+  inventori   Inventori? @relation("inventori", fields: [inventoriId], references: [id])
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   deletedAt   DateTime?

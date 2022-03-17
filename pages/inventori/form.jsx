@@ -15,18 +15,14 @@ function Form({ produk, action }) {
    });
    const notifications = useNotifications();
    const [loading, setLoading] = useState(true);
-   const [disabled, setDisabled] = useState(false);
    const router = useRouter();
    useEffect(() => {
-      if (action != "add") {
+      if (action === "edit") {
          form.setValues({
             kode: produk.kode,
             nama: produk.nama,
             status: produk.status
          })
-         if (action == "read") {
-            setDisabled(true);
-         }
       } else {
          const codeInt = produk.id ? produk.id : 0;
          const code = "PROD" + (parseInt(codeInt) + 1);
@@ -100,18 +96,15 @@ function Form({ produk, action }) {
                   <Grid.Col sm={12} md={6}>
                      <Group direction="column" grow spacing="lg">
                         <InputWrapper label="Kode">
-                           <Input disabled={disabled} name="kode" readOnly value={form.values.kode} />
+                           <Input name="kode" readOnly value={form.values.kode} />
                         </InputWrapper>
                         <InputWrapper label="Nama">
-                           <TextInput disabled={disabled} {...form.getInputProps('nama')} value={form.values.nama} onChange={(e) => form.setFieldValue("nama", e.currentTarget.value)} />
+                           <TextInput {...form.getInputProps('nama')} value={form.values.nama} onChange={(e) => form.setFieldValue("nama", e.currentTarget.value)} />
                         </InputWrapper>
                         <InputWrapper label="Status">
-                           <Switch disabled={disabled} name="status" checked={form.values.status === "ACTIVE"} onChange={(e) => form.setFieldValue("status", e.currentTarget.checked ? "ACTIVE" : "INACTIVE")} onLabel="ON" offLabel="OFF" size="lg" radius="lg" />
+                           <Switch name="status" checked={form.values.status === "ACTIVE"} onChange={(e) => form.setFieldValue("status", e.currentTarget.checked ? "ACTIVE" : "INACTIVE")} onLabel="ON" offLabel="OFF" size="lg" radius="lg" />
                         </InputWrapper>
-                        <div className="space-x-2">
-                            <Button type="button" onClick={() => router.push("/produk")} color="red">Back</Button>
-                       {!disabled &&  <Button type="submit">Submit</Button>}
-                        </div>
+                        <div> <Button type="button" onClick={() => router.push("/produk")} color="red">Back</Button> <Button type="submit">Submit</Button></div>
                      </Group>
                   </Grid.Col>
                </Grid>
@@ -122,7 +115,6 @@ function Form({ produk, action }) {
 }
 export async function getServerSideProps(context) {
    const id = context.query.id;
-   const read = context.query.read;
    let produk = {};
    let action = "add";
    if (Array.isArray(id)) {
@@ -153,9 +145,7 @@ export async function getServerSideProps(context) {
          action = "add";
       }
    }
-   if (read) {
-      action = "read";
-   }
+
    return {
       props: {
          action,

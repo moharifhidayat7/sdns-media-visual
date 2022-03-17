@@ -24,6 +24,7 @@ import {
   Search,
   Pencil,
   Trash,
+  EyeCheck,
 } from "tabler-icons-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
@@ -182,8 +183,9 @@ const Row = ({
   children,
   id,
   editLink = "",
-  onDelete = () => {},
+  onDelete = () => { },
   deleteField,
+  readLink = "",
 }) => {
   const [state, dispatch] = useDataTableContext();
   const [globalState, globalDispatch] = useGlobalContext();
@@ -230,6 +232,12 @@ const Row = ({
       {state.withAction && (
         <td>
           <Group spacing="xs" className="justify-end">
+            {readLink && (
+              <ActionIcon color="blue" variant="filled" onClick={() => router.push(readLink)}>
+                <EyeCheck size={16} />
+              </ActionIcon>)
+            }
+
             <ActionIcon
               color="yellow"
               variant="filled"

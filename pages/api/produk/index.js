@@ -44,6 +44,7 @@ export default async (req, res) => {
       }
    }
    else if (req.method == "DELETE") {
+ 
       try {
          const produk = await prisma.produk.updateMany({
             where: {

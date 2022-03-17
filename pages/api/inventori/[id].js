@@ -1,50 +1,43 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-const inventori = async (req, res) => {
+export default async (req, res) => {
    const data = req.body;
    const method = req.method;
-   if (method == "POST") {
+   const id = req.query.id;
+   if (method == "PUT") {
       try {
-         const inventori = await prisma.inventori.create({
-            data: {
+         const result = await prisma.inventori.update({
+            where: {
+               id: parseInt(id)
+            }, data: {
                ...data,
-               createdId: parseInt(data.createdId),
                updatedId: parseInt(data.updatedId),
             }
-         });
-         res.statusCode = 200;
-         res.json({
-            message: "Inventori created",
-            inventori,
-         });
-      } catch (error) {
-         res.statusCode = 400;
-         res.json({
-            message: "Inventori not created",
-            error: error.message,
-         });
-      }
-   } else if (method == "GET") {
-      try {
-         const result = await prisma.inventori.findMany({
-            include: {
-               updatedBy: true, createdBy: true, logstok: true
-            }, where: {
-               isDeleted: false,
-            }, orderBy: {
-               id: "desc",
-            }
-         });
+         })
          res.status(200).json(result);
       } catch (err) {
          res.status(403).json({ err: err.message });
       }
-   } else if (method == "DELETE") {
+   } else if (method == "GET") {
       try {
-         const result = await prisma.inventori.updateMany({
+         const result = await prisma.inventori.findFirst({
+            include: {
+               updatedBy: true, createdBy: true, logstok: true
+            }, where: {
+               id: parseInt(id),
+               isDeleted: false,
+            }
+         })
+         res.status(200).json(result);
+      } catch (err) {
+         res.status(403).json({ err: err.message });
+      }
+   }else if(method=="DELETE"){
+      try {
+         const result = await prisma.inventori.update({
             where: {
-               id: { in: data.id }
+               id: parseInt(id)
             }, data: {
                isDeleted: true,
                deletedAt: new Date(),
@@ -57,4 +50,3 @@ const inventori = async (req, res) => {
       }
    }
 }
-export default inventori;
