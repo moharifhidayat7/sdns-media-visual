@@ -9,6 +9,7 @@ import DeleteModal from "@components/Modals/DeleteModal";
 import { GlobalContextProvider } from "@components/contexts/GlobalContext";
 
 import "@styles/globals.css";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function App({
   Component,

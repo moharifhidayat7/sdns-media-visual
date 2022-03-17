@@ -22,15 +22,15 @@ model User {
   isDeleted          Boolean?  @default(false)
   updatedBy          Int?
   createdBy          Int?
-  createdProduk       Produk[]  @relation("createdBy")
-  updatedProduk       Produk[]  @relation("updatedBy")
+  createdProduk      Produk[]  @relation("createdBy")
+  updatedProduk      Produk[]  @relation("updatedBy")
 }
 
 model Produk {
   id        Int       @id @default(autoincrement())
-  kode      String    @unique
+  kode      String    @default("1")
   nama      String
-  status    Status    @default(ACTIVE)
+  status    Status    @default(INACTIVE)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?

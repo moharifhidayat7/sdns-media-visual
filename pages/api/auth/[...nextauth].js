@@ -39,7 +39,7 @@ export default NextAuth({
       return token;
     },
     async session({ session, token, user }) {
-      return token;
+      return session;
     },
   },
   pages: {
