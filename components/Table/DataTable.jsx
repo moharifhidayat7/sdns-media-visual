@@ -114,7 +114,15 @@ const Action = ({
             size={36}
             color="red"
             variant="filled"
-            onClick={() => onDelete(state.selection)}
+            onClick={() => {
+              dispatch({ type: "set", payload: { loading: true } });
+              onDelete(state.selection, (s) => {
+                dispatch({
+                  type: "set",
+                  payload: { loading: s },
+                });
+              });
+            }}
             disabled={state.selection.length == 0}
           >
             <Trash />
@@ -123,7 +131,10 @@ const Action = ({
             size={36}
             variant="filled"
             onClick={() => {
-              dispatch({ type: "set", payload: { loading: !state.loading } });
+              dispatch({ type: "set", payload: { loading: true } });
+              onRefresh((isLoading) =>
+                dispatch({ type: "set", payload: { loading: isLoading } })
+              );
             }}
           >
             <Refresh />

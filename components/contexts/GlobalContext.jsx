@@ -11,6 +11,16 @@ const reducer = (state, action) => {
       return { ...state, showSidebar: !state.showSidebar };
     case "set_data":
       return { ...state, data: action.payload };
+    case "delete":
+      return {
+        ...state,
+        data: state.data.filter((d) => d.id != action.payload),
+      };
+    case "delete_many":
+      return {
+        ...state,
+        data: state.data.filter((d) => !action.payload.includes(d.id)),
+      };
     default:
       return state;
   }

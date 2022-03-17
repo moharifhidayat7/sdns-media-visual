@@ -6,9 +6,14 @@ import Layout from "@components/views/Layout";
 import DataTable from "@components/Table/DataTable";
 import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useEffect } from "react";
+import { useNotifications } from "@mantine/notifications";
+
+import { formatDate } from "helpers/functions";
+import { Check, X } from "tabler-icons-react";
 
 export default function Index({ users }) {
   const [state, dispatch] = useGlobalContext();
+  const notifications = useNotifications();
 
   useEffect(() => {
     const getUsersProp = () => {
@@ -21,16 +26,16 @@ export default function Index({ users }) {
 
   const header = [
     {
-      key: "name",
-      label: "Nama",
+      key: "username",
+      label: "Username",
     },
     {
       key: "email",
       label: "Email",
     },
     {
-      key: "job",
-      label: "Job",
+      key: "createdAt",
+      label: "Created At",
     },
   ];
 
@@ -46,7 +51,55 @@ export default function Index({ users }) {
       <DataTable>
         <DataTable.Action
           onEdit={(selected) => console.log(selected)}
-          onDelete={(selected) => console.log("fetch delete many:" + selected)}
+          onDelete={(selected, isLoading) => {
+            // fetch delete many
+            console.log("fetch delete many: ", selected);
+            console.log(state.data);
+            console.log(selected);
+            // if error set loading to false
+            setTimeout(() => isLoading(false), 3000);
+
+            // if success delete data from state
+            dispatch({
+              type: "delete_many",
+              payload: selected,
+            });
+          }}
+          onRefresh={(isLoading) => {
+            // fetch data
+            console.log("fetch data");
+            const result = [
+              {
+                id: 1,
+                username: "tes refresh",
+                email: "tes refresh",
+                createdAt: new Date(),
+              },
+            ];
+
+            // if error set loading to false
+            setTimeout(() => isLoading(false), 3000);
+            notifications.showNotification({
+              disallowClose: true,
+              autoClose: 5000,
+              title: "Refresh Data",
+              message: "Refresh data gagal",
+              color: "red",
+              icon: <X />,
+              loading: false,
+            });
+            // if success set data
+            dispatch({ type: "set_data", payload: result });
+            notifications.showNotification({
+              disallowClose: true,
+              autoClose: 5000,
+              title: "Refresh Data",
+              message: "Refresh data berhasil",
+              color: "green",
+              icon: <Check />,
+              loading: false,
+            });
+          }}
         />
         <DataTable.Filter onFilter={() => {}}>
           <div>
@@ -102,18 +155,29 @@ export default function Index({ users }) {
                 <CustomTable.Row
                   key={row.id}
                   id={row.id}
-                  onDelete={() => console.log("fetch delete")}
+                  onDelete={(isLoading) => {
+                    // fetch delete
+                    console.log("fetch delete");
+                    // if error set loading to false
+                    setTimeout(() => isLoading(false), 3000);
+
+                    // if success delete data from state
+                    dispatch({
+                      type: "delete",
+                      payload: row.id,
+                    });
+                  }}
                   editLink={`/form?${row.id}`}
-                  deleteField={row.name}
+                  deleteField={row.username}
                 >
                   <CustomTable.Col>
-                    <Text>{row.name}</Text>
+                    <Text>{row.username}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text>{row.email}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text>{row.job}</Text>
+                    <Text>{formatDate(row.createdAt)}</Text>
                   </CustomTable.Col>
                 </CustomTable.Row>
               );
@@ -126,26 +190,13 @@ export default function Index({ users }) {
 }
 
 export const getServerSideProps = async (ctx) => {
+  const users = await fetch("http://localhost:3000/api/user").then((res) =>
+    res.json()
+  );
+
   return {
     props: {
-      users: [
-        {
-          id: "1",
-          avatar:
-            "https://images.unsplash.com/photo-1624298357597-fd92dfbec01d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=250&q=80",
-          name: "Robert Wolfkisser",
-          job: "Engineer",
-          email: "rob_wolf@gmail.com",
-        },
-        {
-          id: "2",
-          avatar:
-            "https://images.unsplash.com/photo-1586297135537-94bc9ba060aa?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=250&q=80",
-          name: "Jill Jailbreaker",
-          job: "Engineer",
-          email: "jj@breaker.com",
-        },
-      ],
+      users,
     },
   };
 };
