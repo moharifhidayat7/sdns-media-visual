@@ -44,12 +44,11 @@ const Layout = ({ children }) => {
     { label: "Contracts", icon: FileAnalytics, link: "#" },
     { label: "Settings", icon: Adjustments, link: "#" },
     {
-      label: "Security",
+      label: "Kontrol Akses",
       icon: Lock,
       links: [
-        { label: "Enable 2FA", link: "/" },
-        { label: "Change password", link: "/" },
-        { label: "Recovery codes", link: "/" },
+        { label: "Roles", link: "/" },
+        { label: "Pegawai", link: "/pegawai" },
       ],
     },
   ];

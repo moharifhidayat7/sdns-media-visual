@@ -1,6 +1,6 @@
-import { useState } from "react";
 import Head from "next/head";
-import { MantineProvider, ColorSchemeProvider, Loader } from "@mantine/core";
+import { MantineProvider, ColorSchemeProvider } from "@mantine/core";
+
 import { useLocalStorage } from "@mantine/hooks";
 import { ModalsProvider } from "@mantine/modals";
 import { NotificationsProvider } from "@mantine/notifications";
@@ -9,7 +9,6 @@ import DeleteModal from "@components/Modals/DeleteModal";
 import { GlobalContextProvider } from "@components/contexts/GlobalContext";
 
 import "@styles/globals.css";
-import "react-toastify/dist/ReactToastify.css";
 
 export default function App({
   Component,
@@ -29,6 +28,7 @@ export default function App({
           name="viewport"
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
+        <link rel="shortcut icon" href="/mvb_icon.png" type="image/png" />
       </Head>
       <SessionProvider session={session}>
         <ColorSchemeProvider

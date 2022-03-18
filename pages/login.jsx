@@ -5,14 +5,17 @@ import {
   PasswordInput,
   Checkbox,
   Button,
+  InputWrapper,
   Title,
   Text,
   Anchor,
+  LoadingOverlay,
 } from "@mantine/core";
-
+import { useState } from "react";
 import { useForm } from "@mantine/form";
 import { signIn } from "next-auth/react";
-
+import Image from "next/image";
+import { useRouter } from "next/router";
 const useStyles = createStyles((theme) => ({
   wrapper: {
     position: "fixed",
@@ -53,7 +56,8 @@ const useStyles = createStyles((theme) => ({
 
 export default function Login() {
   const { classes } = useStyles();
-
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
   const form = useForm({
     initialValues: {
       email: "",
@@ -61,15 +65,22 @@ export default function Login() {
     },
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
+      password: (value) => (value.length < 1 ? "Masukkan password!" : null),
     },
   });
 
   const handleSubmit = async (values) => {
-    await signIn("credentials", {
+    setLoading(true);
+    const login = await signIn("credentials", {
       ...values,
       redirect: false,
-      callbackUrl: "https://google.com",
+      callbackUrl: router.query.r,
     });
+    if (login.ok) {
+      router.push(login.url);
+    } else {
+      setLoading(false);
+    }
   };
 
   return (
@@ -82,13 +93,19 @@ export default function Login() {
           mt="md"
           mb={50}
         >
-          Welcome back to Mantine!
+          Login
         </Title>
-        <form onSubmit={form.onSubmit(handleSubmit)}>
+        <form
+          onSubmit={form.onSubmit(handleSubmit)}
+          style={{ position: "relative" }}
+        >
+          <LoadingOverlay visible={loading} />
           <TextInput
             label="Email address"
             placeholder="hello@gmail.com"
             size="md"
+            name="email"
+            autoComplete="username"
             required
             {...form.getInputProps("email")}
           />
@@ -97,6 +114,7 @@ export default function Login() {
             placeholder="Your password"
             mt="md"
             size="md"
+            autoComplete="off"
             required
             {...form.getInputProps("password")}
           />
