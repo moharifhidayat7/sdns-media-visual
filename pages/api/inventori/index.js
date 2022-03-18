@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import dateFormat from "dateformat";
 const prisma = new PrismaClient();
 
 const inventori = async (req, res) => {
@@ -20,6 +21,7 @@ const inventori = async (req, res) => {
             data: {
                inventoriId: inventori.id,
                stok: parseInt(data.stok_awal),
+               datelog: dateFormat(new Date(), "yyyymmdd"),
                createdId: 1,
                updatedId: 1
             }
@@ -63,6 +65,17 @@ const inventori = async (req, res) => {
                updatedId: 1,
             }
          })
+
+         await prisma.logstok.updateMany({
+            where: {
+               inventoriId: { in: data.id }
+            }, data: {
+               isDeleted: true,
+               deletedAt: new Date(),
+               updatedId: 1,
+            }
+         })
+
          res.status(200).json(result);
       } catch (err) {
          res.status(403).json({ err: err.message });

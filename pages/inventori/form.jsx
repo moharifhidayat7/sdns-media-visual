@@ -10,6 +10,7 @@ import {
   TextInput,
   Loader,
   Tooltip,
+  Select,
 } from "@mantine/core";
 import Head from "next/head";
 import Layout from "@components/views/Layout";
@@ -76,7 +77,7 @@ function Form({ inventori, action }) {
     const data = form.values;
     const method = action === "edit" ? "PUT" : "POST";
     const url = action === "edit" ? `/api/inventori/${inventori.id}` : `/api/inventori`;
-    const notifTitle=action.charAt(0).toUpperCase() + action.slice(1);
+    const notifTitle = action.charAt(0).toUpperCase() + action.slice(1);
     await fetch(url, {
       method,
       headers: {
@@ -140,7 +141,7 @@ function Form({ inventori, action }) {
               <Group direction="column" grow spacing="lg">
                 <TextInput label="Kode" disabled={disabled} name="kode" readOnly value={form.values.kode} />
                 <TextInput label="Nama" disabled={disabled} {...form.getInputProps('nama')} value={form.values.nama} onChange={(e) => form.setFieldValue("nama", e.currentTarget.value)} />
-                <TextInput icon="Rp" onInput={(e)=>inputNumberOnly(e)} label="Harga Beli" description="" disabled={disabled} {...form.getInputProps('harga_beli')} value={form.values.harga_beli} onChange={(e) => form.setFieldValue("harga_beli", e.currentTarget.value)} />
+                <TextInput icon="Rp" onInput={(e) => inputNumberOnly(e)} label="Harga Beli" description="" disabled={disabled} {...form.getInputProps('harga_beli')} value={form.values.harga_beli} onChange={(e) => form.setFieldValue("harga_beli", e.currentTarget.value)} />
               </Group>
             </Grid.Col>
             <Grid.Col sm={12} md={6}>
@@ -153,17 +154,25 @@ function Form({ inventori, action }) {
                 </InputWrapper>
                 <Grid>
                   <Grid.Col sm={12} md={6}>
-                    <TextInput label={<Tooltip label="Stok awal tidak dabat di edit" color="blue"  withArrow opened={opened}  placement="start">
+                    <TextInput label={<Tooltip label="Stok awal tidak dabat di edit" color="blue" withArrow opened={opened} placement="start">
                       <label>
                         Stok Awal
                       </label>
-                    </Tooltip>} readOnly={action=="add"?false:true} onClick={(e)=>setOpened(false)} onInput={(e)=>inputNumberOnly(e)} disabled={disabled} {...form.getInputProps('stok_awal')} value={form.values.stok_awal} onChange={(e) => form.setFieldValue("stok_awal", e.currentTarget.value)} />
+                    </Tooltip>} readOnly={action == "add" ? false : true} onClick={(e) => setOpened(false)} onInput={(e) => inputNumberOnly(e)} disabled={disabled} {...form.getInputProps('stok_awal')} value={form.values.stok_awal} onChange={(e) => form.setFieldValue("stok_awal", e.currentTarget.value)} />
 
                   </Grid.Col>
                   <Grid.Col sm={12} md={6}>
-                    <InputWrapper label="Satuan">
-                      <TextInput disabled={disabled} {...form.getInputProps('satuan')} value={form.values.satuan} onChange={(e) => form.setFieldValue("satuan", e.currentTarget.value)} />
-                    </InputWrapper>
+                  <Select
+                      label="Satuan"
+                      {...form.getInputProps('satuan')}
+                      onChange={(e)=>form.setFieldValue("satuan", e)}
+                      value={form.values.satuan}
+                      data={["Meter","Kg","Litre","Box","Pcs"]}
+                      placeholder="Select items"
+                      nothingFound="Nothing found"
+                      searchable
+                      disabled={disabled}                      
+                    />
                   </Grid.Col>
                 </Grid>
               </Group>

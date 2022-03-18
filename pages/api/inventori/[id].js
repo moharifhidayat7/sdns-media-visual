@@ -47,6 +47,15 @@ export default async (req, res) => {
                updatedId: 1,
             }
          })
+         await prisma.logstok.updateMany({
+            where: {
+               inventoriId: parseInt(id)
+            }, data: {
+               isDeleted: true,
+               deletedAt: new Date(),
+               updatedId: 1,
+            }
+         })
          res.status(200).json(result);
       } catch (err) {
          res.status(403).json({ err: err.message });

@@ -70,7 +70,8 @@ model Inventori {
 
 model Logstok {
   id          Int        @id @default(autoincrement())
-  stok        Decimal @db.Decimal(20,2)
+  stok        Int
+  datelog     String  
   inventori   Inventori? @relation("inventori", fields: [inventoriId], references: [id])
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt

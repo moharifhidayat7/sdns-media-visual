@@ -106,9 +106,9 @@ export default function Index({ inventori }) {
   return (
     <Layout>
       <Head>
-        <title style={{ textTransform:"capitalize" }}>Master Inventori </title>
+        <title style={{ textTransform: "capitalize" }}>Master Inventori </title>
       </Head>
-      <Title order={2} style={{ marginBottom: "1.5rem",textTransform:"capitalize" }}>
+      <Title order={2} style={{ marginBottom: "1.5rem", textTransform: "capitalize" }}>
         Data Inventori
       </Title>
       <DataTable>
@@ -142,10 +142,10 @@ export default function Index({ inventori }) {
                     <Text className="uppercase">{row.satuan}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Button variant="subtle">VIEW(10)</Button>
+                    <Button variant="subtle">VIEW({row.logstok.length})</Button>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase">{dateFormat(row.createdAt,"ddmmyyyy")}</Text>
+                    <Text className="uppercase">{dateFormat(row.createdAt, "dd-mm-yyyy")}</Text>
                   </CustomTable.Col>
                 </CustomTable.Row>
               );
@@ -158,11 +158,13 @@ export default function Index({ inventori }) {
   );
 }
 export async function getServerSideProps(context) {
-  const res = await fetch(`http://localhost:3000/api/inventori`);
-  const inventori = await res.json();
-  return {
-    props: {
-      inventori,
-    },
-  }
+
+    const res = await fetch(`http://localhost:3000/api/inventori/`);
+    const inventori = res.status === 200 ? await res.json() : [];
+    return {
+      props: {
+       inventori,
+      },
+    }; 
+
 }
