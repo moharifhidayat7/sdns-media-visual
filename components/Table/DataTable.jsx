@@ -21,9 +21,9 @@ import {
   X,
   Filter as FilterIcon,
 } from "tabler-icons-react";
-
 import { useRouter } from "next/router";
-
+import { useDebouncedValue } from "@mantine/hooks";
+import { useEffect, useCallback, useState } from "react";
 import {
   useDataTableContext,
   DataTableProvider,
@@ -76,9 +76,12 @@ const Action = ({
   onRefresh = () => {},
   onEdit = () => {},
   onDelete = () => {},
+  onSearch = () => {},
 }) => {
   const [state, dispatch] = useDataTableContext();
   const router = useRouter();
+  const [debounced] = useDebouncedValue(state.search, 500);
+
   return (
     <div className="mb-4">
       <Group
@@ -169,6 +172,10 @@ const Action = ({
             placeholder="Search"
             rightSection={<X size={18} />}
             style={{ flexGrow: 1 }}
+            value={state.search}
+            onChange={(e) =>
+              dispatch({ type: "set", payload: { search: e.target.value } })
+            }
           />
           <ActionIcon
             size={36}
@@ -186,7 +193,7 @@ const Action = ({
 
 DataTable.Action = Action;
 
-const Filter = ({ children, onFilter }) => {
+const Filter = ({ children, form, onFilter = () => {} }) => {
   const [state, dispatch] = useDataTableContext();
 
   const cols = () => {
@@ -232,22 +239,28 @@ const Filter = ({ children, onFilter }) => {
               : theme.colors.gray[4],
         })}
       >
-        <SimpleGrid
-          cols={cols()}
-          spacing="md"
-          breakpoints={[
-            { maxWidth: "md", cols: cols() < 3 ? cols() : 3, spacing: "md" },
-            { maxWidth: "sm", cols: cols() < 2 ? cols() : 2, spacing: "sm" },
-            { maxWidth: "xs", cols: 1, spacing: "sm" },
-          ]}
-          className="mb-2"
-        >
-          {children}
-        </SimpleGrid>
-        <Group spacing="xs" position="right">
-          <Button variant="filled">Filter</Button>
-          <Button variant="default">Reset</Button>
-        </Group>
+        <form onSubmit={form.onSubmit(onFilter)}>
+          <SimpleGrid
+            cols={cols()}
+            spacing="md"
+            breakpoints={[
+              { maxWidth: "md", cols: cols() < 3 ? cols() : 3, spacing: "md" },
+              { maxWidth: "sm", cols: cols() < 2 ? cols() : 2, spacing: "sm" },
+              { maxWidth: "xs", cols: 1, spacing: "sm" },
+            ]}
+            className="mb-2"
+          >
+            {children}
+          </SimpleGrid>
+          <Group spacing="xs" position="right">
+            <Button variant="filled" type="submit">
+              Filter
+            </Button>
+            <Button variant="default" onClick={() => form.reset()}>
+              Reset
+            </Button>
+          </Group>
+        </form>
       </Box>
     </Collapse>
   );
