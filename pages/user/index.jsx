@@ -1,5 +1,6 @@
 import Head from "next/head";
 import { Title, Text, MultiSelect } from "@mantine/core";
+import { useForm } from "@mantine/form";
 
 import { CustomTable } from "@components/Table/CustomTable";
 import Layout from "@components/views/Layout";
@@ -7,7 +8,7 @@ import DataTable from "@components/Table/DataTable";
 import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useEffect } from "react";
 import { useNotifications } from "@mantine/notifications";
-
+import { useDebouncedValue } from "@mantine/hooks";
 import { formatDate } from "helpers/functions";
 import { Check, X } from "tabler-icons-react";
 
@@ -15,9 +16,17 @@ export default function Index({ users }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
 
+  const form = useForm({
+    initialValues: {
+      roles: "",
+      roles2: "",
+    },
+  });
+
   useEffect(() => {
     const getUsersProp = () => {
       const data = users;
+
       dispatch({ type: "set_data", payload: data });
     };
 
@@ -50,6 +59,17 @@ export default function Index({ users }) {
 
       <DataTable>
         <DataTable.Action
+          onSearch={(keyword) => {
+            console.log(keyword); // search keyword
+            console.log(form.values); // filter values
+
+            // fetch search & filter
+            const data = [];
+            // then
+
+            // set data
+            dispatch({ type: "set_data", payload: data });
+          }}
           onEdit={(selected) => console.log(selected)}
           onDelete={(selected, isLoading) => {
             // fetch delete many
@@ -100,7 +120,10 @@ export default function Index({ users }) {
             });
           }}
         />
-        <DataTable.Filter onFilter={() => {}}>
+        <DataTable.Filter
+          form={form}
+          onFilter={(values) => console.log(values)}
+        >
           <div>
             <MultiSelect
               data={[
@@ -114,11 +137,11 @@ export default function Index({ users }) {
               ]}
               label="Roles"
               placeholder="Pick all that you like"
-              defaultValue={["react", "next"]}
               clearButtonLabel="Clear selection"
               clearable
               searchable
               nothingFound="Nothing found"
+              {...form.getInputProps("roles")}
             />
           </div>
           <div>
@@ -134,11 +157,11 @@ export default function Index({ users }) {
               ]}
               label="Roles"
               placeholder="Pick all that you like"
-              defaultValue={["react", "next"]}
               clearButtonLabel="Clear selection"
               clearable
               searchable
               nothingFound="Nothing found"
+              {...form.getInputProps("roles2")}
             />
           </div>
         </DataTable.Filter>
