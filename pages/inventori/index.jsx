@@ -11,7 +11,7 @@ import {
 
 import { CustomTable } from "@components/Table/CustomTable";
 import DataTable from "@components/Table/DataTable";
-import { formatDate } from "helpers/functions";
+import { formatDate, getTitle } from "helpers/functions";
 import { useContext, useEffect } from "react";
 import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useNotifications } from "@mantine/notifications";
@@ -107,11 +107,11 @@ export default function Index({ inventori }) {
 
   return (
     <Layout>
-      <Head>
-        <title>Master Produk</title>
+   <Head>
+        <title style={{ textTransform:"capitalize" }}>Master {getTitle()} </title>
       </Head>
-      <Title order={2} style={{ marginBottom: "1.5rem" }}>
-        Data Produk
+      <Title order={2} style={{ marginBottom: "1.5rem",textTransform:"capitalize" }}>
+        Data {getTitle()} 
       </Title>
       <DataTable>
         <DataTable.Action

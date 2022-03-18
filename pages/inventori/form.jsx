@@ -7,25 +7,30 @@ import { useForm } from "@mantine/form";
 
 import { useNotifications } from "@mantine/notifications";
 import { Check, X } from "tabler-icons-react";
-function Form({ produk, action }) {
+function Form({ inventori, action }) {
    const form = useForm({
-      initialValues: { kode: '', nama: "", status: "" }, validate: {
+      initialValues: { kode: '', nama: "", status: "" },
+      validate: {
          nama: (value) => (value.length < 1 ? 'Plese input nama.' : null),
       }
    });
    const notifications = useNotifications();
    const [loading, setLoading] = useState(true);
+   const [disabled, setDisabled] = useState(false);
    const router = useRouter();
    useEffect(() => {
-      if (action === "edit") {
+      if (action != "add") {
          form.setValues({
-            kode: produk.kode,
-            nama: produk.nama,
-            status: produk.status
+            kode: inventori.kode,
+            nama: inventori.nama,
+            status: inventori.status
          })
+         if (action == "read") {
+            setDisabled(true);
+         }
       } else {
-         const codeInt = produk.id ? produk.id : 0;
-         const code = "PROD" + (parseInt(codeInt) + 1);
+         const codeInt = inventori.id ? inventori.id : 0;
+         const code = "INV" + (parseInt(codeInt) + 1);
          form.setValues({
             kode: code,
             nama: "",
@@ -53,7 +58,6 @@ function Form({ produk, action }) {
             });
          } else {
             setLoading(true);
-            console.log(res);
             notifications.showNotification({
                disallowClose: true,
                autoClose: 5000,
@@ -63,7 +67,6 @@ function Form({ produk, action }) {
                icon: <X />,
                loading: false,
             })
-
          }
       })
 
@@ -74,10 +77,10 @@ function Form({ produk, action }) {
             <Loader size="xl" variant="bars" color="orange" />;
          </div>
          <Head>
-            <title>Master Produk</title>
+            <title>Master</title>
          </Head>
          <Title order={2} style={{ marginBottom: "1.5rem" }}>
-            Form Produk
+            Form  
          </Title>
 
          <Box sx={(theme) => ({
@@ -96,15 +99,18 @@ function Form({ produk, action }) {
                   <Grid.Col sm={12} md={6}>
                      <Group direction="column" grow spacing="lg">
                         <InputWrapper label="Kode">
-                           <Input name="kode" readOnly value={form.values.kode} />
+                           <Input disabled={disabled} name="kode" readOnly value={form.values.kode} />
                         </InputWrapper>
                         <InputWrapper label="Nama">
-                           <TextInput {...form.getInputProps('nama')} value={form.values.nama} onChange={(e) => form.setFieldValue("nama", e.currentTarget.value)} />
+                           <TextInput disabled={disabled} {...form.getInputProps('nama')} value={form.values.nama} onChange={(e) => form.setFieldValue("nama", e.currentTarget.value)} />
                         </InputWrapper>
                         <InputWrapper label="Status">
-                           <Switch name="status" checked={form.values.status === "ACTIVE"} onChange={(e) => form.setFieldValue("status", e.currentTarget.checked ? "ACTIVE" : "INACTIVE")} onLabel="ON" offLabel="OFF" size="lg" radius="lg" />
+                           <Switch disabled={disabled} name="status" checked={form.values.status === "ACTIVE"} onChange={(e) => form.setFieldValue("status", e.currentTarget.checked ? "ACTIVE" : "INACTIVE")} onLabel="ON" offLabel="OFF" size="lg" radius="lg" />
                         </InputWrapper>
-                        <div> <Button type="button" onClick={() => router.push("/produk")} color="red">Back</Button> <Button type="submit">Submit</Button></div>
+                        <div className="space-x-2">
+                           <Button type="button" onClick={() => router.push("/produk")} color="red">Back</Button>
+                           {!disabled && <Button type="submit">Submit</Button>}
+                        </div>
                      </Group>
                   </Grid.Col>
                </Grid>
@@ -115,6 +121,7 @@ function Form({ produk, action }) {
 }
 export async function getServerSideProps(context) {
    const id = context.query.id;
+   const read = context.query.read;
    let produk = {};
    let action = "add";
    if (Array.isArray(id)) {
@@ -145,7 +152,9 @@ export async function getServerSideProps(context) {
          action = "add";
       }
    }
-
+   if (read) {
+      action = "read";
+   }
    return {
       props: {
          action,
