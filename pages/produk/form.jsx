@@ -101,7 +101,7 @@ function Form({ produk, action }) {
         <title>Master Produk</title>
       </Head>
       <Title order={2} style={{ marginBottom: "1.5rem" }}>
-        Form {getTitle()}
+        {action=="read"?"Read":"Form"} Produk
       </Title>
 
       <Box sx={(theme) => ({

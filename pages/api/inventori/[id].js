@@ -12,7 +12,10 @@ export default async (req, res) => {
                id: parseInt(id)
             }, data: {
                ...data,
-               updatedId: parseInt(data.updatedId),
+               updatedId: 1,
+               stok: parseInt(data.stok_awal),
+               stok_awal: parseInt(data.stok_awal),
+               harga_beli: parseInt(data.harga_beli)
             }
          })
          res.status(200).json(result);

@@ -15,9 +15,12 @@ export function inputNumberOnly(e) {
       e.target.value = e.target.value.replace(/[^0-9]/g, "");
    }
 }
-//get title from router pathname
-export function getTitle() {
-   const router = useRouter();
-   const title = router.pathname.split("/").slice(-1)[0];
-   return title;
+// generate code with prefix 0000 and params value
+export function generateCode(prefix, value) {
+   let code = prefix + "";
+   for (let i = 0; i < 5 - value.toString().length; i++) {
+      code += "0";
+   }
+   return code + value;
 }
+

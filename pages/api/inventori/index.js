@@ -9,14 +9,26 @@ const inventori = async (req, res) => {
          const inventori = await prisma.inventori.create({
             data: {
                ...data,
-               createdId: parseInt(data.createdId),
-               updatedId: parseInt(data.updatedId),
+               createdId: 1,
+               updatedId: 1,
+               stok: parseInt(data.stok_awal),
+               stok_awal: parseInt(data.stok_awal),
+               harga_beli: parseInt(data.harga_beli)
+            }
+         });
+         const logstok = await prisma.logstok.create({
+            data: {
+               inventoriId: inventori.id,
+               stok: parseInt(data.stok_awal),
+               createdId: 1,
+               updatedId: 1
             }
          });
          res.statusCode = 200;
          res.json({
             message: "Inventori created",
             inventori,
+            logstok
          });
       } catch (error) {
          res.statusCode = 400;

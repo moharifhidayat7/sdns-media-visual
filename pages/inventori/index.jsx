@@ -4,17 +4,15 @@ import Layout from "@components/views/Layout";
 import {
   Title,
   Text,
-  Box,
-  MultiSelect,
   Button,
 } from "@mantine/core";
 
 import { CustomTable } from "@components/Table/CustomTable";
 import DataTable from "@components/Table/DataTable";
-import { formatDate, getTitle } from "helpers/functions";
 import { useContext, useEffect } from "react";
 import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useNotifications } from "@mantine/notifications";
+import dateFormat from "dateformat";
 import { Check, X } from "tabler-icons-react";
 export default function Index({ inventori }) {
   const [state, dispatch] = useGlobalContext();
@@ -36,36 +34,36 @@ export default function Index({ inventori }) {
       },
       body: JSON.stringify(data),
     }).then((res) => {
-        isLoading(false);
-        if (res.status === 200) {
-          if (type != "delete") {
-            selected.forEach(id => {
-              dispatch({ type: "delete", payload: id });
-            });
-          } else {
-            dispatch({ type: "delete", payload: selected });
-          }
-          notifications.showNotification({
-            disallowClose: true,
-            autoClose: 5000,
-            title: "Delete",
-            message: "Delete data berhasil",
-            color: "green",
-            icon: <Check />,
-            loading: false,
-          })
+      isLoading(false);
+      if (res.status === 200) {
+        if (type != "delete") {
+          selected.forEach(id => {
+            dispatch({ type: "delete", payload: id });
+          });
         } else {
-          notifications.showNotification({
-            disallowClose: true,
-            autoClose: 5000,
-            title: "Delete",
-            message: "Delete data gagal",
-            color: "red",
-            icon: <X />,
-            loading: false,
-          })
+          dispatch({ type: "delete", payload: selected });
         }
-      });
+        notifications.showNotification({
+          disallowClose: true,
+          autoClose: 5000,
+          title: "Delete",
+          message: "Delete data berhasil",
+          color: "green",
+          icon: <Check />,
+          loading: false,
+        })
+      } else {
+        notifications.showNotification({
+          disallowClose: true,
+          autoClose: 5000,
+          title: "Delete",
+          message: "Delete data gagal",
+          color: "red",
+          icon: <X />,
+          loading: false,
+        })
+      }
+    });
   }
   const refreshHandler = async (isLoading) => {
     const res = await fetch(`http://localhost:3000/api/inventori/`);
@@ -107,11 +105,11 @@ export default function Index({ inventori }) {
 
   return (
     <Layout>
-   <Head>
-        <title style={{ textTransform:"capitalize" }}>Master {getTitle()} </title>
+      <Head>
+        <title style={{ textTransform:"capitalize" }}>Master Inventori </title>
       </Head>
       <Title order={2} style={{ marginBottom: "1.5rem",textTransform:"capitalize" }}>
-        Data {getTitle()} 
+        Data Inventori
       </Title>
       <DataTable>
         <DataTable.Action
@@ -122,7 +120,10 @@ export default function Index({ inventori }) {
           {state.data &&
             state.data.map((row) => {
               return (
-                <CustomTable.Row key={row.id} id={row.id} editLink={`/form?id=${row.id}`}
+                <CustomTable.Row
+                  key={row.id} id={row.id}
+                  readLink={`inventori/form?id=${row.id}&read=true`}
+                  editLink={`/form?id=${row.id}`}
                   deleteField={row.nama}
                   onDelete={(isLoading) => deleteHandler(row.id, isLoading)} >
                   <CustomTable.Col>
@@ -138,13 +139,13 @@ export default function Index({ inventori }) {
                     <Text className="uppercase">{row.merek}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Button variant="subtle">{row.satuan}</Button>
+                    <Text className="uppercase">{row.satuan}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Button variant="subtle">VIEW(10)</Button>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase">{formatDate(row.createdAt)}</Text>
+                    <Text className="uppercase">{dateFormat(row.createdAt,"ddmmyyyy")}</Text>
                   </CustomTable.Col>
                 </CustomTable.Row>
               );
@@ -156,7 +157,6 @@ export default function Index({ inventori }) {
     </Layout>
   );
 }
-//function get server side props produk
 export async function getServerSideProps(context) {
   const res = await fetch(`http://localhost:3000/api/inventori`);
   const inventori = await res.json();
