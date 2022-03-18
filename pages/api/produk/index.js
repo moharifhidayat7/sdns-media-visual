@@ -43,4 +43,29 @@ export default async (req, res) => {
          res.status(403).json({ err: "Error occured." });
       }
    }
-}
+   else if (req.method == "DELETE") {
+ 
+      try {
+         const produk = await prisma.produk.updateMany({
+            where: {
+               id: {in: data.id}
+            },
+            data: {
+               isDeleted: true,
+               deletedAt:new Date(),
+            }
+         });
+         res.statusCode = 200;
+         res.json({
+            message: "Produk deleted",
+            produk,
+         });
+      } catch (error) {
+         res.statusCode = 400;
+         res.json({
+            message: "Produk not deleted",
+            error: error.message,
+         });
+      }
+   }
+};

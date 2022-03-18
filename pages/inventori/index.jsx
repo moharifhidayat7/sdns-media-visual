@@ -8,19 +8,71 @@ import {
   MultiSelect,
   Button,
 } from "@mantine/core";
-import {
-  ChevronRight,
-  ChevronLeft,
-  ChevronsLeft,
-  ChevronsRight,
-  Dots,
-} from "tabler-icons-react";
 
 import { CustomTable } from "@components/Table/CustomTable";
 import DataTable from "@components/Table/DataTable";
 import { formatDate } from "helpers/functions";
-
-export default function Index({ produk }) {
+import { useContext, useEffect } from "react";
+import { useGlobalContext } from "@components/contexts/GlobalContext";
+import { useNotifications } from "@mantine/notifications";
+import { Check, X } from "tabler-icons-react";
+export default function Index({ inventori }) {
+  const [state, dispatch] = useGlobalContext();
+  const notifications = useNotifications();
+  const getProdukProp = () => {
+    const data = inventori;
+    dispatch({ type: "set_data", payload: data });
+  };
+  useEffect(() => {
+    getProdukProp();
+  }, []);
+  const deleteHandler = async (selected, isLoading, type = "delete") => {
+    const data = { id: selected };
+    const url = type == 'delete' ? `/api/inventori/${selected}` : `/api/inventori`;
+    await fetch(url, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }).then((res) => {
+        isLoading(false);
+        if (res.status === 200) {
+          if (type != "delete") {
+            selected.forEach(id => {
+              dispatch({ type: "delete", payload: id });
+            });
+          } else {
+            dispatch({ type: "delete", payload: selected });
+          }
+          notifications.showNotification({
+            disallowClose: true,
+            autoClose: 5000,
+            title: "Delete",
+            message: "Delete data berhasil",
+            color: "green",
+            icon: <Check />,
+            loading: false,
+          })
+        } else {
+          notifications.showNotification({
+            disallowClose: true,
+            autoClose: 5000,
+            title: "Delete",
+            message: "Delete data gagal",
+            color: "red",
+            icon: <X />,
+            loading: false,
+          })
+        }
+      });
+  }
+  const refreshHandler = async (isLoading) => {
+    const res = await fetch(`http://localhost:3000/api/inventori/`);
+    const data = await res.json();
+    dispatch({ type: "set_data", payload: data });
+    isLoading(false);
+  }
   const header = [
     {
       key: "kode",
@@ -39,96 +91,64 @@ export default function Index({ produk }) {
       label: "Merek",
     },
     {
-      key: "stok",
-      label: "Stok",
-    },
-    {
       key: "satuan",
       label: "Satuan",
     },
     {
-      key: "hargabeli",
-      label: "Harga Beli",
+      key: "logstok",
+      label: "Log Stok",
     },
     {
       key: "createdAt",
       label: "Created At",
     },
   ];
+
+
   return (
     <Layout>
       <Head>
-        <title>Master Inventori</title>
+        <title>Master Produk</title>
       </Head>
       <Title order={2} style={{ marginBottom: "1.5rem" }}>
-        Data Inventori
+        Data Produk
       </Title>
       <DataTable>
-        <DataTable.Action />
-        <DataTable.Filter onFilter={() => { }}>
-          <div>
-            <MultiSelect
-              data={[
-                "React",
-                "Angular",
-                "Svelte",
-                "Vue",
-                "Riot",
-                "Next.js",
-                "Blitz.js",
-              ]}
-              label="Roles"
-              placeholder="Pick all that you like"
-              defaultValue={["react", "next"]}
-              clearButtonLabel="Clear selection"
-              clearable
-              searchable
-              nothingFound="Nothing found"
-            />
-          </div>
-          <div>
-            <MultiSelect
-              data={[
-                "React",
-                "Angular",
-                "Svelte",
-                "Vue",
-                "Riot",
-                "Next.js",
-                "Blitz.js",
-              ]}
-              label="Roles"
-              placeholder="Pick all that you like"
-              defaultValue={["react", "next"]}
-              clearButtonLabel="Clear selection"
-              clearable
-              searchable
-              nothingFound="Nothing found"
-            />
-          </div>
-        </DataTable.Filter>
-        <CustomTable header={header}>
-          {produk.map((row) => {
-            return (
-              <CustomTable.Row key={row.id}>
-                <CustomTable.Col>
-                  <Text><div className="uppercase">{row.kode}</div></Text>
-                </CustomTable.Col>
-                <CustomTable.Col>
-                  <Text><div className="uppercase">{row.nama}</div></Text>
-                </CustomTable.Col>
-                <CustomTable.Col>
-                  <Button variant="subtle">VIEW(100)</Button>
-                </CustomTable.Col>
-                <CustomTable.Col>
-                  <Button variant="subtle">VIEW(100)</Button>
-                </CustomTable.Col>
-                <CustomTable.Col>
-                  <Text>{formatDate(row.createdAt)}</Text>
-                </CustomTable.Col>
-              </CustomTable.Row>
-            );
-          })}
+        <DataTable.Action
+          onDelete={(selected, isLoading) => deleteHandler(selected, isLoading, "many")}
+          onRefresh={(isLoading) => refreshHandler(isLoading)} />
+        <CustomTable header={header} name="inventori"
+          withSelection={true} withAction={true}>
+          {state.data &&
+            state.data.map((row) => {
+              return (
+                <CustomTable.Row key={row.id} id={row.id} editLink={`/form?id=${row.id}`}
+                  deleteField={row.nama}
+                  onDelete={(isLoading) => deleteHandler(row.id, isLoading)} >
+                  <CustomTable.Col>
+                    <Text>{row.kode}</Text>
+                  </CustomTable.Col>
+                  <CustomTable.Col>
+                    <Text className="uppercase">{row.nama}</Text>
+                  </CustomTable.Col>
+                  <CustomTable.Col>
+                    <Text className="uppercase">{row.tipe}</Text>
+                  </CustomTable.Col>
+                  <CustomTable.Col>
+                    <Text className="uppercase">{row.merek}</Text>
+                  </CustomTable.Col>
+                  <CustomTable.Col>
+                    <Button variant="subtle">{row.satuan}</Button>
+                  </CustomTable.Col>
+                  <CustomTable.Col>
+                    <Button variant="subtle">VIEW(10)</Button>
+                  </CustomTable.Col>
+                  <CustomTable.Col>
+                    <Text className="uppercase">{formatDate(row.createdAt)}</Text>
+                  </CustomTable.Col>
+                </CustomTable.Row>
+              );
+            })}
         </CustomTable>
         <DataTable.Footer />
       </DataTable>
@@ -138,11 +158,11 @@ export default function Index({ produk }) {
 }
 //function get server side props produk
 export async function getServerSideProps(context) {
-  const res = await fetch(`http://localhost:3000/api/produk`);
-  const produk = await res.json();
+  const res = await fetch(`http://localhost:3000/api/inventori`);
+  const inventori = await res.json();
   return {
     props: {
-      produk,
+      inventori,
     },
   }
 }

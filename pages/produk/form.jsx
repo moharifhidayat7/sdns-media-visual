@@ -18,6 +18,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useForm } from "@mantine/form";
 
+import { useNotifications } from "@mantine/notifications";
+import { Check, X } from "tabler-icons-react";
 function Form({ produk, action }) {
   const form = useForm({
     initialValues: { kode: "", nama: "", status: "" },
@@ -25,22 +27,26 @@ function Form({ produk, action }) {
       nama: (value) => (value.length < 1 ? "Plese input nama." : null),
     },
   });
+  const notifications = useNotifications();
   const [loading, setLoading] = useState(true);
+  const [disabled, setDisabled] = useState(false);
   const router = useRouter();
   useEffect(() => {
-    if (action === "edit") {
+    if (action != "add") {
       form.setValues({
         kode: produk.kode,
         nama: produk.nama,
         status: produk.status,
       });
+      if (action == "read") {
+        setDisabled(true);
+      }
     } else {
-      const codeInt = produk.id ? produk.id : 0;
-      const code = "PROD" + (parseInt(codeInt) + 1);
-      form.setValues({
-        kode: code,
-        nama: "",
-        status: "INACTIVE",
+      setLoading(true);
+      setNotif({
+        show: true,
+        message: res.statusText,
+        title: "Error",
       });
     }
   }, []);
@@ -64,10 +70,15 @@ function Form({ produk, action }) {
         });
       } else {
         setLoading(true);
-        setNotif({
-          show: true,
-          message: res.statusText,
-          title: "Error",
+        console.log(res);
+        notifications.showNotification({
+          disallowClose: true,
+          autoClose: 5000,
+          title: "Tambah",
+          message: "Tambah data gagal",
+          color: "red",
+          icon: <X />,
+          loading: false,
         });
       }
     });
@@ -102,10 +113,16 @@ function Form({ produk, action }) {
             <Grid.Col sm={12} md={6}>
               <Group direction="column" grow spacing="lg">
                 <InputWrapper label="Kode">
-                  <Input name="kode" readOnly value={form.values.kode} />
+                  <Input
+                    disabled={disabled}
+                    name="kode"
+                    readOnly
+                    value={form.values.kode}
+                  />
                 </InputWrapper>
                 <InputWrapper label="Nama">
                   <TextInput
+                    disabled={disabled}
                     {...form.getInputProps("nama")}
                     value={form.values.nama}
                     onChange={(e) =>
@@ -115,6 +132,7 @@ function Form({ produk, action }) {
                 </InputWrapper>
                 <InputWrapper label="Status">
                   <Switch
+                    disabled={disabled}
                     name="status"
                     checked={form.values.status === "ACTIVE"}
                     onChange={(e) =>
@@ -129,16 +147,15 @@ function Form({ produk, action }) {
                     radius="lg"
                   />
                 </InputWrapper>
-                <div>
-                  {" "}
+                <div className="space-x-2">
                   <Button
                     type="button"
                     onClick={() => router.push("/produk")}
                     color="red"
                   >
                     Back
-                  </Button>{" "}
-                  <Button type="submit">Submit</Button>
+                  </Button>
+                  {!disabled && <Button type="submit">Submit</Button>}
                 </div>
               </Group>
             </Grid.Col>
@@ -150,25 +167,40 @@ function Form({ produk, action }) {
 }
 export async function getServerSideProps(context) {
   const id = context.query.id;
+  const read = context.query.read;
   let produk = {};
-  let action;
-  if (id) {
-    let res = await fetch(`http://localhost:3000/api/produk/${id}`);
-    action = "edit";
+  let action = "add";
+  if (Array.isArray(id)) {
+    const res = await fetch("http://localhost:3000/api/produk");
     produk = await res.json();
-    if (res.status === 403) {
+    produk = produk.filter((item, i) => {
+      for (let i = 0; i < id.length; i++) {
+        if (item.id == id[i]) {
+          return item;
+        }
+      }
+    });
+  } else {
+    if (id) {
+      let res = await fetch(`http://localhost:3000/api/produk/${id}`);
+      action = "edit";
+      produk = await res.json();
+      if (res.status === 403) {
+        let res = await fetch(`http://localhost:3000/api/produk`);
+        const produks = await res.json();
+        produk = produks.length > 0 ? produks[0] : produks;
+        action = "add";
+      }
+    } else {
       let res = await fetch(`http://localhost:3000/api/produk`);
       const produks = await res.json();
       produk = produks.length > 0 ? produks[0] : produks;
       action = "add";
     }
-  } else {
-    let res = await fetch(`http://localhost:3000/api/produk`);
-    const produks = await res.json();
-    produk = produks.length > 0 ? produks[0] : produks;
-    action = "add";
   }
-
+  if (read) {
+    action = "read";
+  }
   return {
     props: {
       action,
