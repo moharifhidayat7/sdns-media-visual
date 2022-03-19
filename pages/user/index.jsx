@@ -74,7 +74,7 @@ export default function Index({ users }) {
             console.log("fetch delete many: ", selected);
 
             // if error set loading to false
-            setTimeout(() => isLoading(false), 3000);
+            setTimeout(isLoading(false), 3000);
 
             // if success delete data from state
             dispatch({
@@ -137,6 +137,7 @@ export default function Index({ users }) {
               placeholder="Pick all that you like"
               clearButtonLabel="Clear selection"
               clearable
+              defaultValue={[]}
               searchable
               nothingFound="Nothing found"
               {...form.getInputProps("roles")}
@@ -153,10 +154,11 @@ export default function Index({ users }) {
                 "Next.js",
                 "Blitz.js",
               ]}
-              label="Roles"
+              label="Roles2"
               placeholder="Pick all that you like"
               clearButtonLabel="Clear selection"
               clearable
+              defaultValue={[]}
               searchable
               nothingFound="Nothing found"
               {...form.getInputProps("roles2")}

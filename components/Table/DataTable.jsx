@@ -80,6 +80,29 @@ const Action = ({
 }) => {
   const [state, dispatch] = useDataTableContext();
   const router = useRouter();
+  const [debounced] = useDebouncedValue(state.search, 1000);
+
+  const debounce = (func) => {
+    let timer;
+    return function (...args) {
+      const context = this;
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        timer = null;
+        func.apply(context, args);
+      }, 1000);
+    };
+  };
+  const handleChange = (value) => {
+    console.log("handleChange: " + value);
+  };
+
+  const optimizedFn = useCallback(() => debounced, []);
+
+  useEffect(() => {
+    optimizedFn();
+    console.log("sdsd");
+  }, []);
 
   return (
     <div className="mb-4">
@@ -171,7 +194,7 @@ const Action = ({
             placeholder="Search"
             rightSection={<X size={18} />}
             style={{ flexGrow: 1 }}
-            value={state.Search}
+            value={state.search}
             onChange={(e) => {
               dispatch({
                 type: "set",
