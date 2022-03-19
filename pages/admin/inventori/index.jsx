@@ -25,8 +25,7 @@ export default function Index({ inventori }) {
   });
 
   useEffect(() => {
-
-    dispatch({ type: "set_data", payload: { result: inventori } });
+    dispatch({ type: "set_data", payload:  inventori  });
   }, []);
   const deleteHandler = async (selected, isLoading, type = "delete") => {
     const data = { id: selected };
@@ -69,10 +68,16 @@ export default function Index({ inventori }) {
       }
     });
   }
-  const refreshHandler = async (isLoading) => {
-    const res = await fetch(`http://localhost:3000/api/inventori`);
+  const refreshHandler = async (isLoading, page = 1, search = "") => {
+    if (search == "") {
+      search = state.data.search ? state.data.search : "";
+    } {
+      dispatch({ type: "set_data", payload: { search } });
+    }
+    const url = `http://localhost:3000/api/inventori?page=${page}&search=${search}&limit=1`
+    const res = await fetch(url);
     const data = await res.json();
-    dispatch({ type: "set_data", payload: data });
+    dispatch({ type: "set_data", payload: {...data,search} });
     isLoading(false);
   }
   const header = [
@@ -118,12 +123,13 @@ export default function Index({ inventori }) {
       <DataTable>
         <DataTable.Action
           onDelete={(selected, isLoading) => deleteHandler(selected, isLoading, "many")}
-          onRefresh={(isLoading) => refreshHandler(isLoading)} />
+          onRefresh={(isLoading) => refreshHandler(isLoading)} 
+          onSearch={(search,isLoading) => refreshHandler(isLoading, 1, search)}
+          />
         <CustomTable header={header} name="inventori"
           withSelection={true} withAction={true}>
           {state.data.result &&
             state.data.result.map((row) => {
-              console.log(state.data.result)
               return (
                 <CustomTable.Row
                   key={row.id} id={row.id}
@@ -161,7 +167,7 @@ export default function Index({ inventori }) {
               );
             })}
         </CustomTable>
-        <DataTable.Footer />
+        <DataTable.Footer total={state.data.total} pages={state.data.pages} onChange={(page,isLoading)=>refreshHandler(isLoading,page)}/>
       </DataTable>
       <ViewModalLogStok logstok={modalStokLog} setModalStokLog={setModalStokLog} />
     </Layout>

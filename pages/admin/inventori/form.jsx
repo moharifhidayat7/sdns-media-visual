@@ -96,7 +96,7 @@ function Form({ inventori, action }) {
           loading: false,
         });
         router.push({
-          pathname: "/inventori",
+          pathname: "/admin/inventori",
         });
       } else {
         setLoading(true);

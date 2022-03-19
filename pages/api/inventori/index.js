@@ -40,19 +40,68 @@ const inventori = async (req, res) => {
          });
       }
    } else if (method == "GET") {
+      const search = req.query.search || "";
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const skip = (page - 1) * limit;
       try {
-         const result = await prisma.inventori.findMany({
+         const inventori = await prisma.inventori.findMany({
+            skip,
+            take: limit,
             include: {
-               updatedBy: true, createdBy: true, logstok: true
-            }, where: {
+               createdBy: true,
+               updatedBy: true,
+               logstok: true
+            },
+            where: {
                isDeleted: false,
-            }, orderBy: {
-               id: "desc",
-            }
+               OR: [
+                  {
+                     nama: {
+                        contains: search
+                     }
+                  },
+                  {
+                     kode: {
+                        contains: search
+                     }
+                  }
+               ]
+            },
+            orderBy: {
+               createdAt: "desc",
+            },
          });
-         res.status(200).json(result);
+         const totalInventori= await prisma.inventori.count({
+            where: {
+               isDeleted: false,
+               OR: [
+                  {
+                     nama: {
+                        contains: search
+                     }
+                  },
+                  {
+                     kode: {
+                        contains: search
+                     }
+                  }
+               ]
+            },
+            
+         });
+         const pages = Math.ceil(totalInventori / limit);
+         res.json({
+            status: "success",
+            message: "Berhasil mengambil data inventori",
+            result: inventori,
+            pages,
+            total: totalInventori,
+            page,
+            limit,
+         });
       } catch (err) {
-         res.status(403).json({ err: err.message });
+         res.status(403).json({ err: "Error occured." });
       }
    } else if (method == "DELETE") {
       try {

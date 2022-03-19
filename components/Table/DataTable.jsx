@@ -51,13 +51,13 @@ const DataTable = ({ children }) => {
   );
 };
 
-const Footer = ({ total, onChange = () => { } }) => {
+const Footer = ({ total,pages, onChange = () => { } }) => {
   const [activePage, setActivePage] = useState(1);
   const [state, dispatch] = useDataTableContext();
   return (
     <Group position="right" className="mt-4">
       <Text>Total : <b> {total}</b> items</Text>
-      <Pagination total={total} page={activePage} onChange={(page) => {
+      <Pagination total={pages} page={activePage} onChange={(page) => {
         setActivePage(page);
         dispatch({ type: "set", payload: { loading: true } });
         onChange(page, (isLoading) =>

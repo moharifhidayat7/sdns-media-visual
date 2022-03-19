@@ -55,7 +55,7 @@ model Inventori {
   harga_jual Int?
   stok_awal  Int
   stok       Int
-  satuan     String    @unique
+  satuan     String   
   logstok    Logstok[] @relation("inventori")
   status     Status    @default(INACTIVE)
   createdAt  DateTime  @default(now())

@@ -20,7 +20,8 @@ export default function Index({ produk }) {
   const notifications = useNotifications();
   const getProdukProp = () => {
     const data = produk?produk:[];
-    dispatch({ type: "set_data", payload: data });
+        
+    dispatch({ type: "set_data", payload: data});
   };
   useEffect(() => {
     getProdukProp();
@@ -142,7 +143,7 @@ export default function Index({ produk }) {
               );
             })}
         </CustomTable>
-        <DataTable.Footer total={state.data.pages} onChange={(page, isLoading) => refreshHandler(isLoading, page)} />
+        <DataTable.Footer total={state.data.total} page={state.data.pages} onChange={(page, isLoading) => refreshHandler(isLoading, page)} />
       </DataTable>
     </Layout>
   );

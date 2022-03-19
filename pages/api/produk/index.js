@@ -82,6 +82,7 @@ export default async (req, res) => {
             status: "success",
             message: "Berhasil mengambil data produk",
             result: produk,
+            total: totalProduk,
             pages,
             page,
             limit,
