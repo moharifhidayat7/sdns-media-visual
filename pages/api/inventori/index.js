@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import dateFormat from "dateformat";
 const prisma = new PrismaClient();
 
 const inventori = async (req, res) => {
@@ -9,14 +10,27 @@ const inventori = async (req, res) => {
          const inventori = await prisma.inventori.create({
             data: {
                ...data,
-               createdId: parseInt(data.createdId),
-               updatedId: parseInt(data.updatedId),
+               createdId: 1,
+               updatedId: 1,
+               stok: parseInt(data.stok_awal),
+               stok_awal: parseInt(data.stok_awal),
+               harga_beli: parseInt(data.harga_beli)
+            }
+         });
+         const logstok = await prisma.logstok.create({
+            data: {
+               inventoriId: inventori.id,
+               stok: parseInt(data.stok_awal),
+               datelog: dateFormat(new Date(), "yyyymmdd"),
+               createdId: 1,
+               updatedId: 1
             }
          });
          res.statusCode = 200;
          res.json({
             message: "Inventori created",
             inventori,
+            logstok
          });
       } catch (error) {
          res.statusCode = 400;
@@ -51,6 +65,17 @@ const inventori = async (req, res) => {
                updatedId: 1,
             }
          })
+
+         await prisma.logstok.updateMany({
+            where: {
+               inventoriId: { in: data.id }
+            }, data: {
+               isDeleted: true,
+               deletedAt: new Date(),
+               updatedId: 1,
+            }
+         })
+
          res.status(200).json(result);
       } catch (err) {
          res.status(403).json({ err: err.message });

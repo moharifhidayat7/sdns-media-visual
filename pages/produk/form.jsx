@@ -17,7 +17,7 @@ import Layout from "@components/views/Layout";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useForm } from "@mantine/form";
-
+import { getTitle } from "helpers/functions";
 import { useNotifications } from "@mantine/notifications";
 import { Check, X } from "tabler-icons-react";
 function Form({ produk, action }) {
@@ -42,12 +42,12 @@ function Form({ produk, action }) {
         setDisabled(true);
       }
     } else {
-      setLoading(true);
-      setNotif({
-        show: true,
-        message: res.statusText,
-        title: "Error",
-      });
+      const codeInt = produk.id ? produk.id : 0;
+      const code = "PROD" + (parseInt(codeInt) + 1);
+      form.setValues({
+        kode: code,
+        nama: "",
+        status: "INACTIVE"})
     }
   }, []);
   const submitHandler = async (e) => {
@@ -65,12 +65,21 @@ function Form({ produk, action }) {
       body: JSON.stringify({ ...data, updatedId: 1, createdId: 1 }),
     }).then((res) => {
       if (res.status === 200) {
+        notifications.showNotification({
+          disallowClose: true,
+          autoClose: 5000,
+          title: "Tambah",
+          message: "Tambah data berhasil",
+          color: "green",
+          icon: <Check />,
+          loading: false,
+        });
         router.push({
           pathname: "/produk",
         });
+
       } else {
         setLoading(true);
-        console.log(res);
         notifications.showNotification({
           disallowClose: true,
           autoClose: 5000,
@@ -92,69 +101,36 @@ function Form({ produk, action }) {
         <title>Master Produk</title>
       </Head>
       <Title order={2} style={{ marginBottom: "1.5rem" }}>
-        Form Produk
+        {action=="read"?"Read":"Form"} Produk
       </Title>
 
-      <Box
-        sx={(theme) => ({
-          border: "1px solid",
-          borderRadius: theme.radius.sm,
-          padding: theme.spacing.sm,
-          backgroundColor:
-            theme.colorScheme === "dark" ? theme.colors.dark[7] : "white",
-          borderColor:
-            theme.colorScheme === "dark"
-              ? theme.colors.dark[6]
-              : theme.colors.gray[4],
-        })}
-      >
+      <Box sx={(theme) => ({
+        border: "1px solid",
+        borderRadius: theme.radius.sm,
+        padding: theme.spacing.sm,
+        backgroundColor:
+          theme.colorScheme === "dark" ? theme.colors.dark[7] : "white",
+        borderColor:
+          theme.colorScheme === "dark"
+            ? theme.colors.dark[6]
+            : theme.colors.gray[4],
+      })} >
         <form autoComplete="off" method="post" onSubmit={submitHandler}>
           <Grid>
             <Grid.Col sm={12} md={6}>
               <Group direction="column" grow spacing="lg">
                 <InputWrapper label="Kode">
-                  <Input
-                    disabled={disabled}
-                    name="kode"
-                    readOnly
-                    value={form.values.kode}
-                  />
+                  <Input disabled={disabled} name="kode" readOnly value={form.values.kode} />
                 </InputWrapper>
                 <InputWrapper label="Nama">
-                  <TextInput
-                    disabled={disabled}
-                    {...form.getInputProps("nama")}
-                    value={form.values.nama}
-                    onChange={(e) =>
-                      form.setFieldValue("nama", e.currentTarget.value)
-                    }
-                  />
+                  <TextInput disabled={disabled} {...form.getInputProps('nama')} value={form.values.nama} onChange={(e) => form.setFieldValue("nama", e.currentTarget.value)} />
                 </InputWrapper>
                 <InputWrapper label="Status">
-                  <Switch
-                    disabled={disabled}
-                    name="status"
-                    checked={form.values.status === "ACTIVE"}
-                    onChange={(e) =>
-                      form.setFieldValue(
-                        "status",
-                        e.currentTarget.checked ? "ACTIVE" : "INACTIVE"
-                      )
-                    }
-                    onLabel="ON"
-                    offLabel="OFF"
-                    size="lg"
-                    radius="lg"
-                  />
+                  <Switch disabled={disabled} name="status" checked={form.values.status === "ACTIVE"} onChange={(e) => form.setFieldValue("status", e.currentTarget.checked ? "ACTIVE" : "INACTIVE")} onLabel="ON" offLabel="OFF" size="lg" radius="lg" />
                 </InputWrapper>
                 <div className="space-x-2">
-                  <Button
-                    type="button"
-                    onClick={() => router.push("/produk")}
-                    color="red"
-                  >
-                    Back
-                  </Button>
+
+                  <Button type="button" onClick={() => router.push("/produk")} color="red">Back</Button>
                   {!disabled && <Button type="submit">Submit</Button>}
                 </div>
               </Group>

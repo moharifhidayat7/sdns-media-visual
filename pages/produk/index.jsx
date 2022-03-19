@@ -4,17 +4,15 @@ import Layout from "@components/views/Layout";
 import {
   Title,
   Text,
-  Box,
-  MultiSelect,
   Button,
 } from "@mantine/core";
 
 import { CustomTable } from "@components/Table/CustomTable";
 import DataTable from "@components/Table/DataTable";
-import { formatDate } from "helpers/functions";
 import { useContext, useEffect } from "react";
 import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useNotifications } from "@mantine/notifications";
+import dateFormat from "dateformat";
 import { Check, X } from "tabler-icons-react";
 export default function Index({ produk }) {
   const [state, dispatch] = useGlobalContext();
@@ -100,10 +98,10 @@ export default function Index({ produk }) {
   return (
     <Layout>
       <Head>
-        <title>Master Produk</title>
+        <title style={{ textTransform:"capitalize" }}>Master Produk </title>
       </Head>
-      <Title order={2} style={{ marginBottom: "1.5rem" }}>
-        Data Produk
+      <Title order={2} style={{ marginBottom: "1.5rem",textTransform:"capitalize" }}>
+        Data Produk 
       </Title>
       <DataTable>
         <DataTable.Action
@@ -133,7 +131,7 @@ export default function Index({ produk }) {
                     <Button variant="subtle">VIEW(100)</Button>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase">{formatDate(row.createdAt)}</Text>
+                    <Text className="uppercase">{dateFormat(row.createdAt,"dd-mm-yyyy")}</Text>
                   </CustomTable.Col>
                 </CustomTable.Row>
               );
