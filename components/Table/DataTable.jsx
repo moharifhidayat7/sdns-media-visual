@@ -25,8 +25,8 @@ import { useRouter } from "next/router";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useEffect, useCallback, useState } from "react";
 import {
-  DataTableProvider,
   useDataTableContext,
+  DataTableProvider,
 } from "@components/contexts/DataTableContext";
 
 const DataTable = ({ children }) => {
@@ -80,29 +80,7 @@ const Action = ({
 }) => {
   const [state, dispatch] = useDataTableContext();
   const router = useRouter();
-  const [debounced] = useDebouncedValue(state.search, 1000);
-
-  const debounce = (func) => {
-    let timer;
-    return function (...args) {
-      const context = this;
-      if (timer) clearTimeout(timer);
-      timer = setTimeout(() => {
-        timer = null;
-        func.apply(context, args);
-      }, 1000);
-    };
-  };
-  const handleChange = (value) => {
-    console.log("handleChange: " + value);
-  };
-
-  const optimizedFn = useCallback(() => debounced, []);
-
-  useEffect(() => {
-    optimizedFn();
-    console.log("sdsd");
-  }, []);
+  const [debounced] = useDebouncedValue(state.search, 500);
 
   return (
     <div className="mb-4">
@@ -195,12 +173,9 @@ const Action = ({
             rightSection={<X size={18} />}
             style={{ flexGrow: 1 }}
             value={state.search}
-            onChange={(e) => {
-              dispatch({
-                type: "set",
-                payload: { search: e.target.value },
-              });
-            }}
+            onChange={(e) =>
+              dispatch({ type: "set", payload: { search: e.target.value } })
+            }
           />
           <ActionIcon
             size={36}
@@ -218,7 +193,7 @@ const Action = ({
 
 DataTable.Action = Action;
 
-const Filter = ({ children, onFilter = () => {}, onReset = () => {} }) => {
+const Filter = ({ children, form, onFilter = () => {} }) => {
   const [state, dispatch] = useDataTableContext();
 
   const cols = () => {
@@ -264,7 +239,7 @@ const Filter = ({ children, onFilter = () => {}, onReset = () => {} }) => {
               : theme.colors.gray[4],
         })}
       >
-        <form onSubmit={onFilter}>
+        <form onSubmit={form.onSubmit(onFilter)}>
           <SimpleGrid
             cols={cols()}
             spacing="md"
@@ -281,7 +256,7 @@ const Filter = ({ children, onFilter = () => {}, onReset = () => {} }) => {
             <Button variant="filled" type="submit">
               Filter
             </Button>
-            <Button variant="default" onClick={() => onReset()}>
+            <Button variant="default" onClick={() => form.reset()}>
               Reset
             </Button>
           </Group>
