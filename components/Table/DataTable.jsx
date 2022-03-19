@@ -25,8 +25,8 @@ import { useRouter } from "next/router";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useEffect, useCallback, useState } from "react";
 import {
-  useDataTableContext,
   DataTableProvider,
+  useDataTableContext,
 } from "@components/contexts/DataTableContext";
 
 const DataTable = ({ children }) => {
@@ -80,7 +80,6 @@ const Action = ({
 }) => {
   const [state, dispatch] = useDataTableContext();
   const router = useRouter();
-  const [debounced] = useDebouncedValue(state.search, 500);
 
   return (
     <div className="mb-4">
@@ -172,10 +171,13 @@ const Action = ({
             placeholder="Search"
             rightSection={<X size={18} />}
             style={{ flexGrow: 1 }}
-            value={state.search}
-            onChange={(e) =>
-              dispatch({ type: "set", payload: { search: e.target.value } })
-            }
+            value={state.Search}
+            onChange={(e) => {
+              dispatch({
+                type: "set",
+                payload: { search: e.target.value },
+              });
+            }}
           />
           <ActionIcon
             size={36}
@@ -193,7 +195,7 @@ const Action = ({
 
 DataTable.Action = Action;
 
-const Filter = ({ children, form, onFilter = () => {} }) => {
+const Filter = ({ children, onFilter = () => {}, onReset = () => {} }) => {
   const [state, dispatch] = useDataTableContext();
 
   const cols = () => {
@@ -239,7 +241,7 @@ const Filter = ({ children, form, onFilter = () => {} }) => {
               : theme.colors.gray[4],
         })}
       >
-        <form onSubmit={form.onSubmit(onFilter)}>
+        <form onSubmit={onFilter}>
           <SimpleGrid
             cols={cols()}
             spacing="md"
@@ -256,7 +258,7 @@ const Filter = ({ children, form, onFilter = () => {} }) => {
             <Button variant="filled" type="submit">
               Filter
             </Button>
-            <Button variant="default" onClick={() => form.reset()}>
+            <Button variant="default" onClick={() => onReset()}>
               Reset
             </Button>
           </Group>

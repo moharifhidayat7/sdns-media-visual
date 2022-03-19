@@ -6,7 +6,7 @@ import { CustomTable } from "@components/Table/CustomTable";
 import Layout from "@components/views/Layout";
 import DataTable from "@components/Table/DataTable";
 import { useGlobalContext } from "@components/contexts/GlobalContext";
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { useNotifications } from "@mantine/notifications";
 import { useDebouncedValue } from "@mantine/hooks";
 import { formatDate } from "helpers/functions";
@@ -24,13 +24,11 @@ export default function Index({ users }) {
   });
 
   useEffect(() => {
-    const getUsersProp = () => {
+    const getUserProp = () => {
       const data = users;
-
       dispatch({ type: "set_data", payload: data });
     };
-
-    getUsersProp();
+    getUserProp();
   }, []);
 
   const header = [
@@ -64,11 +62,11 @@ export default function Index({ users }) {
             console.log(form.values); // filter values
 
             // fetch search & filter
-            const data = [];
+            // const data = [];
             // then
 
             // set data
-            dispatch({ type: "set_data", payload: data });
+            // dispatch({ type: "set_data", payload: data });
           }}
           onEdit={(selected) => console.log(selected)}
           onDelete={(selected, isLoading) => {
@@ -121,8 +119,8 @@ export default function Index({ users }) {
           }}
         />
         <DataTable.Filter
-          form={form}
-          onFilter={(values) => console.log(values)}
+          onFilter={form.onSubmit((values) => console.log(values))}
+          onReset={form.reset}
         >
           <div>
             <MultiSelect
