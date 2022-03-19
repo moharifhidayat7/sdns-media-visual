@@ -62,13 +62,26 @@ export default async (req, res) => {
          const totalProduk = await prisma.produk.count({
             where: {
                isDeleted: false,
+               OR: [
+                  {
+                     nama: {
+                        contains: search
+                     }
+                  },
+                  {
+                     kode: {
+                        contains: search
+                     }
+                  }
+               ]
             },
+            
          });
          const pages = Math.ceil(totalProduk / limit);
          res.json({
             status: "success",
             message: "Berhasil mengambil data produk",
-            data: produk,
+            result: produk,
             pages,
             page,
             limit,

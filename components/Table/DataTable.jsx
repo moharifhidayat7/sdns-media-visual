@@ -59,9 +59,9 @@ const Footer = ({ total, onChange = () => { } }) => {
       <Text>Total : <b> {total}</b> items</Text>
       <Pagination total={total} page={activePage} onChange={(page) => {
         setActivePage(page);
-        dispatch({ type: "set", payload:{loading: true} });
-        onChange( page,(isLoading) =>
-          dispatch({ type: "set", payload:{loading: isLoading} })
+        dispatch({ type: "set", payload: { loading: true } });
+        onChange(page, (isLoading) =>
+          dispatch({ type: "set", payload: { loading: isLoading } })
         );
       }} />
     </Group>
@@ -72,7 +72,7 @@ DataTable.Footer = Footer;
 
 const Action = ({
   onRefresh = () => { },
-  onEdit ,
+  onEdit,
   onDelete = () => { },
   onSearch = () => { },
 }) => {
@@ -102,16 +102,16 @@ const Action = ({
           >
             Tambah
           </Button>
-          {onEdit&&
-          <ActionIcon
-            size={36}
-            color="yellow"
-            variant="filled"
-            onClick={() => onEdit(state.selection)}
-            disabled={false}
-          >
-            <Pencil />
-          </ActionIcon>}
+          {onEdit &&
+            <ActionIcon
+              size={36}
+              color="yellow"
+              variant="filled"
+              onClick={() => onEdit(state.selection)}
+              disabled={false}
+            >
+              <Pencil />
+            </ActionIcon>}
           <ActionIcon
             size={36}
             color="red"
@@ -172,9 +172,12 @@ const Action = ({
             rightSection={<X size={18} />}
             style={{ flexGrow: 1 }}
             value={state.search}
-            onChange={(e) =>
-              dispatch({ type: "set", payload: { search: e.target.value } })
-            }
+            onChange={(e) => {
+              dispatch({ type: "set", payload: { search: e.target.value, loading: true } })
+              onSearch(e.target.value, (isLoading) => {
+                dispatch({ type: "set", payload: { loading: isLoading } })
+              })
+            }}
           />
           <ActionIcon
             size={36}

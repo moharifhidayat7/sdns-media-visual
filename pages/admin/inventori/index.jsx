@@ -23,12 +23,10 @@ export default function Index({ inventori }) {
     opened: false,
     data: [],
   });
-  const getProdukProp = () => {
-    const data = inventori;
-    dispatch({ type: "set_data", payload: data });
-  };
+
   useEffect(() => {
-    getProdukProp();
+
+    dispatch({ type: "set_data", payload: { result: inventori } });
   }, []);
   const deleteHandler = async (selected, isLoading, type = "delete") => {
     const data = { id: selected };
@@ -72,7 +70,7 @@ export default function Index({ inventori }) {
     });
   }
   const refreshHandler = async (isLoading) => {
-    const res = await fetch(`http://localhost:3000/api/inventori/`);
+    const res = await fetch(`http://localhost:3000/api/inventori`);
     const data = await res.json();
     dispatch({ type: "set_data", payload: data });
     isLoading(false);
@@ -123,8 +121,9 @@ export default function Index({ inventori }) {
           onRefresh={(isLoading) => refreshHandler(isLoading)} />
         <CustomTable header={header} name="inventori"
           withSelection={true} withAction={true}>
-          {state.data &&
-            state.data.map((row) => {
+          {state.data.result &&
+            state.data.result.map((row) => {
+              console.log(state.data.result)
               return (
                 <CustomTable.Row
                   key={row.id} id={row.id}
@@ -153,7 +152,7 @@ export default function Index({ inventori }) {
                         opened: true,
                         title: `${row.kode} - ${row.nama} ${row.tipe} ${row.merek}`,
                         data: row.logstok,
-                      })}>VIEW({row.logstok.length})</Button>
+                      })}>VIEW(1)</Button>
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text className="uppercase">{dateFormat(row.createdAt, "dd-mm-yyyy")}</Text>
@@ -173,8 +172,6 @@ const ViewModalLogStok = ({ logstok, setModalStokLog }) => {
   const sumStok = logstok.data.reduce((acc, cur) => {
     return acc + cur.stok;
   }, 0);
-
-
 
   return (
     <Modal
@@ -199,7 +196,7 @@ const ViewModalLogStok = ({ logstok, setModalStokLog }) => {
             <tr key={element.id}>
               <td>{key + 1}</td>
               <td>{element.datelog}</td>
-              <td>{dateFormat(element.createdAt,"dd-mm-yyyy")}</td>
+              <td>{dateFormat(element.createdAt, "dd-mm-yyyy")}</td>
               <td>{element.stok}</td>
             </tr>
           ))}</tbody>
@@ -209,7 +206,7 @@ const ViewModalLogStok = ({ logstok, setModalStokLog }) => {
               Total
             </th>
             <th>
-             {sumStok}
+              {sumStok}
             </th>
           </tr>
 
@@ -220,9 +217,8 @@ const ViewModalLogStok = ({ logstok, setModalStokLog }) => {
 }
 
 export async function getServerSideProps(context) {
-
   const res = await fetch(`http://localhost:3000/api/inventori/`);
-  const inventori = res.status === 200 ? await res.json() : [];
+  const inventori = await res.json();
   return {
     props: {
       inventori,

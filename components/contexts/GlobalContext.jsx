@@ -14,12 +14,12 @@ const reducer = (state, action) => {
     case "delete":
       return {
         ...state,
-        data: state.data.filter((d) => d.id != action.payload),
+        data: state.data.result.filter((d) => d.id != action.payload),
       };
     case "delete_many":
       return {
         ...state,
-        data: state.data.filter((d) => !action.payload.includes(d.id)),
+        data: state.data.result.filter((d) => !action.payload.includes(d.id)),
       };
     default:
       return state;

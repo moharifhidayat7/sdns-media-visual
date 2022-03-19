@@ -19,7 +19,8 @@ export default function Index({ produk }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
   const getProdukProp = () => {
-    dispatch({ type: "set_data", payload: produk.data ? produk.data : [] });
+    const data = produk?produk:[];
+    dispatch({ type: "set_data", payload: data });
   };
   useEffect(() => {
     getProdukProp();
@@ -65,11 +66,16 @@ export default function Index({ produk }) {
       }
     });
   }
-  const refreshHandler = async (isLoading,page=1) => {
-    const url=`http://localhost:3000/api/produk?page=${page}`
+  const refreshHandler = async (isLoading, page = 1, search = "") => {
+    if (search == "") {
+      search = state.data.search ? state.data.search : "";
+    } {
+      dispatch({ type: "set_data", payload: { search } });
+    }
+    const url = `http://localhost:3000/api/produk?page=${page}&search=${search}`
     const res = await fetch(url);
     const data = await res.json();
-    dispatch({ type: "set_data", payload: data.data });
+    dispatch({ type: "set_data", payload: {data:{...data},search} });
     isLoading(false);
   }
   const header = [
@@ -105,11 +111,11 @@ export default function Index({ produk }) {
       <DataTable>
         <DataTable.Action
           onDelete={(selected, isLoading) => deleteHandler(selected, isLoading, "many")}
-          onRefresh={(isLoading) => refreshHandler(isLoading)} />
+          onRefresh={(isLoading) => refreshHandler(isLoading)} onSearch={(value, isLoading) => refreshHandler(isLoading, 1, value)} />
         <CustomTable header={header} name="produk"
           withSelection={true} withAction={true}>
-          {state.data &&
-            state.data.map((row) => {
+          {state.data.result &&
+            state.data.result.map((row) => {
               return (
                 <CustomTable.Row
                   key={row.id} id={row.id}
@@ -136,8 +142,7 @@ export default function Index({ produk }) {
               );
             })}
         </CustomTable>
-        <DataTable.Footer total={produk.pages} onChange={(page,isLoading)=>refreshHandler(isLoading,page)}/>
-
+        <DataTable.Footer total={state.data.pages} onChange={(page, isLoading) => refreshHandler(isLoading, page)} />
       </DataTable>
     </Layout>
   );
