@@ -6,7 +6,9 @@
     "dev": "npx prisma db push && next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "vercel-build": "prisma generate && prisma migrate deploy && next build",
+    "prisma:generate": "prisma generate"
   },
   "dependencies": {
     "@mantine/core": "^4.0.4",
