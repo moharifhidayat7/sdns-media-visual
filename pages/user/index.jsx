@@ -6,7 +6,7 @@ import { CustomTable } from "@components/Table/CustomTable";
 import Layout from "@components/views/Layout";
 import DataTable from "@components/Table/DataTable";
 import { useGlobalContext } from "@components/contexts/GlobalContext";
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { useNotifications } from "@mantine/notifications";
 import { useDebouncedValue } from "@mantine/hooks";
 import { formatDate } from "helpers/functions";
@@ -24,13 +24,11 @@ export default function Index({ users }) {
   });
 
   useEffect(() => {
-    const getUsersProp = () => {
+    const getUserProp = () => {
       const data = users;
-
       dispatch({ type: "set_data", payload: data });
     };
-
-    getUsersProp();
+    getUserProp();
   }, []);
 
   const header = [
@@ -64,11 +62,11 @@ export default function Index({ users }) {
             console.log(form.values); // filter values
 
             // fetch search & filter
-            const data = [];
+            // const data = [];
             // then
 
             // set data
-            dispatch({ type: "set_data", payload: data });
+            // dispatch({ type: "set_data", payload: data });
           }}
           onEdit={(selected) => console.log(selected)}
           onDelete={(selected, isLoading) => {
@@ -76,7 +74,7 @@ export default function Index({ users }) {
             console.log("fetch delete many: ", selected);
 
             // if error set loading to false
-            setTimeout(() => isLoading(false), 3000);
+            setTimeout(isLoading(false), 3000);
 
             // if success delete data from state
             dispatch({
@@ -121,8 +119,8 @@ export default function Index({ users }) {
           }}
         />
         <DataTable.Filter
-          form={form}
-          onFilter={(values) => console.log(values)}
+          onFilter={form.onSubmit((values) => console.log(values))}
+          onReset={form.reset}
         >
           <div>
             <MultiSelect
@@ -139,6 +137,7 @@ export default function Index({ users }) {
               placeholder="Pick all that you like"
               clearButtonLabel="Clear selection"
               clearable
+              defaultValue={[]}
               searchable
               nothingFound="Nothing found"
               {...form.getInputProps("roles")}
@@ -155,10 +154,11 @@ export default function Index({ users }) {
                 "Next.js",
                 "Blitz.js",
               ]}
-              label="Roles"
+              label="Roles2"
               placeholder="Pick all that you like"
               clearButtonLabel="Clear selection"
               clearable
+              defaultValue={[]}
               searchable
               nothingFound="Nothing found"
               {...form.getInputProps("roles2")}
