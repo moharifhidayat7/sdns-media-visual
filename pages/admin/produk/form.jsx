@@ -75,9 +75,8 @@ function Form({ produk, action }) {
           loading: false,
         });
         router.push({
-          pathname: "/produk",
+          pathname: "/admin/produk",
         });
-
       } else {
         setLoading(true);
         notifications.showNotification({
@@ -130,7 +129,7 @@ function Form({ produk, action }) {
                 </InputWrapper>
                 <div className="space-x-2">
 
-                  <Button type="button" onClick={() => router.push("/produk")} color="red">Back</Button>
+                  <Button type="button" onClick={() => router.push("/admin/produk")} color="red">Back</Button>
                   {!disabled && <Button type="submit">Submit</Button>}
                 </div>
               </Group>

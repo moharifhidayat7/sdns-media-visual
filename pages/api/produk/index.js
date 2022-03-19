@@ -28,31 +28,65 @@ export default async (req, res) => {
       }
    }
    else if (req.method == "GET") {
+      const search = req.query.search || "";
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const skip = (page - 1) * limit;
       try {
-         const result = await prisma.produk.findMany({
+         const produk = await prisma.produk.findMany({
+            skip,
+            take: limit,
             include: {
-               updatedBy: true, createdBy: true
-            }, where: {
+               createdBy: true,
+               updatedBy: true,
+            },
+            where: {
                isDeleted: false,
-            }, orderBy: {
-               id: "desc",
-            }
+               OR: [
+                  {
+                     nama: {
+                        contains: search
+                     }
+                  },
+                  {
+                     kode: {
+                        contains: search
+                     }
+                  }
+               ]
+            },
+            orderBy: {
+               createdAt: "desc",
+            },
          });
-         res.status(200).json(result);
+         const totalProduk = await prisma.produk.count({
+            where: {
+               isDeleted: false,
+            },
+         });
+         const pages = Math.ceil(totalProduk / limit);
+         res.json({
+            status: "success",
+            message: "Berhasil mengambil data produk",
+            data: produk,
+            pages,
+            page,
+            limit,
+         });
       } catch (err) {
          res.status(403).json({ err: "Error occured." });
       }
    }
    else if (req.method == "DELETE") {
- 
+
       try {
          const produk = await prisma.produk.updateMany({
             where: {
-               id: {in: data.id}
+               id: { in: data.id }
             },
             data: {
                isDeleted: true,
-               deletedAt:new Date(),
+               deletedAt: new Date(),
             }
          });
          res.statusCode = 200;

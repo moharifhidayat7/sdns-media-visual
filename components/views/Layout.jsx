@@ -25,10 +25,10 @@ const Layout = ({ children }) => {
       icon: Notes,
       initiallyOpened: true,
       links: [
-        { label: "Produk", link: "/produk" },
-        { label: "Inventori", link: "/inventori" },
-        { label: "Suppliers", link: "/" },
-        { label: "Gudang", link: "/" },
+        { label: "Produk", link: "/admin/produk" },
+        { label: "Inventori", link: "/admin/inventori" },
+        { label: "Suppliers", link: "/admin/supplier" },
+        { label: "Gudang", link: "/admin/gudang" },
       ],
     },
     {

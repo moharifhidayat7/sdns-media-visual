@@ -51,21 +51,19 @@ const DataTable = ({ children }) => {
   );
 };
 
-const Footer = () => {
+const Footer = ({ total, onChange = () => { } }) => {
+  const [activePage, setActivePage] = useState(1);
+  const [state, dispatch] = useDataTableContext();
   return (
     <Group position="right" className="mt-4">
-      <Text>showing 1 to 10 from 10</Text>
-      <Pagination total={10} />
-      <Select
-        style={{ maxWidth: "80px" }}
-        size="sm"
-        data={[
-          { value: "10", label: "10" },
-          { value: "20", label: "20" },
-          { value: "50", label: "50" },
-          { value: "100", label: "100" },
-        ]}
-      />
+      <Text>Total : <b> {total}</b> items</Text>
+      <Pagination total={total} page={activePage} onChange={(page) => {
+        setActivePage(page);
+        dispatch({ type: "set", payload:{loading: true} });
+        onChange( page,(isLoading) =>
+          dispatch({ type: "set", payload:{loading: isLoading} })
+        );
+      }} />
     </Group>
   );
 };
@@ -73,10 +71,10 @@ const Footer = () => {
 DataTable.Footer = Footer;
 
 const Action = ({
-  onRefresh = () => {},
-  onEdit = () => {},
-  onDelete = () => {},
-  onSearch = () => {},
+  onRefresh = () => { },
+  onEdit ,
+  onDelete = () => { },
+  onSearch = () => { },
 }) => {
   const [state, dispatch] = useDataTableContext();
   const router = useRouter();
@@ -104,6 +102,7 @@ const Action = ({
           >
             Tambah
           </Button>
+          {onEdit&&
           <ActionIcon
             size={36}
             color="yellow"
@@ -112,7 +111,7 @@ const Action = ({
             disabled={false}
           >
             <Pencil />
-          </ActionIcon>
+          </ActionIcon>}
           <ActionIcon
             size={36}
             color="red"
@@ -145,7 +144,7 @@ const Action = ({
           <Button
             leftIcon={<TableExport size={16} />}
             variant="default"
-            onClick={() => {}}
+            onClick={() => { }}
             disabled={false}
           >
             Export
@@ -153,7 +152,7 @@ const Action = ({
           <Button
             leftIcon={<TableImport size={16} />}
             variant="default"
-            onClick={() => {}}
+            onClick={() => { }}
             disabled={false}
           >
             Import
@@ -193,7 +192,7 @@ const Action = ({
 
 DataTable.Action = Action;
 
-const Filter = ({ children, form, onFilter = () => {} }) => {
+const Filter = ({ children, form, onFilter = () => { } }) => {
   const [state, dispatch] = useDataTableContext();
 
   const cols = () => {

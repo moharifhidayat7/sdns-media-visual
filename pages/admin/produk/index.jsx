@@ -14,12 +14,12 @@ import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useNotifications } from "@mantine/notifications";
 import dateFormat from "dateformat";
 import { Check, X } from "tabler-icons-react";
+
 export default function Index({ produk }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
   const getProdukProp = () => {
-    const data = produk;
-    dispatch({ type: "set_data", payload: data });
+    dispatch({ type: "set_data", payload: produk.data ? produk.data : [] });
   };
   useEffect(() => {
     getProdukProp();
@@ -65,10 +65,11 @@ export default function Index({ produk }) {
       }
     });
   }
-  const refreshHandler = async (isLoading) => {
-    const res = await fetch(`http://localhost:3000/api/produk/`);
+  const refreshHandler = async (isLoading,page=1) => {
+    const url=`http://localhost:3000/api/produk?page=${page}`
+    const res = await fetch(url);
     const data = await res.json();
-    dispatch({ type: "set_data", payload: data });
+    dispatch({ type: "set_data", payload: data.data });
     isLoading(false);
   }
   const header = [
@@ -93,15 +94,13 @@ export default function Index({ produk }) {
       label: "Created At",
     },
   ];
-
-
   return (
     <Layout>
       <Head>
-        <title style={{ textTransform:"capitalize" }}>Master Produk </title>
+        <title style={{ textTransform: "capitalize" }}>Master Produk </title>
       </Head>
-      <Title order={2} style={{ marginBottom: "1.5rem",textTransform:"capitalize" }}>
-        Data Produk 
+      <Title order={2} style={{ marginBottom: "1.5rem", textTransform: "capitalize" }}>
+        Data Produk
       </Title>
       <DataTable>
         <DataTable.Action
@@ -131,21 +130,21 @@ export default function Index({ produk }) {
                     <Button variant="subtle">VIEW(100)</Button>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase">{dateFormat(row.createdAt,"dd-mm-yyyy")}</Text>
+                    <Text className="uppercase">{dateFormat(row.createdAt, "dd-mm-yyyy")}</Text>
                   </CustomTable.Col>
                 </CustomTable.Row>
               );
             })}
         </CustomTable>
-        <DataTable.Footer />
-      </DataTable>
+        <DataTable.Footer total={produk.pages} onChange={(page,isLoading)=>refreshHandler(isLoading,page)}/>
 
+      </DataTable>
     </Layout>
   );
 }
 //function get server side props produk
 export async function getServerSideProps(context) {
-  const res = await fetch(`http://localhost:3000/api/produk`);
+  const res = await fetch('http://localhost:3000/api/produk?page=0');
   const produk = await res.json();
   return {
     props: {

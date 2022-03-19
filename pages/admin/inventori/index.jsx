@@ -5,18 +5,24 @@ import {
   Title,
   Text,
   Button,
+  Modal,
+  Table,
 } from "@mantine/core";
 
 import { CustomTable } from "@components/Table/CustomTable";
 import DataTable from "@components/Table/DataTable";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useNotifications } from "@mantine/notifications";
 import dateFormat from "dateformat";
-import { Check, X } from "tabler-icons-react";
+import { Check, H3, X } from "tabler-icons-react";
 export default function Index({ inventori }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
+  const [modalStokLog, setModalStokLog] = useState({
+    opened: false,
+    data: [],
+  });
   const getProdukProp = () => {
     const data = inventori;
     dispatch({ type: "set_data", payload: data });
@@ -142,7 +148,12 @@ export default function Index({ inventori }) {
                     <Text className="uppercase">{row.satuan}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Button variant="subtle">VIEW({row.logstok.length})</Button>
+                    <Button variant="subtle"
+                      onClick={() => setModalStokLog({
+                        opened: true,
+                        title: `${row.kode} - ${row.nama} ${row.tipe} ${row.merek}`,
+                        data: row.logstok,
+                      })}>VIEW({row.logstok.length})</Button>
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text className="uppercase">{dateFormat(row.createdAt, "dd-mm-yyyy")}</Text>
@@ -153,18 +164,69 @@ export default function Index({ inventori }) {
         </CustomTable>
         <DataTable.Footer />
       </DataTable>
-
+      <ViewModalLogStok logstok={modalStokLog} setModalStokLog={setModalStokLog} />
     </Layout>
   );
 }
+const ViewModalLogStok = ({ logstok, setModalStokLog }) => {
+  //sum stok total
+  const sumStok = logstok.data.reduce((acc, cur) => {
+    return acc + cur.stok;
+  }, 0);
+
+
+
+  return (
+    <Modal
+      opened={logstok.opened}
+      onClose={() => setModalStokLog({
+        opened: false,
+        data: []
+      })}
+      size="lg"
+      transition="rotate-left"
+      title={logstok.title}
+    >
+      <Table verticalSpacing="xs" className="border">
+        <thead><tr>
+          <th>NO</th>
+          <th>Unique Date Log</th>
+          <th>Created On</th>
+          <th>Stok</th>
+        </tr></thead>
+        <tbody>{
+          logstok.data.map((element, key) => (
+            <tr key={element.id}>
+              <td>{key + 1}</td>
+              <td>{element.datelog}</td>
+              <td>{dateFormat(element.createdAt,"dd-mm-yyyy")}</td>
+              <td>{element.stok}</td>
+            </tr>
+          ))}</tbody>
+        <tfoot>
+          <tr>
+            <th colSpan="3"  >
+              Total
+            </th>
+            <th>
+             {sumStok}
+            </th>
+          </tr>
+
+        </tfoot>
+      </Table>
+    </Modal>
+  )
+}
+
 export async function getServerSideProps(context) {
 
-    const res = await fetch(`http://localhost:3000/api/inventori/`);
-    const inventori = res.status === 200 ? await res.json() : [];
-    return {
-      props: {
-       inventori,
-      },
-    }; 
+  const res = await fetch(`http://localhost:3000/api/inventori/`);
+  const inventori = res.status === 200 ? await res.json() : [];
+  return {
+    props: {
+      inventori,
+    },
+  };
 
 }
