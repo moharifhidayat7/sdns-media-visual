@@ -19,9 +19,8 @@ export default function Index({ produk }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
   const getProdukProp = () => {
-    const data = produk?produk:[];
-        
-    dispatch({ type: "set_data", payload: data});
+    const data = produk ? produk : [];
+    dispatch({ type: "set_data", payload: data });
   };
   useEffect(() => {
     getProdukProp();
@@ -38,13 +37,7 @@ export default function Index({ produk }) {
     }).then((res) => {
       isLoading(false);
       if (res.status === 200) {
-        if (type != "delete") {
-          selected.forEach(id => {
-            dispatch({ type: "delete", payload: id });
-          });
-        } else {
-          dispatch({ type: "delete", payload: selected });
-        }
+        dispatch({ type: type, payload: selected });
         notifications.showNotification({
           disallowClose: true,
           autoClose: 5000,
@@ -67,16 +60,13 @@ export default function Index({ produk }) {
       }
     });
   }
-  const refreshHandler = async (isLoading, page = 1, search = "") => {
-    if (search == "") {
-      search = state.data.search ? state.data.search : "";
-    } {
-      dispatch({ type: "set_data", payload: { search } });
-    }
+  const refreshHandler = async (isLoading = null, page = 1, search = "") => {
+
     const url = `http://localhost:3000/api/produk?page=${page}&search=${search}`
     const res = await fetch(url);
     const data = await res.json();
-    dispatch({ type: "set_data", payload: {data:{...data},search} });
+
+    dispatch({ type: "set_data", payload: { ...data, search, page } });
     isLoading(false);
   }
   const header = [
@@ -111,7 +101,9 @@ export default function Index({ produk }) {
       </Title>
       <DataTable>
         <DataTable.Action
-          onDelete={(selected, isLoading) => deleteHandler(selected, isLoading, "many")}
+          onDelete={(selected, isLoading) => {
+            deleteHandler(selected, isLoading, "delete_many")
+          }}
           onRefresh={(isLoading) => refreshHandler(isLoading)} onSearch={(value, isLoading) => refreshHandler(isLoading, 1, value)} />
         <CustomTable header={header} name="produk"
           withSelection={true} withAction={true}>
@@ -123,9 +115,11 @@ export default function Index({ produk }) {
                   readLink={`produk/form?id=${row.id}&read=true`}
                   editLink={`/form?id=${row.id}`}
                   deleteField={row.nama}
-                  onDelete={(isLoading) => deleteHandler(row.id, isLoading)} >
+                  onDelete={(isLoading) => {
+                    deleteHandler(row.id, isLoading)
+                  }} >
                   <CustomTable.Col>
-                    <Text>{row.kode}</Text>
+                    <Text className="">{row.kode}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text className="uppercase">{row.nama}</Text>
@@ -143,7 +137,7 @@ export default function Index({ produk }) {
               );
             })}
         </CustomTable>
-        <DataTable.Footer total={state.data.total} page={state.data.pages} onChange={(page, isLoading) => refreshHandler(isLoading, page)} />
+        <DataTable.Footer total={state.data.total} pages={state.data.pages} onChange={(page, isLoading) => refreshHandler(isLoading, page, state.data.search)} />
       </DataTable>
     </Layout>
   );

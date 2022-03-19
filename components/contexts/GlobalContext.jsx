@@ -2,7 +2,8 @@ import { createContext, useContext, useReducer } from "react";
 
 const initialState = {
   showSidebar: false,
-  data: [],
+  data: [
+  ],
 };
 
 const reducer = (state, action) => {
@@ -12,14 +13,18 @@ const reducer = (state, action) => {
     case "set_data":
       return { ...state, data: action.payload };
     case "delete":
+      const result=state.data.result.filter((item) => item.id !== action.payload);
+      const total=state.data.total-1;
       return {
         ...state,
-        data: state.data.result.filter((d) => d.id != action.payload),
+        data:  {...state.data,total,result:[...result]} ,
       };
     case "delete_many":
+      const resultMany=state.data.result.filter((d) => !action.payload.includes(d.id))
+      const totalMany=state.data.total-1;
       return {
         ...state,
-        data: state.data.result.filter((d) => !action.payload.includes(d.id)),
+        data: {...state.data,total:totalMany,result:[...resultMany]} ,
       };
     default:
       return state;

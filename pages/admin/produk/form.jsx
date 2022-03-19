@@ -163,13 +163,13 @@ export async function getServerSideProps(context) {
       if (res.status === 403) {
         let res = await fetch(`http://localhost:3000/api/produk`);
         const produks = await res.json();
-        produk = produks.length > 0 ? produks[0] : produks;
+        produk = produks.result.length > 0 ? produks.result[0] : produks;
         action = "add";
       }
     } else {
       let res = await fetch(`http://localhost:3000/api/produk`);
       const produks = await res.json();
-      produk = produks.length > 0 ? produks[0] : produks;
+      produk = produks.result.length > 0 ? produks.result[0] : produks;
       action = "add";
     }
   }

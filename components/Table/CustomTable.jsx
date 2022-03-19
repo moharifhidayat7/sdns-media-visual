@@ -65,7 +65,8 @@ function Th({ children, reversed, sorted, onSort, ...props }) {
   return (
     <th className={classes.th} {...props}>
       <UnstyledButton onClick={onSort} className={classes.control}>
-        <Group position="apart">
+        <Group position="apart" noWrap>
+      
           <Text weight={500} size="sm">
             {children}
           </Text>
@@ -131,6 +132,7 @@ const CustomTable = ({
       payload: sortData(globalState.data, {
         sortBy: field,
         reversed,
+        result: [],
         search: state.search,
       }),
     });
@@ -145,8 +147,9 @@ const CustomTable = ({
             {state.withSelection && (
               <th style={{ width: 40 }}>
                 <Checkbox
-                  onChange={() =>
-                    dispatch({ type: "toggle_all", payload: globalState.data })
+                  onChange={() => {
+                    dispatch({ type: "toggle_all", payload: globalState.data.result })
+                  }
                   }
                   checked={state.selection.length === globalState.data.length}
                   indeterminate={
@@ -164,7 +167,7 @@ const CustomTable = ({
                   key={th.key}
                   sorted={sortBy === th.key}
                   reversed={reverseSortDirection}
-                  onSort={() => setSorting(th.key)}
+                  onSort={() => console.log(th.key)}
                 >
                   {th.label}
                 </Th>
@@ -231,7 +234,7 @@ const Row = ({
       {children}
       {state.withAction && (
         <td>
-          <Group spacing="xs" className="justify-end">
+          <Group spacing="xs" noWrap className="justify-end">
             {readLink && (
               <ActionIcon color="blue" variant="filled" onClick={() => router.push(readLink)}>
                 <EyeCheck size={16} />

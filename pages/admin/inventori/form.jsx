@@ -162,16 +162,16 @@ function Form({ inventori, action }) {
 
                   </Grid.Col>
                   <Grid.Col sm={12} md={6}>
-                  <Select
+                    <Select
                       label="Satuan"
                       {...form.getInputProps('satuan')}
-                      onChange={(e)=>form.setFieldValue("satuan", e)}
+                      onChange={(e) => form.setFieldValue("satuan", e)}
                       value={form.values.satuan}
-                      data={["Meter","Kg","Litre","Box","Pcs"]}
+                      data={["Meter", "Kg", "Litre", "Box", "Pcs"]}
                       placeholder="Select items"
                       nothingFound="Nothing found"
                       searchable
-                      disabled={disabled}                      
+                      disabled={disabled}
                     />
                   </Grid.Col>
                 </Grid>
@@ -204,13 +204,13 @@ export async function getServerSideProps(context) {
     if (res.status === 403) {
       let res = await fetch(`http://localhost:3000/api/inventori`);
       const inventoris = await res.json();
-      inventori = inventoris.length > 0 ? inventoris[0] : inventoris;
+      inventori = inventoris.result.length > 0 ? inventoris.result[0] : inventoris;
       action = "add";
     }
   } else {
     let res = await fetch(`http://localhost:3000/api/inventori`);
     const inventoris = await res.json();
-    inventori = inventoris.length > 0 ? inventoris[0] : inventoris;
+    inventori = inventoris.result.length > 0 ? inventoris.result[0] : inventoris;
     action = "add";
   }
   if (read) {
@@ -218,8 +218,7 @@ export async function getServerSideProps(context) {
   }
   return {
     props: {
-      action,
-      inventori,
+      action, inventori,
     },
   };
 }

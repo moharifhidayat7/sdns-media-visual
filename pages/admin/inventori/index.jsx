@@ -25,7 +25,7 @@ export default function Index({ inventori }) {
   });
 
   useEffect(() => {
-    dispatch({ type: "set_data", payload:  inventori  });
+    dispatch({ type: "set_data", payload: inventori });
   }, []);
   const deleteHandler = async (selected, isLoading, type = "delete") => {
     const data = { id: selected };
@@ -39,13 +39,7 @@ export default function Index({ inventori }) {
     }).then((res) => {
       isLoading(false);
       if (res.status === 200) {
-        if (type != "delete") {
-          selected.forEach(id => {
-            dispatch({ type: "delete", payload: id });
-          });
-        } else {
-          dispatch({ type: "delete", payload: selected });
-        }
+        dispatch({ type: type, payload: selected });
         notifications.showNotification({
           disallowClose: true,
           autoClose: 5000,
@@ -74,10 +68,10 @@ export default function Index({ inventori }) {
     } {
       dispatch({ type: "set_data", payload: { search } });
     }
-    const url = `http://localhost:3000/api/inventori?page=${page}&search=${search}&limit=1`
+    const url = `http://localhost:3000/api/inventori?page=${page}&search=${search}`
     const res = await fetch(url);
     const data = await res.json();
-    dispatch({ type: "set_data", payload: {...data,search} });
+    dispatch({ type: "set_data", payload: { ...data, search } });
     isLoading(false);
   }
   const header = [
@@ -122,10 +116,10 @@ export default function Index({ inventori }) {
       </Title>
       <DataTable>
         <DataTable.Action
-          onDelete={(selected, isLoading) => deleteHandler(selected, isLoading, "many")}
-          onRefresh={(isLoading) => refreshHandler(isLoading)} 
-          onSearch={(search,isLoading) => refreshHandler(isLoading, 1, search)}
-          />
+          onDelete={(selected, isLoading) => deleteHandler(selected, isLoading, "delete_many")}
+          onRefresh={(isLoading) => refreshHandler(isLoading)}
+          onSearch={(search, isLoading) => refreshHandler(isLoading, 1, search)}
+        />
         <CustomTable header={header} name="inventori"
           withSelection={true} withAction={true}>
           {state.data.result &&
@@ -167,7 +161,7 @@ export default function Index({ inventori }) {
               );
             })}
         </CustomTable>
-        <DataTable.Footer total={state.data.total} pages={state.data.pages} onChange={(page,isLoading)=>refreshHandler(isLoading,page)}/>
+        <DataTable.Footer total={state.data.total} pages={state.data.pages} onChange={(page, isLoading) => refreshHandler(isLoading, page)} />
       </DataTable>
       <ViewModalLogStok logstok={modalStokLog} setModalStokLog={setModalStokLog} />
     </Layout>

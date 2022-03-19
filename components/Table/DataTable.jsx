@@ -169,7 +169,7 @@ const Action = ({
           <Input
             icon={<Search size={18} />}
             placeholder="Search"
-            rightSection={<X size={18} />}
+            type="search"
             style={{ flexGrow: 1 }}
             value={state.search}
             onChange={(e) => {
