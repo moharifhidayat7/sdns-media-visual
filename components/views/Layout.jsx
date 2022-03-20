@@ -5,10 +5,13 @@ import { AppShell, Container, Loader } from "@mantine/core";
 
 import {
   Gauge,
-  Notes,
-  CalendarStats,
-  PresentationAnalytics,
-  FileAnalytics,
+  BuildingCottage,
+  Receipt2,
+  ReportMoney,
+  Report,
+  Notification,
+  Server,
+  Users,
   Adjustments,
   Lock,
 } from "tabler-icons-react";
@@ -22,7 +25,7 @@ const Layout = ({ children }) => {
     { label: "Dashboard", icon: Gauge, link: "/" },
     {
       label: "Master",
-      icon: Notes,
+      icon: BuildingCottage,
       initiallyOpened: true,
       links: [
         { label: "Produk", link: "/admin/produk" },
@@ -32,16 +35,43 @@ const Layout = ({ children }) => {
       ],
     },
     {
-      label: "Releases",
-      icon: CalendarStats,
+      label: "Notifikasi",
+      icon: Notification,
       links: [
-        { label: "Upcoming releases", link: "/" },
-        { label: "Previous releases", link: "/" },
-        { label: "Releases schedule", link: "/" },
+        { label: "Permintaan", link: "/" },
+        { label: "Kirim Pesan", link: "/" }
       ],
     },
-    { label: "Analytics", icon: PresentationAnalytics, link: "#" },
-    { label: "Contracts", icon: FileAnalytics, link: "#" },
+    {
+      label: "Users Management",
+      icon: Users,
+      links: [
+        { label: "Pelanggan Aktif", link: "/" },
+        { label: "Pelanggan Non Aktif", link: "/" },
+        { label: "Tagihan Pelanggan", link: "/" },
+        { label: "Pembayaran Tagihan", link: "/" }
+      ],
+    },
+  
+    {
+      label: "Instalasi",
+      icon: Server,
+      links: [
+        { label: "Pasang Baru", link: "/" },
+        { label: "Mutasi", link: "/" },
+        { label: "Paralel", link: "/" },
+      ],
+    },
+    {
+      label: "Transaksi",
+      icon: Receipt2,
+      links: [
+        { label: "Inventori Stok In", link: "/" },
+        { label: "Inventori Opname", link: "/" },
+        { label: "Tagihan Pelanggan", link: "/" },
+        { label: "Pembayaran Tagihan", link: "/" }
+      ],
+    },
     { label: "Settings", icon: Adjustments, link: "#" },
     {
       label: "Kontrol Akses",
