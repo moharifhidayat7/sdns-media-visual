@@ -16,7 +16,7 @@ import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useNotifications } from "@mantine/notifications";
 import dateFormat from "dateformat";
 import { Check, H3, X } from "tabler-icons-react";
-export default function Index({ inventori }) {
+export default function Index({ supplier }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
   const [modalStokLog, setModalStokLog] = useState({
@@ -25,11 +25,11 @@ export default function Index({ inventori }) {
   });
 
   useEffect(() => {
-    dispatch({ type: "set_data", payload: inventori });
+    dispatch({ type: "set_data", payload: supplier });
   }, []);
   const deleteHandler = async (selected, isLoading, type = "delete") => {
     const data = { id: selected };
-    const url = type == 'delete' ? `/api/inventori/${selected}` : `/api/inventori`;
+    const url = type == 'delete' ? `/api/supplier/${selected}` : `/api/supplier`;
     await fetch(url, {
       method: "DELETE",
       headers: {
@@ -63,7 +63,7 @@ export default function Index({ inventori }) {
     });
   }
   const refreshHandler = async (isLoading, page = 1, search = "") => {
-    const url = `http://localhost:3000/api/inventori?page=${page}&search=${search}`
+    const url = `http://localhost:3000/api/supplier?page=${page}&search=${search}`
     const res = await fetch(url);
     const data = await res.json();
     dispatch({ type: "set_data", payload: { ...data, search, page } });
@@ -79,20 +79,20 @@ export default function Index({ inventori }) {
       label: "Nama",
     },
     {
-      key: "tipe",
-      label: "Tipe",
+      key: "email",
+      label: "Email",
     },
     {
-      key: "merek",
-      label: "Merek",
+      key: "whatsapp",
+      label: "WhatsApp",
     },
     {
-      key: "satuan",
-      label: "Satuan",
+      key: "notelphone",
+      label: "No telphone",
     },
     {
-      key: "logstok",
-      label: "Log Stok",
+      key: "alamat",
+      label: "alamat",
     },
     {
       key: "createdAt",
@@ -104,10 +104,10 @@ export default function Index({ inventori }) {
   return (
     <Layout>
       <Head>
-        <title style={{ textTransform: "capitalize" }}>Master Inventori </title>
+        <title style={{ textTransform: "capitalize" }}>Master Supplier </title>
       </Head>
       <Title order={2} style={{ marginBottom: "1.5rem", textTransform: "capitalize" }}>
-        Data Inventori
+        Data Supplier
       </Title>
       <DataTable>
         <DataTable.Action
@@ -116,14 +116,14 @@ export default function Index({ inventori }) {
           onRefresh={(isLoading) => refreshHandler(isLoading)}
           onSearch={(search, isLoading) => refreshHandler(isLoading, 1, search)}
         />
-        <CustomTable header={header} name="inventori"
+        <CustomTable header={header} name="supplier"
           withSelection={true} withAction={true}>
           {state.data.result &&
             state.data.result.map((row) => {
               return (
                 <CustomTable.Row
                   key={row.id} id={row.id}
-                  readLink={`inventori/form?id=${row.id}&read=true`}
+                  readLink={`supplier/form?id=${row.id}&read=true`}
                   editLink={`/form?id=${row.id}`}
                   deleteField={row.nama}
                   onDelete={(isLoading) => deleteHandler(row.id, isLoading)} >
@@ -134,21 +134,16 @@ export default function Index({ inventori }) {
                     <Text className="uppercase">{row.nama}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase">{row.tipe}</Text>
+                    <Text className="uppercase">{row.email}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase">{row.merek}</Text>
+                    <Text className="uppercase">{row.whatsapp}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase">{row.satuan}</Text>
+                    <Text className="uppercase">{row.no_telphone}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Button variant="subtle"
-                      onClick={() => setModalStokLog({
-                        opened: true,
-                        title: `${row.kode} - ${row.nama} ${row.tipe} ${row.merek}`,
-                        data: row.logstok,
-                      })}>VIEW({row.logstok?row.logstok.length:0})</Button>
+                    <Text className="uppercase">{row.alamat}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text className="uppercase">{dateFormat(row.createdAt, "dd-mm-yyyy")}</Text>
@@ -159,65 +154,17 @@ export default function Index({ inventori }) {
         </CustomTable>
         <DataTable.Footer total={state.data.total} pages={state.data.pages} onChange={(page, isLoading) => refreshHandler(isLoading, page)} />
       </DataTable>
-      <ViewModalLogStok logstok={modalStokLog} setModalStokLog={setModalStokLog} />
     </Layout>
   );
 }
-const ViewModalLogStok = ({ logstok, setModalStokLog }) => {
-  //sum stok total
-  const sumStok = logstok.data.reduce((acc, cur) => {
-    return acc + cur.stok;
-  }, 0);
 
-  return (
-    <Modal
-      opened={logstok.opened}
-      onClose={() => setModalStokLog({
-        opened: false,
-        data: []
-      })}
-      size="lg"
-      transition="rotate-left"
-      title={logstok.title}
-    >
-      <Table verticalSpacing="xs" className="border">
-        <thead><tr>
-          <th>NO</th>
-          <th>Unique Date Log</th>
-          <th>Created On</th>
-          <th>Stok</th>
-        </tr></thead>
-        <tbody>{
-          logstok.data.map((element, key) => (
-            <tr key={element.id}>
-              <td>{key + 1}</td>
-              <td>{element.datelog}</td>
-              <td>{dateFormat(element.createdAt, "dd-mm-yyyy")}</td>
-              <td>{element.stok}</td>
-            </tr>
-          ))}</tbody>
-        <tfoot>
-          <tr>
-            <th colSpan="3"  >
-              Total
-            </th>
-            <th>
-              {sumStok}
-            </th>
-          </tr>
-
-        </tfoot>
-      </Table>
-    </Modal>
-  )
-}
 
 export async function getServerSideProps(context) {
-  const res = await fetch(`http://localhost:3000/api/inventori/`);
-  const inventori = await res.json();
+  const res = await fetch(`http://localhost:3000/api/supplier/`);
+  const supplier = await res.json();
   return {
     props: {
-      inventori,
+      supplier,
     },
   };
 

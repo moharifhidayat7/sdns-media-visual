@@ -51,7 +51,7 @@ const DataTable = ({ children }) => {
   );
 };
 
-const Footer = ({ total,pages, onChange = () => { } }) => {
+const Footer = ({ total, pages, onChange = () => { } }) => {
   const [activePage, setActivePage] = useState(1);
   const [state, dispatch] = useDataTableContext();
   return (
@@ -73,6 +73,7 @@ DataTable.Footer = Footer;
 const Action = ({
   onRefresh = () => { },
   onEdit,
+  filterVisibility=true,
   onDelete = () => { },
   onSearch = () => { },
 }) => {
@@ -179,14 +180,15 @@ const Action = ({
               })
             }}
           />
+          {filterVisibility&&
           <ActionIcon
             size={36}
             color="blue"
             variant={state.showFilter ? "filled" : "default"}
             onClick={() => dispatch({ type: "toggle_filter" })}
           >
-            <FilterIcon />
-          </ActionIcon>
+            <FilterIcon/>
+          </ActionIcon>}
         </Group>
       </Group>
     </div>
@@ -222,6 +224,7 @@ const Filter = ({ children, form, onFilter = () => { } }) => {
   };
 
   return (
+
     <Collapse
       in={state.showFilter}
       transitionDuration={200}

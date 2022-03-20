@@ -28,6 +28,10 @@ model User {
   updatedInventori   Inventori[] @relation("userInventoriUpdate")
   createdLogstok     Logstok[]   @relation("logstokcreatedBy")
   updatedLogstok     Logstok[]   @relation("logstokupdatedBy")
+  createdSupplier    Supplier[]  @relation("suppliercreatedBy")
+  updatedSupplier    Supplier[]  @relation("supplierupdatedBy")
+  createdGudang      Gudang[]    @relation("gudangcreatedBy")
+  updatedGudang      Gudang[]    @relation("gudangupdatedBy")
 }
 
 model Produk {
@@ -45,6 +49,41 @@ model Produk {
   createdId Int?
 }
 
+model Gudang {
+  id        Int       @id @default(autoincrement())
+  kode      String
+  nama      String
+  status    Status    @default(INACTIVE)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  isDeleted Boolean?  @default(false)
+  updatedBy User?     @relation(fields: [updatedId], references: [id], name: "gudangupdatedBy")
+  createdBy User?     @relation(fields: [createdId], references: [id], name: "gudangcreatedBy")
+  updatedId Int?
+  createdId Int?
+  Logstok   Logstok[] @relation("gudang")
+}
+
+model Supplier {
+  id          Int       @id @default(autoincrement())
+  kode        String
+  nama        String
+  alamat      String    @db.Text
+  whatsapp    String?
+  no_telphone String
+  email       String?
+  status      Status    @default(INACTIVE)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  isDeleted   Boolean?  @default(false)
+  updatedBy   User?     @relation(fields: [updatedId], references: [id], name: "supplierupdatedBy")
+  createdBy   User?     @relation(fields: [createdId], references: [id], name: "suppliercreatedBy")
+  updatedId   Int?
+  createdId   Int?
+}
+
 model Inventori {
   id         Int       @id @default(autoincrement())
   kode       String
@@ -52,10 +91,9 @@ model Inventori {
   merek      String
   nama       String
   harga_beli Int
-  harga_jual Int?
-  stok_awal  Int
-  stok       Int
-  satuan     String   
+  stok_awal  Int?
+  stok       Int?
+  satuan     String
   logstok    Logstok[] @relation("inventori")
   status     Status    @default(INACTIVE)
   createdAt  DateTime  @default(now())
@@ -71,8 +109,10 @@ model Inventori {
 model Logstok {
   id          Int        @id @default(autoincrement())
   stok        Int
-  datelog     String  
+  datelog     String
   inventori   Inventori? @relation("inventori", fields: [inventoriId], references: [id])
+  gudang      Gudang?    @relation("gudang", fields: [gudangId], references: [id])
+  gudangId    Int?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   deletedAt   DateTime?

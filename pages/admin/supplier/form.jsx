@@ -8,9 +8,7 @@ import {
   Switch,
   Button,
   TextInput,
-  Loader,
-  Tooltip,
-  Select,
+  Loader
 } from "@mantine/core";
 import Head from "next/head";
 import Layout from "@components/views/Layout";
@@ -19,16 +17,14 @@ import { useRouter } from "next/router";
 import { useForm } from "@mantine/form";
 import { generateCode, getTitle, inputNumberOnly } from "helpers/functions";
 import { useNotifications } from "@mantine/notifications";
-import { Check, X } from "tabler-icons-react";
-function Form({ inventori, action }) {
+import { Mail, Check, X } from "tabler-icons-react";
+function Form({ supplier, action }) {
   const form = useForm({
-    initialValues: { kode: "", nama: "", tipe: "", merek: "", harga_beli: "",  satuan: "", status: "" },
+    initialValues: { kode: "", nama: "",email:"", alamat: "", no_telphone: "", whatsapp: "", status: "" },
     validate: {
       nama: (value) => (value.length < 1 ? "Plese input nama." : null),
-      tipe: (value) => (value.length < 1 ? "Plese input tipe." : null),
-      merek: (value) => (value.length < 1 ? "Plese input merek." : null),
-      harga_beli: (value) => (value.length < 1 ? "Plese input harga beli." : null),
-      satuan: (value) => (value.length < 1 ? "Plese input satuan." : null),
+      alamat: (value) => (value.length < 1 ? "Plese input alamat." : null),
+      no_telphone: (value) => (value.length < 1 ? "Plese input no telphone." : null),
     },
   });
   const [opened, setOpened] = useState(true);
@@ -39,28 +35,28 @@ function Form({ inventori, action }) {
   useEffect(() => {
     if (action != "add") {
       form.setValues({
-        kode: inventori.kode,
-        nama: inventori.nama,
-        tipe: inventori.tipe,
-        merek: inventori.merek,
-        satuan: inventori.satuan,
-        harga_beli: inventori.harga_beli,
-        status: inventori.status,
+        kode: supplier.kode,
+        nama: supplier.nama,
+        email: supplier.email,
+        no_telphone: supplier.no_telphone,
+        whatsapp: supplier.whatsapp,
+        alamat: supplier.alamat,
+        status: supplier.status,
       });
       setOpened(false);
       if (action == "read") {
         setDisabled(true);
       }
     } else {
-      const codeInt = inventori.id ? inventori.id : 0;
-      const code = generateCode("INV", parseInt(codeInt) + 1);
+      const codeInt = supplier.id ? supplier.id : 0;
+      const code = generateCode("SUP", parseInt(codeInt) + 1);
       form.setValues({
         kode: code,
         nama: "",
-        tipe: "",
-        merek: "",
-        satuan: "",
-        harga_beli: "",
+        email: "",
+        no_telphone: "",
+        alamat: "",
+        whatsapp: "",
         status: "INACTIVE"
       })
     }
@@ -71,7 +67,7 @@ function Form({ inventori, action }) {
     setLoading(false);
     const data = form.values;
     const method = action === "edit" ? "PUT" : "POST";
-    const url = action === "edit" ? `/api/inventori/${inventori.id}` : `/api/inventori`;
+    const url = action === "edit" ? `/api/supplier/${supplier.id}` : `/api/supplier`;
     const notifTitle = action.charAt(0).toUpperCase() + action.slice(1);
     await fetch(url, {
       method,
@@ -91,7 +87,7 @@ function Form({ inventori, action }) {
           loading: false,
         });
         router.push({
-          pathname: "/admin/inventori",
+          pathname: "/admin/supplier",
         });
       } else {
         setLoading(true);
@@ -113,10 +109,10 @@ function Form({ inventori, action }) {
         <Loader size="xl" variant="bars" color="orange" />;
       </div>
       <Head>
-        <title>Master Inventori</title>
+        <title>Master Supplier</title>
       </Head>
       <Title order={2} style={{ marginBottom: "1.5rem" }}>
-        {action == "read" ? "Read" : "Form"} Inventori
+        {action == "read" ? "Read" : "Form"} Supplier
       </Title>
 
       <Box sx={(theme) => ({
@@ -136,46 +132,18 @@ function Form({ inventori, action }) {
               <Group direction="column" grow spacing="lg">
                 <TextInput label="Kode" disabled={disabled} name="kode" readOnly value={form.values.kode} />
                 <TextInput label="Nama" disabled={disabled} {...form.getInputProps('nama')} value={form.values.nama} onChange={(e) => form.setFieldValue("nama", e.currentTarget.value)} />
-          
-                <Grid>
-                 <Grid.Col sm={12} md={6}>
-                 <TextInput icon="Rp" onInput={(e) => inputNumberOnly(e)} label="Harga Beli" description="" disabled={disabled} {...form.getInputProps('harga_beli')} value={form.values.harga_beli} onChange={(e) => form.setFieldValue("harga_beli", e.currentTarget.value)} />
-                  </Grid.Col>
-                 <Grid.Col sm={12} md={6}>
-                   <Select
-                     label="Satuan"
-                     {...form.getInputProps('satuan')}
-                     onChange={(e) => form.setFieldValue("satuan", e)}
-                     value={form.values.satuan}
-                     data={["Meter", "Kg", "Litre", "Box", "Pcs"]}
-                     placeholder="Select items"
-                     nothingFound="Nothing found"
-                     searchable
-                     disabled={disabled}
-                   />
-                 </Grid.Col>
-               </Grid>
-              </Group>
-            </Grid.Col>
-            <Grid.Col sm={12} md={6}>
-              <Group direction="column" grow spacing="lg" >
-                <InputWrapper label="Tipe">
-                  <TextInput disabled={disabled} {...form.getInputProps('tipe')} value={form.values.tipe} onChange={(e) => form.setFieldValue("tipe", e.currentTarget.value)} />
+                <TextInput icon={<Mail />} label="Email" disabled={disabled} {...form.getInputProps('email')} value={form.values.email} onChange={(e) => form.setFieldValue("email", e.currentTarget.value)} />
+                <TextInput  label="No Telphone" disabled={disabled} {...form.getInputProps('no_telphone')} value={form.values.no_telphone} onChange={(e) => form.setFieldValue("no_telphone", e.currentTarget.value)} />
+                <TextInput  label="WhatsApp" disabled={disabled} {...form.getInputProps('whatsapp')} value={form.values.whatsapp} onChange={(e) => form.setFieldValue("whatsapp", e.currentTarget.value)} />
+                <TextInput  label="Alamat" disabled={disabled} {...form.getInputProps('alamat')} value={form.values.alamat} onChange={(e) => form.setFieldValue("alamat", e.currentTarget.value)} />
+                <InputWrapper label="Status">
+                  <Switch disabled={disabled} name="status" checked={form.values.status === "ACTIVE"} onChange={(e) => form.setFieldValue("status", e.currentTarget.checked ? "ACTIVE" : "INACTIVE")} onLabel="ON" offLabel="OFF" size="lg" radius="lg" />
                 </InputWrapper>
-                <InputWrapper label="Merek">
-                  <TextInput disabled={disabled} {...form.getInputProps('merek')} value={form.values.merek} onChange={(e) => form.setFieldValue("merek", e.currentTarget.value)} />
-                </InputWrapper>
-             
               </Group>
-            </Grid.Col>
-            <Grid.Col sm={12} md={6}>
-              <InputWrapper label="Status">
-                <Switch disabled={disabled} name="status" checked={form.values.status === "ACTIVE"} onChange={(e) => form.setFieldValue("status", e.currentTarget.checked ? "ACTIVE" : "INACTIVE")} onLabel="ON" offLabel="OFF" size="lg" radius="lg" />
-              </InputWrapper>
             </Grid.Col>
           </Grid>
           <div className="space-x-2 mt-10">
-            <Button type="button" onClick={() => router.back()} color="red">Back</Button>
+            <Button type="button" onClick={() => router.push("/admin/supplier")} color="red">Back</Button>
             {!disabled && <Button type="submit">Submit</Button>}
           </div>
         </form>
@@ -186,22 +154,22 @@ function Form({ inventori, action }) {
 export async function getServerSideProps(context) {
   const id = context.query.id;
   const read = context.query.read;
-  let inventori = {};
+  let supplier = [];
   let action = "add";
   if (id) {
-    let res = await fetch(`http://localhost:3000/api/inventori/${id}`);
+    let res = await fetch(`http://localhost:3000/api/supplier/${id}`);
     action = "edit";
-    inventori = await res.json();
+    supplier = await res.json();
     if (res.status === 403) {
-      let res = await fetch(`http://localhost:3000/api/inventori`);
-      const inventoris = await res.json();
-      inventori = inventoris.result.length > 0 ? inventoris.result[0] : inventoris;
+      let res = await fetch(`http://localhost:3000/api/supplier`);
+      const suppliers = await res.json();
+      supplier = suppliers.result.length > 0 ? suppliers.result[0] : suppliers;
       action = "add";
     }
   } else {
-    let res = await fetch(`http://localhost:3000/api/inventori`);
-    const inventoris = await res.json();
-    inventori = inventoris.result.length > 0 ? inventoris.result[0] : inventoris;
+    let res = await fetch(`http://localhost:3000/api/supplier`);
+    const suppliers = await res.json();
+    supplier = suppliers.result.length > 0 ? suppliers.result[0] : suppliers;
     action = "add";
   }
   if (read) {
@@ -209,7 +177,7 @@ export async function getServerSideProps(context) {
   }
   return {
     props: {
-      action, inventori,
+      action, supplier,
     },
   };
 }

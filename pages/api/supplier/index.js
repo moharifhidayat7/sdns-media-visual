@@ -1,47 +1,39 @@
 import { PrismaClient } from "@prisma/client";
-import dateFormat from "dateformat";
 const prisma = new PrismaClient();
-
-const inventori = async (req, res) => {
+//prisma create produk
+export default async (req, res) => {
    const data = req.body;
-   const method = req.method;
-   if (method == "POST") {
+   if (req.method == "POST") {
       try {
-         const inventori = await prisma.inventori.create({
+         const supplier = await prisma.supplier.create({
             data: {
                ...data,
-               harga_beli: parseInt(data.harga_beli),
-               stok: parseInt(data.stok?data.stok:0),
-               createdId: 1,
-               updatedId: 1
+               createdId: parseInt(data.createdId),
+               updatedId: parseInt(data.updatedId),
             }
          });
-   
          res.statusCode = 200;
          res.json({
-            message: "Inventori created",
-            inventori
+            message: res.message,
+            supplier,
          });
       } catch (error) {
          res.statusCode = 400;
-         res.json({
-            message: "Inventori not created",
-            error: error.message,
-         });
+         res.json({ error: error.message });
       }
-   } else if (method == "GET") {
+   }
+   else if (req.method == "GET") {
       const search = req.query.search || "";
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10;
       const skip = (page - 1) * limit;
       try {
-         const inventori = await prisma.inventori.findMany({
+         const supplier = await prisma.supplier.findMany({
             skip,
             take: limit,
             include: {
                createdBy: true,
                updatedBy: true,
-               logstok: true
             },
             where: {
                isDeleted: false,
@@ -62,7 +54,7 @@ const inventori = async (req, res) => {
                createdAt: "desc",
             },
          });
-         const totalInventori= await prisma.inventori.count({
+         const totalSupplier = await prisma.supplier.count({
             where: {
                isDeleted: false,
                OR: [
@@ -78,47 +70,41 @@ const inventori = async (req, res) => {
                   }
                ]
             },
-            
+
          });
-         const pages = Math.ceil(totalInventori / limit);
+         const pages = Math.ceil(totalSupplier / limit);
          res.json({
             status: "success",
-            message: "Berhasil mengambil data inventori",
-            result: inventori,
+            message: "Berhasil mengambil data supplier",
+            result: supplier,
+            total: totalSupplier,
             pages,
-            total: totalInventori,
             page,
             limit,
          });
       } catch (err) {
-         res.status(403).json({ err: "Error occured." });
-      }
-   } else if (method == "DELETE") {
-      try {
-         const result = await prisma.inventori.updateMany({
-            where: {
-               id: { in: data.id }
-            }, data: {
-               isDeleted: true,
-               deletedAt: new Date(),
-               updatedId: 1,
-            }
-         })
-
-         await prisma.logstok.updateMany({
-            where: {
-               inventoriId: { in: data.id }
-            }, data: {
-               isDeleted: true,
-               deletedAt: new Date(),
-               updatedId: 1,
-            }
-         })
-
-         res.status(200).json(result);
-      } catch (err) {
          res.status(403).json({ err: err.message });
       }
    }
-}
-export default inventori;
+   else if (req.method == "DELETE") {
+
+      try {
+         const supplier = await prisma.supplier.updateMany({
+            where: {
+               id: { in: data.id }
+            },
+            data: {
+               isDeleted: true,
+               deletedAt: new Date(),
+            }
+         });
+         res.statusCode = 200;
+         res.json({
+            message: "supplier deleted",
+            supplier,
+         });
+      } catch (error) {
+         res.status(403).json({ err: err.message });
+      }
+   }
+};

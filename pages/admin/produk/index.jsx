@@ -101,6 +101,7 @@ export default function Index({ produk }) {
       </Title>
       <DataTable>
         <DataTable.Action
+        filterVisibility={false}
           onDelete={(selected, isLoading) => {
             deleteHandler(selected, isLoading, "delete_many")
           }}
