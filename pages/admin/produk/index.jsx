@@ -1,11 +1,7 @@
 import Head from "next/head";
 
 import Layout from "@components/views/Layout";
-import {
-  Title,
-  Text,
-  Button,
-} from "@mantine/core";
+import { Title, Text, Button } from "@mantine/core";
 
 import { CustomTable } from "@components/Table/CustomTable";
 import DataTable from "@components/Table/DataTable";
@@ -27,7 +23,7 @@ export default function Index({ produk }) {
   }, []);
   const deleteHandler = async (selected, isLoading, type = "delete") => {
     const data = { id: selected };
-    const url = type == 'delete' ? `/api/produk/${selected}` : `/api/produk`;
+    const url = type == "delete" ? `/api/produk/${selected}` : `/api/produk`;
     await fetch(url, {
       method: "DELETE",
       headers: {
@@ -46,7 +42,7 @@ export default function Index({ produk }) {
           color: "green",
           icon: <Check />,
           loading: false,
-        })
+        });
       } else {
         notifications.showNotification({
           disallowClose: true,
@@ -56,19 +52,18 @@ export default function Index({ produk }) {
           color: "red",
           icon: <X />,
           loading: false,
-        })
+        });
       }
     });
-  }
+  };
   const refreshHandler = async (isLoading = null, page = 1, search = "") => {
-
-    const url = `http://localhost:3000/api/produk?page=${page}&search=${search}`
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/produk?page=${page}&search=${search}`;
     const res = await fetch(url);
     const data = await res.json();
 
     dispatch({ type: "set_data", payload: { ...data, search, page } });
     isLoading(false);
-  }
+  };
   const header = [
     {
       key: "kode",
@@ -100,29 +95,40 @@ export default function Index({ produk }) {
       <Head>
         <title style={{ textTransform: "capitalize" }}>Master Produk </title>
       </Head>
-      <Title order={2} style={{ marginBottom: "1.5rem", textTransform: "capitalize" }}>
+      <Title
+        order={2}
+        style={{ marginBottom: "1.5rem", textTransform: "capitalize" }}
+      >
         Data Produk
       </Title>
       <DataTable>
         <DataTable.Action
-        filterVisibility={false}
+          filterVisibility={false}
           onDelete={(selected, isLoading) => {
-            deleteHandler(selected, isLoading, "delete_many")
+            deleteHandler(selected, isLoading, "delete_many");
           }}
-          onRefresh={(isLoading) => refreshHandler(isLoading)} onSearch={(value, isLoading) => refreshHandler(isLoading, 1, value)} />
-        <CustomTable header={header} name="produk"
-          withSelection={true} withAction={true}>
+          onRefresh={(isLoading) => refreshHandler(isLoading)}
+          onSearch={(value, isLoading) => refreshHandler(isLoading, 1, value)}
+        />
+        <CustomTable
+          header={header}
+          name="produk"
+          withSelection={true}
+          withAction={true}
+        >
           {state.data.result &&
             state.data.result.map((row) => {
               return (
                 <CustomTable.Row
-                  key={row.id} id={row.id}
+                  key={row.id}
+                  id={row.id}
                   readLink={`produk/form?id=${row.id}&read=true`}
                   editLink={`/form?id=${row.id}`}
                   deleteField={row.nama}
                   onDelete={(isLoading) => {
-                    deleteHandler(row.id, isLoading)
-                  }} >
+                    deleteHandler(row.id, isLoading);
+                  }}
+                >
                   <CustomTable.Col>
                     <Text className="">{row.kode}</Text>
                   </CustomTable.Col>
@@ -139,24 +145,32 @@ export default function Index({ produk }) {
                     <Text className="uppercase">{row.status}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase">{dateFormat(row.createdAt, "dd-mm-yyyy")}</Text>
+                    <Text className="uppercase">
+                      {dateFormat(row.createdAt, "dd-mm-yyyy")}
+                    </Text>
                   </CustomTable.Col>
                 </CustomTable.Row>
               );
             })}
         </CustomTable>
-        <DataTable.Footer total={state.data.total} pages={state.data.pages} onChange={(page, isLoading) => refreshHandler(isLoading, page, state.data.search)} />
+        <DataTable.Footer
+          total={state.data.total}
+          pages={state.data.pages}
+          onChange={(page, isLoading) =>
+            refreshHandler(isLoading, page, state.data.search)
+          }
+        />
       </DataTable>
     </Layout>
   );
 }
 //function get server side props produk
 export async function getServerSideProps(context) {
-  const res = await fetch('http://localhost:3000/api/produk?page=0');
+  const res = await fetch(`${process.env.API_URL}/api/produk?page=0`);
   const produk = await res.json();
   return {
     props: {
       produk,
     },
-  }
+  };
 }

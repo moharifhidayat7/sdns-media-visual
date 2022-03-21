@@ -1,13 +1,7 @@
 import Head from "next/head";
 
 import Layout from "@components/views/Layout";
-import {
-  Title,
-  Text,
-  Button,
-  Modal,
-  Table,
-} from "@mantine/core";
+import { Title, Text, Button, Modal, Table } from "@mantine/core";
 
 import { CustomTable } from "@components/Table/CustomTable";
 import DataTable from "@components/Table/DataTable";
@@ -29,7 +23,8 @@ export default function Index({ supplier }) {
   }, []);
   const deleteHandler = async (selected, isLoading, type = "delete") => {
     const data = { id: selected };
-    const url = type == 'delete' ? `/api/supplier/${selected}` : `/api/supplier`;
+    const url =
+      type == "delete" ? `/api/supplier/${selected}` : `/api/supplier`;
     await fetch(url, {
       method: "DELETE",
       headers: {
@@ -48,7 +43,7 @@ export default function Index({ supplier }) {
           color: "green",
           icon: <Check />,
           loading: false,
-        })
+        });
       } else {
         notifications.showNotification({
           disallowClose: true,
@@ -58,17 +53,17 @@ export default function Index({ supplier }) {
           color: "red",
           icon: <X />,
           loading: false,
-        })
+        });
       }
     });
-  }
+  };
   const refreshHandler = async (isLoading, page = 1, search = "") => {
-    const url = `http://localhost:3000/api/supplier?page=${page}&search=${search}`
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/supplier?page=${page}&search=${search}`;
     const res = await fetch(url);
     const data = await res.json();
     dispatch({ type: "set_data", payload: { ...data, search, page } });
     isLoading(false);
-  }
+  };
   const header = [
     {
       key: "kode",
@@ -93,7 +88,8 @@ export default function Index({ supplier }) {
     {
       key: "alamat",
       label: "Alamat",
-    }, {
+    },
+    {
       key: "status",
       label: "Status",
     },
@@ -103,33 +99,43 @@ export default function Index({ supplier }) {
     },
   ];
 
-
   return (
     <Layout>
       <Head>
         <title style={{ textTransform: "capitalize" }}>Master Supplier </title>
       </Head>
-      <Title order={2} style={{ marginBottom: "1.5rem", textTransform: "capitalize" }}>
+      <Title
+        order={2}
+        style={{ marginBottom: "1.5rem", textTransform: "capitalize" }}
+      >
         Data Supplier
       </Title>
       <DataTable>
         <DataTable.Action
-        filterVisibility={false}
-          onDelete={(selected, isLoading) => deleteHandler(selected, isLoading, "delete_many")}
+          filterVisibility={false}
+          onDelete={(selected, isLoading) =>
+            deleteHandler(selected, isLoading, "delete_many")
+          }
           onRefresh={(isLoading) => refreshHandler(isLoading)}
           onSearch={(search, isLoading) => refreshHandler(isLoading, 1, search)}
         />
-        <CustomTable header={header} name="supplier"
-          withSelection={true} withAction={true}>
+        <CustomTable
+          header={header}
+          name="supplier"
+          withSelection={true}
+          withAction={true}
+        >
           {state.data.result &&
             state.data.result.map((row) => {
               return (
                 <CustomTable.Row
-                  key={row.id} id={row.id}
+                  key={row.id}
+                  id={row.id}
                   readLink={`supplier/form?id=${row.id}&read=true`}
                   editLink={`/form?id=${row.id}`}
                   deleteField={row.nama}
-                  onDelete={(isLoading) => deleteHandler(row.id, isLoading)} >
+                  onDelete={(isLoading) => deleteHandler(row.id, isLoading)}
+                >
                   <CustomTable.Col>
                     <Text>{row.kode}</Text>
                   </CustomTable.Col>
@@ -152,26 +158,30 @@ export default function Index({ supplier }) {
                     <Text className="uppercase">{row.status}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase">{dateFormat(row.createdAt, "dd-mm-yyyy")}</Text>
+                    <Text className="uppercase">
+                      {dateFormat(row.createdAt, "dd-mm-yyyy")}
+                    </Text>
                   </CustomTable.Col>
                 </CustomTable.Row>
               );
             })}
         </CustomTable>
-        <DataTable.Footer total={state.data.total} pages={state.data.pages} onChange={(page, isLoading) => refreshHandler(isLoading, page)} />
+        <DataTable.Footer
+          total={state.data.total}
+          pages={state.data.pages}
+          onChange={(page, isLoading) => refreshHandler(isLoading, page)}
+        />
       </DataTable>
     </Layout>
   );
 }
 
-
 export async function getServerSideProps(context) {
-  const res = await fetch(`http://localhost:3000/api/supplier/`);
+  const res = await fetch(`${process.env.API_URL}/api/supplier/`);
   const supplier = await res.json();
   return {
     props: {
       supplier,
     },
   };
-
 }

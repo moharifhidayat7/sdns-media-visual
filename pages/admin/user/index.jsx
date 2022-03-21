@@ -212,7 +212,7 @@ export default function Index({ users }) {
 }
 
 export const getServerSideProps = async (ctx) => {
-  const users = await fetch("http://localhost:3000/api/user").then((res) =>
+  const users = await fetch(`${process.env.API_URL}/api/user`).then((res) =>
     res.json()
   );
 

@@ -8,7 +8,7 @@ import {
   Switch,
   Button,
   TextInput,
-  Loader
+  Loader,
 } from "@mantine/core";
 import Head from "next/head";
 import Layout from "@components/views/Layout";
@@ -20,11 +20,20 @@ import { useNotifications } from "@mantine/notifications";
 import { Mail, Check, X } from "tabler-icons-react";
 function Form({ supplier, action }) {
   const form = useForm({
-    initialValues: { kode: "", nama: "",email:"", alamat: "", no_telphone: "", whatsapp: "", status: "" },
+    initialValues: {
+      kode: "",
+      nama: "",
+      email: "",
+      alamat: "",
+      no_telphone: "",
+      whatsapp: "",
+      status: "",
+    },
     validate: {
       nama: (value) => (value.length < 1 ? "Plese input nama." : null),
       alamat: (value) => (value.length < 1 ? "Plese input alamat." : null),
-      no_telphone: (value) => (value.length < 1 ? "Plese input no telphone." : null),
+      no_telphone: (value) =>
+        value.length < 1 ? "Plese input no telphone." : null,
     },
   });
   const [opened, setOpened] = useState(true);
@@ -57,8 +66,8 @@ function Form({ supplier, action }) {
         no_telphone: "",
         alamat: "",
         whatsapp: "",
-        status: "INACTIVE"
-      })
+        status: "INACTIVE",
+      });
     }
   }, []);
   const submitHandler = async (e) => {
@@ -67,7 +76,8 @@ function Form({ supplier, action }) {
     setLoading(false);
     const data = form.values;
     const method = action === "edit" ? "PUT" : "POST";
-    const url = action === "edit" ? `/api/supplier/${supplier.id}` : `/api/supplier`;
+    const url =
+      action === "edit" ? `/api/supplier/${supplier.id}` : `/api/supplier`;
     const notifTitle = action.charAt(0).toUpperCase() + action.slice(1);
     await fetch(url, {
       method,
@@ -115,35 +125,104 @@ function Form({ supplier, action }) {
         {action == "read" ? "Read" : "Form"} Supplier
       </Title>
 
-      <Box sx={(theme) => ({
-        border: "1px solid",
-        borderRadius: theme.radius.sm,
-        padding: theme.spacing.sm,
-        backgroundColor:
-          theme.colorScheme === "dark" ? theme.colors.dark[7] : "white",
-        borderColor:
-          theme.colorScheme === "dark"
-            ? theme.colors.dark[6]
-            : theme.colors.gray[4],
-      })} >
+      <Box
+        sx={(theme) => ({
+          border: "1px solid",
+          borderRadius: theme.radius.sm,
+          padding: theme.spacing.sm,
+          backgroundColor:
+            theme.colorScheme === "dark" ? theme.colors.dark[7] : "white",
+          borderColor:
+            theme.colorScheme === "dark"
+              ? theme.colors.dark[6]
+              : theme.colors.gray[4],
+        })}
+      >
         <form autoComplete="off" method="post" onSubmit={submitHandler}>
-          <Grid >
+          <Grid>
             <Grid.Col sm={12} md={6}>
               <Group direction="column" grow spacing="lg">
-                <TextInput label="Kode" disabled={disabled} name="kode" readOnly value={form.values.kode} />
-                <TextInput label="Nama" disabled={disabled} {...form.getInputProps('nama')} value={form.values.nama} onChange={(e) => form.setFieldValue("nama", e.currentTarget.value)} />
-                <TextInput icon={<Mail />} label="Email" disabled={disabled} {...form.getInputProps('email')} value={form.values.email} onChange={(e) => form.setFieldValue("email", e.currentTarget.value)} />
-                <TextInput  label="No Telphone" disabled={disabled} {...form.getInputProps('no_telphone')} value={form.values.no_telphone} onChange={(e) => form.setFieldValue("no_telphone", e.currentTarget.value)} />
-                <TextInput  label="WhatsApp" disabled={disabled} {...form.getInputProps('whatsapp')} value={form.values.whatsapp} onChange={(e) => form.setFieldValue("whatsapp", e.currentTarget.value)} />
-                <TextInput  label="Alamat" disabled={disabled} {...form.getInputProps('alamat')} value={form.values.alamat} onChange={(e) => form.setFieldValue("alamat", e.currentTarget.value)} />
+                <TextInput
+                  label="Kode"
+                  disabled={disabled}
+                  name="kode"
+                  readOnly
+                  value={form.values.kode}
+                />
+                <TextInput
+                  label="Nama"
+                  disabled={disabled}
+                  {...form.getInputProps("nama")}
+                  value={form.values.nama}
+                  onChange={(e) =>
+                    form.setFieldValue("nama", e.currentTarget.value)
+                  }
+                />
+                <TextInput
+                  icon={<Mail />}
+                  label="Email"
+                  disabled={disabled}
+                  {...form.getInputProps("email")}
+                  value={form.values.email}
+                  onChange={(e) =>
+                    form.setFieldValue("email", e.currentTarget.value)
+                  }
+                />
+                <TextInput
+                  label="No Telphone"
+                  disabled={disabled}
+                  {...form.getInputProps("no_telphone")}
+                  value={form.values.no_telphone}
+                  onChange={(e) =>
+                    form.setFieldValue("no_telphone", e.currentTarget.value)
+                  }
+                />
+                <TextInput
+                  label="WhatsApp"
+                  disabled={disabled}
+                  {...form.getInputProps("whatsapp")}
+                  value={form.values.whatsapp}
+                  onChange={(e) =>
+                    form.setFieldValue("whatsapp", e.currentTarget.value)
+                  }
+                />
+                <TextInput
+                  label="Alamat"
+                  disabled={disabled}
+                  {...form.getInputProps("alamat")}
+                  value={form.values.alamat}
+                  onChange={(e) =>
+                    form.setFieldValue("alamat", e.currentTarget.value)
+                  }
+                />
                 <InputWrapper label="Status">
-                  <Switch disabled={disabled} name="status" checked={form.values.status === "ACTIVE"} onChange={(e) => form.setFieldValue("status", e.currentTarget.checked ? "ACTIVE" : "INACTIVE")} onLabel="ON" offLabel="OFF" size="lg" radius="lg" />
+                  <Switch
+                    disabled={disabled}
+                    name="status"
+                    checked={form.values.status === "ACTIVE"}
+                    onChange={(e) =>
+                      form.setFieldValue(
+                        "status",
+                        e.currentTarget.checked ? "ACTIVE" : "INACTIVE"
+                      )
+                    }
+                    onLabel="ON"
+                    offLabel="OFF"
+                    size="lg"
+                    radius="lg"
+                  />
                 </InputWrapper>
               </Group>
             </Grid.Col>
           </Grid>
           <div className="space-x-2 mt-10">
-            <Button type="button" onClick={() => router.push("/admin/supplier")} color="red">Back</Button>
+            <Button
+              type="button"
+              onClick={() => router.push("/admin/supplier")}
+              color="red"
+            >
+              Back
+            </Button>
             {!disabled && <Button type="submit">Submit</Button>}
           </div>
         </form>
@@ -157,17 +236,17 @@ export async function getServerSideProps(context) {
   let supplier = [];
   let action = "add";
   if (id) {
-    let res = await fetch(`http://localhost:3000/api/supplier/${id}`);
+    let res = await fetch(`${process.env.API_URL}/api/supplier/${id}`);
     action = "edit";
     supplier = await res.json();
     if (res.status === 403) {
-      let res = await fetch(`http://localhost:3000/api/supplier`);
+      let res = await fetch(`${process.env.API_URL}/api/supplier`);
       const suppliers = await res.json();
       supplier = suppliers.result.length > 0 ? suppliers.result[0] : suppliers;
       action = "add";
     }
   } else {
-    let res = await fetch(`http://localhost:3000/api/supplier`);
+    let res = await fetch(`${process.env.API_URL}/api/supplier`);
     const suppliers = await res.json();
     supplier = suppliers.result.length > 0 ? suppliers.result[0] : suppliers;
     action = "add";
@@ -177,7 +256,8 @@ export async function getServerSideProps(context) {
   }
   return {
     props: {
-      action, supplier,
+      action,
+      supplier,
     },
   };
 }

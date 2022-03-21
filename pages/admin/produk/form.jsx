@@ -47,7 +47,8 @@ function Form({ produk, action }) {
       form.setValues({
         kode: code,
         nama: "",
-        status: "INACTIVE"})
+        status: "INACTIVE",
+      });
     }
   }, []);
   const submitHandler = async (e) => {
@@ -100,36 +101,69 @@ function Form({ produk, action }) {
         <title>Master Produk</title>
       </Head>
       <Title order={2} style={{ marginBottom: "1.5rem" }}>
-        {action=="read"?"Read":"Form"} Produk
+        {action == "read" ? "Read" : "Form"} Produk
       </Title>
 
-      <Box sx={(theme) => ({
-        border: "1px solid",
-        borderRadius: theme.radius.sm,
-        padding: theme.spacing.sm,
-        backgroundColor:
-          theme.colorScheme === "dark" ? theme.colors.dark[7] : "white",
-        borderColor:
-          theme.colorScheme === "dark"
-            ? theme.colors.dark[6]
-            : theme.colors.gray[4],
-      })} >
+      <Box
+        sx={(theme) => ({
+          border: "1px solid",
+          borderRadius: theme.radius.sm,
+          padding: theme.spacing.sm,
+          backgroundColor:
+            theme.colorScheme === "dark" ? theme.colors.dark[7] : "white",
+          borderColor:
+            theme.colorScheme === "dark"
+              ? theme.colors.dark[6]
+              : theme.colors.gray[4],
+        })}
+      >
         <form autoComplete="off" method="post" onSubmit={submitHandler}>
           <Grid>
             <Grid.Col sm={12} md={6}>
               <Group direction="column" grow spacing="lg">
                 <InputWrapper label="Kode">
-                  <Input disabled={disabled} name="kode" readOnly value={form.values.kode} />
+                  <Input
+                    disabled={disabled}
+                    name="kode"
+                    readOnly
+                    value={form.values.kode}
+                  />
                 </InputWrapper>
                 <InputWrapper label="Nama">
-                  <TextInput disabled={disabled} {...form.getInputProps('nama')} value={form.values.nama} onChange={(e) => form.setFieldValue("nama", e.currentTarget.value)} />
+                  <TextInput
+                    disabled={disabled}
+                    {...form.getInputProps("nama")}
+                    value={form.values.nama}
+                    onChange={(e) =>
+                      form.setFieldValue("nama", e.currentTarget.value)
+                    }
+                  />
                 </InputWrapper>
                 <InputWrapper label="Status">
-                  <Switch disabled={disabled} name="status" checked={form.values.status === "ACTIVE"} onChange={(e) => form.setFieldValue("status", e.currentTarget.checked ? "ACTIVE" : "INACTIVE")} onLabel="ON" offLabel="OFF" size="lg" radius="lg" />
+                  <Switch
+                    disabled={disabled}
+                    name="status"
+                    checked={form.values.status === "ACTIVE"}
+                    onChange={(e) =>
+                      form.setFieldValue(
+                        "status",
+                        e.currentTarget.checked ? "ACTIVE" : "INACTIVE"
+                      )
+                    }
+                    onLabel="ON"
+                    offLabel="OFF"
+                    size="lg"
+                    radius="lg"
+                  />
                 </InputWrapper>
                 <div className="space-x-2">
-
-                  <Button type="button" onClick={() => router.push("/admin/produk")} color="red">Back</Button>
+                  <Button
+                    type="button"
+                    onClick={() => router.push("/admin/produk")}
+                    color="red"
+                  >
+                    Back
+                  </Button>
                   {!disabled && <Button type="submit">Submit</Button>}
                 </div>
               </Group>
@@ -146,7 +180,7 @@ export async function getServerSideProps(context) {
   let produk = {};
   let action = "add";
   if (Array.isArray(id)) {
-    const res = await fetch("http://localhost:3000/api/produk");
+    const res = await fetch(`${process.env.API_URL}/api/produk`);
     produk = await res.json();
     produk = produk.filter((item, i) => {
       for (let i = 0; i < id.length; i++) {
@@ -157,17 +191,17 @@ export async function getServerSideProps(context) {
     });
   } else {
     if (id) {
-      let res = await fetch(`http://localhost:3000/api/produk/${id}`);
+      let res = await fetch(`${process.env.API_URL}/api/produk/${id}`);
       action = "edit";
       produk = await res.json();
       if (res.status === 403) {
-        let res = await fetch(`http://localhost:3000/api/produk`);
+        let res = await fetch(`${process.env.API_URL}/api/produk`);
         const produks = await res.json();
         produk = produks.result.length > 0 ? produks.result[0] : produks;
         action = "add";
       }
     } else {
-      let res = await fetch(`http://localhost:3000/api/produk`);
+      let res = await fetch(`${process.env.API_URL}/api/produk`);
       const produks = await res.json();
       produk = produks.result.length > 0 ? produks.result[0] : produks;
       action = "add";

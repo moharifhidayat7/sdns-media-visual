@@ -23,7 +23,7 @@ function Form({ fitur, action }) {
   const form = useForm({
     initialValues: { kode: "", nama: "", status: "" },
     validate: {
-      nama: (value) => (value.length < 1 ? "Plese input nama." : null)
+      nama: (value) => (value.length < 1 ? "Plese input nama." : null),
     },
   });
   const [opened, setOpened] = useState(true);
@@ -48,8 +48,8 @@ function Form({ fitur, action }) {
       form.setValues({
         kode: code,
         nama: "",
-        status: "INACTIVE"
-      })
+        status: "INACTIVE",
+      });
     }
   }, []);
   const submitHandler = async (e) => {
@@ -66,7 +66,7 @@ function Form({ fitur, action }) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ ...data, updatedId: 1, createdId: 1 }),
-    }).then(async(res) => {
+    }).then(async (res) => {
       const result = await res.json();
       if (res.status === 200) {
         notifications.showNotification({
@@ -107,31 +107,67 @@ function Form({ fitur, action }) {
         {action == "read" ? "Read" : "Form"} Fitur
       </Title>
 
-      <Box sx={(theme) => ({
-        border: "1px solid",
-        borderRadius: theme.radius.sm,
-        padding: theme.spacing.sm,
-        backgroundColor:
-          theme.colorScheme === "dark" ? theme.colors.dark[7] : "white",
-        borderColor:
-          theme.colorScheme === "dark"
-            ? theme.colors.dark[6]
-            : theme.colors.gray[4],
-      })} >
+      <Box
+        sx={(theme) => ({
+          border: "1px solid",
+          borderRadius: theme.radius.sm,
+          padding: theme.spacing.sm,
+          backgroundColor:
+            theme.colorScheme === "dark" ? theme.colors.dark[7] : "white",
+          borderColor:
+            theme.colorScheme === "dark"
+              ? theme.colors.dark[6]
+              : theme.colors.gray[4],
+        })}
+      >
         <form autoComplete="off" method="post" onSubmit={submitHandler}>
-          <Grid >
+          <Grid>
             <Grid.Col sm={12} md={6}>
               <Group direction="column" grow spacing="lg">
-                <TextInput label="Kode" disabled={disabled} name="kode" readOnly value={form.values.kode} />
-                <TextInput label="Nama" disabled={disabled} {...form.getInputProps('nama')} value={form.values.nama} onChange={(e) => form.setFieldValue("nama", e.currentTarget.value)} />
+                <TextInput
+                  label="Kode"
+                  disabled={disabled}
+                  name="kode"
+                  readOnly
+                  value={form.values.kode}
+                />
+                <TextInput
+                  label="Nama"
+                  disabled={disabled}
+                  {...form.getInputProps("nama")}
+                  value={form.values.nama}
+                  onChange={(e) =>
+                    form.setFieldValue("nama", e.currentTarget.value)
+                  }
+                />
                 <InputWrapper label="Status">
-                  <Switch disabled={disabled} name="status" checked={form.values.status === "ACTIVE"} onChange={(e) => form.setFieldValue("status", e.currentTarget.checked ? "ACTIVE" : "INACTIVE")} onLabel="ON" offLabel="OFF" size="lg" radius="lg" />
+                  <Switch
+                    disabled={disabled}
+                    name="status"
+                    checked={form.values.status === "ACTIVE"}
+                    onChange={(e) =>
+                      form.setFieldValue(
+                        "status",
+                        e.currentTarget.checked ? "ACTIVE" : "INACTIVE"
+                      )
+                    }
+                    onLabel="ON"
+                    offLabel="OFF"
+                    size="lg"
+                    radius="lg"
+                  />
                 </InputWrapper>
               </Group>
             </Grid.Col>
           </Grid>
           <div className="space-x-2 mt-10">
-            <Button type="button" onClick={() => router.push('/admin/fitur')} color="red">Back</Button>
+            <Button
+              type="button"
+              onClick={() => router.push("/admin/fitur")}
+              color="red"
+            >
+              Back
+            </Button>
             {!disabled && <Button type="submit">Submit</Button>}
           </div>
         </form>
@@ -145,17 +181,17 @@ export async function getServerSideProps(context) {
   let fitur = [];
   let action = "add";
   if (id) {
-    let res = await fetch(`http://localhost:3000/api/fitur/${id}`);
+    let res = await fetch(`${process.env.API_URL}/api/fitur/${id}`);
     action = "edit";
     fitur = await res.json();
     if (res.status === 403) {
-      let res = await fetch(`http://localhost:3000/api/fitur`);
+      let res = await fetch(`${process.env.API_URL}/api/fitur`);
       const fiturs = await res.json();
       fitur = fiturs.result.length > 0 ? fiturs.result[0] : fiturs;
       action = "add";
     }
   } else {
-    let res = await fetch(`http://localhost:3000/api/fitur`);
+    let res = await fetch(`${process.env.API_URL}/api/fitur`);
     const fiturs = await res.json();
     fitur = fiturs.result.length > 0 ? fiturs.result[0] : fiturs;
     action = "add";
@@ -165,7 +201,8 @@ export async function getServerSideProps(context) {
   }
   return {
     props: {
-      action, fitur,
+      action,
+      fitur,
     },
   };
 }
