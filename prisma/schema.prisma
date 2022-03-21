@@ -32,6 +32,23 @@ model User {
   updatedSupplier    Supplier[]  @relation("supplierupdatedBy")
   createdGudang      Gudang[]    @relation("gudangcreatedBy")
   updatedGudang      Gudang[]    @relation("gudangupdatedBy")
+  createdFitur       Fitur[]     @relation("fiturcreatedBy")
+  updatedFitur       Fitur[]     @relation("fiturupdatedBy")
+}
+
+model Fitur {
+  id        Int       @id @default(autoincrement())
+  kode      String    @unique
+  nama      String    @unique
+  status    Status    @default(INACTIVE)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  isDeleted Boolean?  @default(false)
+  updatedBy User?     @relation(fields: [updatedId], references: [id], name: "fiturupdatedBy")
+  createdBy User?     @relation(fields: [createdId], references: [id], name: "fiturcreatedBy")
+  updatedId Int?
+  createdId Int?
 }
 
 model Produk {

@@ -87,6 +87,10 @@ export default function Index({ produk }) {
       label: "Pelanggan",
     },
     {
+      key: "status",
+      label: "Status",
+    },
+    {
       key: "createdAt",
       label: "Created At",
     },
@@ -130,6 +134,9 @@ export default function Index({ produk }) {
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Button variant="subtle">VIEW(100)</Button>
+                  </CustomTable.Col>
+                  <CustomTable.Col>
+                    <Text className="uppercase">{row.status}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text className="uppercase">{dateFormat(row.createdAt, "dd-mm-yyyy")}</Text>

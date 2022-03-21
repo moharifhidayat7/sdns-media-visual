@@ -79,6 +79,10 @@ export default function Index({ gudang }) {
       label: "Nama",
     },
     {
+      key: "Status",
+      label: "Status",
+    },
+    {
       key: "createdAt",
       label: "Created At",
     },
@@ -116,6 +120,9 @@ export default function Index({ gudang }) {
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text className="uppercase">{row.nama}</Text>
+                  </CustomTable.Col>              
+                  <CustomTable.Col>
+                    <Text className="uppercase">{row.status}</Text>
                   </CustomTable.Col>              
                   <CustomTable.Col>
                     <Text className="uppercase">{dateFormat(row.createdAt, "dd-mm-yyyy")}</Text>

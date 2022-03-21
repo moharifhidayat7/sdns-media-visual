@@ -16,7 +16,7 @@ import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useNotifications } from "@mantine/notifications";
 import dateFormat from "dateformat";
 import { Check, H3, X } from "tabler-icons-react";
-export default function Index({ supplier }) {
+export default function Index({ fitur }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
   const [modalStokLog, setModalStokLog] = useState({
@@ -25,11 +25,11 @@ export default function Index({ supplier }) {
   });
 
   useEffect(() => {
-    dispatch({ type: "set_data", payload: supplier });
+    dispatch({ type: "set_data", payload: fitur });
   }, []);
   const deleteHandler = async (selected, isLoading, type = "delete") => {
     const data = { id: selected };
-    const url = type == 'delete' ? `/api/supplier/${selected}` : `/api/supplier`;
+    const url = type == 'delete' ? `/api/fitur/${selected}` : `/api/fitur`;
     await fetch(url, {
       method: "DELETE",
       headers: {
@@ -63,7 +63,7 @@ export default function Index({ supplier }) {
     });
   }
   const refreshHandler = async (isLoading, page = 1, search = "") => {
-    const url = `http://localhost:3000/api/supplier?page=${page}&search=${search}`
+    const url = `http://localhost:3000/api/fitur?page=${page}&search=${search}`
     const res = await fetch(url);
     const data = await res.json();
     dispatch({ type: "set_data", payload: { ...data, search, page } });
@@ -79,21 +79,6 @@ export default function Index({ supplier }) {
       label: "Nama",
     },
     {
-      key: "email",
-      label: "Email",
-    },
-    {
-      key: "whatsapp",
-      label: "WhatsApp",
-    },
-    {
-      key: "notelphone",
-      label: "No telphone",
-    },
-    {
-      key: "alamat",
-      label: "Alamat",
-    }, {
       key: "status",
       label: "Status",
     },
@@ -107,10 +92,10 @@ export default function Index({ supplier }) {
   return (
     <Layout>
       <Head>
-        <title style={{ textTransform: "capitalize" }}>Master Supplier </title>
+        <title style={{ textTransform: "capitalize" }}>Master Fitur </title>
       </Head>
       <Title order={2} style={{ marginBottom: "1.5rem", textTransform: "capitalize" }}>
-        Data Supplier
+        Data Fitur
       </Title>
       <DataTable>
         <DataTable.Action
@@ -119,14 +104,14 @@ export default function Index({ supplier }) {
           onRefresh={(isLoading) => refreshHandler(isLoading)}
           onSearch={(search, isLoading) => refreshHandler(isLoading, 1, search)}
         />
-        <CustomTable header={header} name="supplier"
+        <CustomTable header={header} name="fitur"
           withSelection={true} withAction={true}>
           {state.data.result &&
             state.data.result.map((row) => {
               return (
                 <CustomTable.Row
                   key={row.id} id={row.id}
-                  readLink={`supplier/form?id=${row.id}&read=true`}
+                  readLink={`fitur/form?id=${row.id}&read=true`}
                   editLink={`/form?id=${row.id}`}
                   deleteField={row.nama}
                   onDelete={(isLoading) => deleteHandler(row.id, isLoading)} >
@@ -135,22 +120,10 @@ export default function Index({ supplier }) {
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text className="uppercase">{row.nama}</Text>
-                  </CustomTable.Col>
-                  <CustomTable.Col>
-                    <Text className="uppercase">{row.email}</Text>
-                  </CustomTable.Col>
-                  <CustomTable.Col>
-                    <Text className="uppercase">{row.whatsapp}</Text>
-                  </CustomTable.Col>
-                  <CustomTable.Col>
-                    <Text className="uppercase">{row.no_telphone}</Text>
-                  </CustomTable.Col>
-                  <CustomTable.Col>
-                    <Text className="uppercase">{row.alamat}</Text>
-                  </CustomTable.Col>
+                  </CustomTable.Col>              
                   <CustomTable.Col>
                     <Text className="uppercase">{row.status}</Text>
-                  </CustomTable.Col>
+                  </CustomTable.Col>              
                   <CustomTable.Col>
                     <Text className="uppercase">{dateFormat(row.createdAt, "dd-mm-yyyy")}</Text>
                   </CustomTable.Col>
@@ -164,13 +137,12 @@ export default function Index({ supplier }) {
   );
 }
 
-
 export async function getServerSideProps(context) {
-  const res = await fetch(`http://localhost:3000/api/supplier/`);
-  const supplier = await res.json();
+  const res = await fetch(`http://localhost:3000/api/fitur/`);
+  const fitur = await res.json();
   return {
     props: {
-      supplier,
+      fitur,
     },
   };
 

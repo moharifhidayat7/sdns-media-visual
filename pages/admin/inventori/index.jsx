@@ -93,6 +93,9 @@ export default function Index({ inventori }) {
     {
       key: "logstok",
       label: "Log Stok",
+    }, {
+      key: "status",
+      label: "Status",
     },
     {
       key: "createdAt",
@@ -149,6 +152,9 @@ export default function Index({ inventori }) {
                         title: `${row.kode} - ${row.nama} ${row.tipe} ${row.merek}`,
                         data: row.logstok,
                       })}>VIEW({row.logstok?row.logstok.length:0})</Button>
+                  </CustomTable.Col>
+                  <CustomTable.Col>
+                    <Text className="uppercase">{row.status}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text className="uppercase">{dateFormat(row.createdAt, "dd-mm-yyyy")}</Text>

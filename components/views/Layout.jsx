@@ -32,6 +32,9 @@ const Layout = ({ children }) => {
         { label: "Inventori", link: "/admin/inventori" },
         { label: "Suppliers", link: "/admin/supplier" },
         { label: "Gudang", link: "/admin/gudang" },
+        { label: "Fitur", link: "/admin/fitur" },
+        { label: "Paket", link: "/admin/paket" },
+        { label: "Area", link: "/admin/area" },
       ],
     },
     {
@@ -66,10 +69,20 @@ const Layout = ({ children }) => {
       label: "Transaksi",
       icon: Receipt2,
       links: [
-        { label: "Inventori Stok In", link: "/" },
+        { label: "Inventori Stok Masuk", link: "/" },
         { label: "Inventori Opname", link: "/" },
         { label: "Tagihan Pelanggan", link: "/" },
         { label: "Pembayaran Tagihan", link: "/" }
+      ],
+    },
+    {
+      label: "Laporan",
+      icon: Report,
+      links: [
+        { label: "Faktur Stok Masuk", link: "/" },
+        { label: "Faktur Stok Keluar", link: "/" },
+        { label: "Faktur Stok Opname", link: "/" },
+        { label: "Ringkasan Stok", link: "/" },
       ],
     },
     { label: "Settings", icon: Adjustments, link: "#" },
