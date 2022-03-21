@@ -118,7 +118,6 @@ export default function Login() {
             required
             {...form.getInputProps("password")}
           />
-          {/* <Checkbox label="Keep me logged in" mt="xl" size="md" /> */}
           <Button fullWidth mt="xl" size="md" type="submit">
             Login
           </Button>
