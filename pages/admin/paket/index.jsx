@@ -19,13 +19,19 @@ export default function Index({ paket }) {
     opened: false,
     data: [],
   });
-
+  const [fiturs, setFiturs] = useState([]);
+  const getFitur = async () => {
+    const res = await fetch(`/api/fitur`);
+    const datares = await res.json();
+    setFiturs(datares);
+  };
   useEffect(() => {
     dispatch({ type: "set_data", payload: paket });
+    getFitur()
   }, []);
   const deleteHandler = async (selected, isLoading, type = "delete") => {
     const data = { id: selected };
-    const url = type == "delete" ?`${URL}/${selected}` : URL;
+    const url = type == "delete" ? `${URL}/${selected}` : URL;
     await fetch(url, {
       method: "DELETE",
       headers: {
@@ -153,10 +159,33 @@ export default function Index({ paket }) {
           onChange={(page, isLoading) => refreshHandler(isLoading, page)}
         />
       </DataTable>
+      <ViewModalLogStok
+        logstok={modalStokLog}
+        setModalStokLog={setModalStokLog}
+      />
     </Layout>
   );
 }
+const ViewModalLogStok = ({ logstok, setModalStokLog }) => {
 
+
+  return (
+    <Modal
+      opened={logstok.opened}
+      onClose={() =>
+        setModalStokLog({
+          opened: false,
+          data: [],
+        })
+      }
+      size="lg"
+      transition="rotate-left"
+      title={logstok.title}
+    >
+  
+    </Modal>
+  );
+};
 export async function getServerSideProps(context) {
   const res = await fetch(`${process.env.API_URL}/api/paket`);
   const paket = await res.json();
