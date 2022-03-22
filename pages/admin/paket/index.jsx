@@ -10,7 +10,9 @@ import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useNotifications } from "@mantine/notifications";
 import dateFormat from "dateformat";
 import { Check, H3, X } from "tabler-icons-react";
-export default function Index({ gudang }) {
+const URL = "/api/paket";
+const NAMEPAGE = "Paket";
+export default function Index({ paket }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
   const [modalStokLog, setModalStokLog] = useState({
@@ -19,11 +21,11 @@ export default function Index({ gudang }) {
   });
 
   useEffect(() => {
-    dispatch({ type: "set_data", payload: gudang });
+    dispatch({ type: "set_data", payload: paket });
   }, []);
   const deleteHandler = async (selected, isLoading, type = "delete") => {
     const data = { id: selected };
-    const url = type == "delete" ? `/api/gudang/${selected}` : `/api/gudang`;
+    const url = type == "delete" ?`${URL}/${selected}` : URL;
     await fetch(url, {
       method: "DELETE",
       headers: {
@@ -57,8 +59,7 @@ export default function Index({ gudang }) {
     });
   };
   const refreshHandler = async (isLoading, page = 1, search = "") => {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/gudang?page=${page}&search=${search}`;
-    const res = await fetch(url);
+    const res = await fetch(`${URL}?page=${page}&search=${search}`);
     const data = await res.json();
     dispatch({ type: "set_data", payload: { ...data, search, page } });
     isLoading(false);
@@ -73,8 +74,20 @@ export default function Index({ gudang }) {
       label: "Nama",
     },
     {
-      key: "nama",
-      label: "Nama",
+      key: "produk",
+      label: "Produk",
+    },
+    {
+      key: "harga",
+      label: "Harga",
+    },
+    {
+      key: "fiturs",
+      label: "Fiturs",
+    },
+    {
+      key: "status",
+      label: "Status",
     },
     {
       key: "createdAt",
@@ -85,13 +98,13 @@ export default function Index({ gudang }) {
   return (
     <Layout>
       <Head>
-        <title style={{ textTransform: "capitalize" }}>Master Gudang </title>
+        <title style={{ textTransform: "capitalize" }}>Master {NAMEPAGE} </title>
       </Head>
       <Title
         order={2}
         style={{ marginBottom: "1.5rem", textTransform: "capitalize" }}
       >
-        Data Gudang
+        Data {NAMEPAGE}
       </Title>
       <DataTable>
         <DataTable.Action
@@ -104,7 +117,7 @@ export default function Index({ gudang }) {
         />
         <CustomTable
           header={header}
-          name="gudang"
+          name={NAMEPAGE}
           withSelection={true}
           withAction={true}
         >
@@ -114,7 +127,7 @@ export default function Index({ gudang }) {
                 <CustomTable.Row
                   key={row.id}
                   id={row.id}
-                  readLink={`gudang/form?id=${row.id}&read=true`}
+                  readLink={`/form?id=${row.id}&read=true`}
                   editLink={`/form?id=${row.id}`}
                   deleteField={row.nama}
                   onDelete={(isLoading) => deleteHandler(row.id, isLoading)}
@@ -145,11 +158,11 @@ export default function Index({ gudang }) {
 }
 
 export async function getServerSideProps(context) {
-  const res = await fetch(`${process.env.API_URL}/api/gudang/`);
-  const gudang = await res.json();
+  const res = await fetch(`${process.env.API_URL}/api/paket`);
+  const paket = await res.json();
   return {
     props: {
-      gudang,
+      paket,
     },
   };
 }

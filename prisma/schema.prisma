@@ -34,21 +34,52 @@ model User {
   updatedGudang      Gudang[]    @relation("gudangupdatedBy")
   createdFitur       Fitur[]     @relation("fiturcreatedBy")
   updatedFitur       Fitur[]     @relation("fiturupdatedBy")
+  createdPaket       Paket[]     @relation("paketcreatedBy")
+  updatedPaket       Paket[]     @relation("paketupdatedBy")
 }
 
 model Fitur {
-  id        Int       @id @default(autoincrement())
-  kode      String    @unique
-  nama      String    @unique
-  status    Status    @default(INACTIVE)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id        Int              @id @default(autoincrement())
+  kode      String           @unique
+  nama      String           @unique
+  status    Status           @default(INACTIVE)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
   deletedAt DateTime?
-  isDeleted Boolean?  @default(false)
-  updatedBy User?     @relation(fields: [updatedId], references: [id], name: "fiturupdatedBy")
-  createdBy User?     @relation(fields: [createdId], references: [id], name: "fiturcreatedBy")
+  isDeleted Boolean?         @default(false)
+  updatedBy User?            @relation(fields: [updatedId], references: [id], name: "fiturupdatedBy")
+  createdBy User?            @relation(fields: [createdId], references: [id], name: "fiturcreatedBy")
   updatedId Int?
   createdId Int?
+  pakets    FitursOnPakets[]
+}
+
+model Paket {
+  id        Int              @id @default(autoincrement())
+  kode      String           @unique
+  nama      String
+  harga     Int
+  produk    Produk?          @relation(fields: [produkId], references: [id], name: "paketproduk")
+  produkId  Int?
+  status    Status           @default(INACTIVE)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  deletedAt DateTime?
+  isDeleted Boolean?         @default(false)
+  updatedBy User?            @relation(fields: [updatedId], references: [id], name: "paketupdatedBy")
+  createdBy User?            @relation(fields: [createdId], references: [id], name: "paketcreatedBy")
+  updatedId Int?
+  createdId Int?
+  fiturs    FitursOnPakets[]
+}
+
+model FitursOnPakets {
+  fitur   Fitur @relation(fields: [fiturId], references: [id])
+  paket   Paket @relation(fields: [paketId], references: [id])
+  fiturId Int
+  paketId Int
+
+  @@id([fiturId, paketId])
 }
 
 model Produk {
@@ -64,6 +95,7 @@ model Produk {
   createdBy User?     @relation(fields: [createdId], references: [id], name: "produkcreatedBy")
   updatedId Int?
   createdId Int?
+  paket     Paket[]   @relation("paketproduk")
 }
 
 model Gudang {

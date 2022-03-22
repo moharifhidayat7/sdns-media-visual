@@ -6,9 +6,13 @@ export default async (req, res) => {
    const id = req.query.id;
    if (req.method == "GET") {
       try {
-         const result = await prisma.gudang.findFirst({
+         const result = await prisma.paket.findFirst({
             include: {
-               updatedBy: true, createdBy: true
+               updatedBy: true, createdBy: true, fiturs: {
+                  include: {
+                     fitur: true
+                  }
+               }
             }, where: {
                id: parseInt(id),
                isDeleted: false,
@@ -22,38 +26,37 @@ export default async (req, res) => {
    else if (req.method == "PUT") {
       try {
          const data = req.body;
-         const result = await prisma.gudang.update({
+         const result = await prisma.paket.update({
             where: {
                id: parseInt(id),
             },
             data: {
-               nama: data.nama,
-               status: data.status,
+               ...data,
                updatedId: parseInt(data.updatedId),
             },
          });
          res.status(200).json({
-            message: res.message,
+            message: "Put data success",
             result,
          });
       } catch (err) {
          console.log(err);
-         res.status(403).json({ err: err.message });
+         res.status(403).json({ message: err.message });
       }
    }
    else if (req.method == "DELETE") {
       try {
-         const result = await prisma.gudang.update({
+         const result = await prisma.paket.update({
             where: {
                id: parseInt(id),
             },
             data: {
                isDeleted: true,
-               deletedAt:new Date(),
+               deletedAt: new Date(),
             },
          });
          res.status(200).json({
-            message: "gudang deleted",
+            message: "paket deleted",
             result,
          });
       } catch (err) {

@@ -32,12 +32,12 @@ export default async (req, res) => {
             },
          });
          res.status(200).json({
-            message: res.message,
+            message: "Put data success",
             result,
          });
       } catch (err) {
          console.log(err);
-         res.status(403).json({ err: err.message });
+         res.status(403).json({ message: err.message });
       }
    }
    else if (req.method == "DELETE") {

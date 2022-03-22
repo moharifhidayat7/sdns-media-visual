@@ -14,7 +14,7 @@ export default async (req, res) => {
          });
          res.statusCode = 200;
          res.json({
-            message: res.message,
+            message: "Add data success",
             fitur,
          });
       } catch (error) {

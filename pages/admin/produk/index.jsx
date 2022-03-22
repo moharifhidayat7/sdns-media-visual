@@ -57,7 +57,7 @@ export default function Index({ produk }) {
     });
   };
   const refreshHandler = async (isLoading = null, page = 1, search = "") => {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/produk?page=${page}&search=${search}`;
+    const url = `/api/produk?page=${page}&search=${search}`;
     const res = await fetch(url);
     const data = await res.json();
 

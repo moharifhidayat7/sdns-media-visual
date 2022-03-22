@@ -5,21 +5,31 @@ export default async (req, res) => {
    const data = req.body;
    if (req.method == "POST") {
       try {
-         const gudang = await prisma.gudang.create({
+         const paket = await prisma.paket.create({
             data: {
                ...data,
-               createdId: parseInt(data.createdId),
-               updatedId: parseInt(data.updatedId),
+               fiturs: {
+                  create: data.fiturs.map((fitur) => {
+                     return {
+                        fitur: {
+                           connect: {
+                              id: parseInt(fitur)
+                           }
+                        }
+                     };
+                  }),
+               }
             }
          });
          res.statusCode = 200;
          res.json({
-            message: res.message,
-            gudang,
+            message: "Add data success",
+            paket,
          });
       } catch (error) {
          res.statusCode = 400;
-         res.json({ error: error.message });
+
+         res.json({ message: error.message });
       }
    }
    else if (req.method == "GET") {
@@ -28,12 +38,17 @@ export default async (req, res) => {
       const limit = parseInt(req.query.limit) || 10;
       const skip = (page - 1) * limit;
       try {
-         const gudang = await prisma.gudang.findMany({
+         const paket = await prisma.paket.findMany({
             skip,
             take: limit,
             include: {
                createdBy: true,
                updatedBy: true,
+               fiturs: {
+                  include: {
+                     fitur: true
+                  }
+               }
             },
             where: {
                isDeleted: false,
@@ -54,7 +69,7 @@ export default async (req, res) => {
                createdAt: "desc",
             },
          });
-         const totalgudang = await prisma.gudang.count({
+         const total = await prisma.paket.count({
             where: {
                isDeleted: false,
                OR: [
@@ -72,24 +87,32 @@ export default async (req, res) => {
             },
 
          });
-         const pages = Math.ceil(totalgudang / limit);
+         const pages = Math.ceil(total / limit);
          res.json({
             status: "success",
-            message: "Berhasil mengambil data gudang",
-            result: gudang,
-            total: totalgudang,
+            message: "Berhasil mengambil data paket",
+            result: paket,
+            total,
             pages,
             page,
             limit,
          });
       } catch (err) {
-         res.status(403).json({ err: err.message });
+         res.status(403).json({
+            status: "error",
+            message: err.message,
+            result: [],
+            total: 0,
+            pages: 0,
+            page: 1,
+            limit: 10,
+         });
       }
    }
    else if (req.method == "DELETE") {
 
       try {
-         const gudang = await prisma.gudang.updateMany({
+         const paket = await prisma.paket.updateMany({
             where: {
                id: { in: data.id }
             },
@@ -100,8 +123,8 @@ export default async (req, res) => {
          });
          res.statusCode = 200;
          res.json({
-            message: "gudang deleted",
-            gudang,
+            message: "paket deleted",
+            paket,
          });
       } catch (error) {
          res.status(403).json({ err: err.message });

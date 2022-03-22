@@ -58,7 +58,7 @@ export default function Index({ inventori }) {
     });
   };
   const refreshHandler = async (isLoading, page = 1, search = "") => {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/inventori?page=${page}&search=${search}`;
+    const url = `/api/inventori?page=${page}&search=${search}`;
     const res = await fetch(url);
     const data = await res.json();
     dispatch({ type: "set_data", payload: { ...data, search, page } });
