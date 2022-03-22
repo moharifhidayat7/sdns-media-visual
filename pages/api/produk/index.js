@@ -33,7 +33,7 @@ export default async (req, res) => {
     try {
       const produk = await prisma.produk.findMany({
         skip,
-        take: limit,
+        take: limit == 9999 ? undefined : limit,
         include: {
           createdBy: true,
           updatedBy: true,
@@ -57,6 +57,7 @@ export default async (req, res) => {
           createdAt: "desc",
         },
       });
+
       const totalProduk = await prisma.produk.count({
         where: {
           isDeleted: false,

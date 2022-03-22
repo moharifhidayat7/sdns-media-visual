@@ -31,7 +31,7 @@ export default async (req, res) => {
       try {
          const fitur = await prisma.fitur.findMany({
             skip,
-            take: limit,
+            take: limit==9999?undefined:limit,
             include: {
                createdBy: true,
                updatedBy: true,

@@ -8,7 +8,7 @@ export default async (req, res) => {
       try {
          const result = await prisma.paket.findFirst({
             include: {
-               updatedBy: true, createdBy: true, fiturs: {
+               updatedBy: true, createdBy: true,produk:true, fiturs: {
                   include: {
                      fitur: true
                   }
@@ -26,13 +26,30 @@ export default async (req, res) => {
    else if (req.method == "PUT") {
       try {
          const data = req.body;
+         await prisma.FitursOnPakets.deleteMany({
+            where: {
+               paketId: parseInt(id)
+            }
+         })
          const result = await prisma.paket.update({
             where: {
                id: parseInt(id),
             },
             data: {
                ...data,
-               updatedId: parseInt(data.updatedId),
+               harga:parseInt(data.harga),
+               produkId:parseInt(data.produkId),
+               fiturs: {
+                  create: data.fiturs.map((fitur) => {
+                     return {
+                        fitur: {
+                           connect: {
+                              id: parseInt(fitur)
+                           }
+                        }
+                     };
+                  }),
+               }
             },
          });
          res.status(200).json({
