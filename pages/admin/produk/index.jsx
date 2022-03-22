@@ -166,7 +166,11 @@ export default function Index({ produk }) {
 }
 //function get server side props produk
 export async function getServerSideProps(context) {
-  const res = await fetch(`${process.env.API_URL}/api/produk?page=0`);
+  const res = await fetch(`${process.env.API_URL}/api/produk?page=0`, {
+    headers: {
+      Cookie: context.req.headers.cookie,
+    },
+  });
   const produk = await res.json();
   return {
     props: {

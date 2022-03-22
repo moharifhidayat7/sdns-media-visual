@@ -63,7 +63,7 @@ function Form({ produk, action }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ ...data, updatedId: 1, createdId: 1 }),
+      body: JSON.stringify({ ...data }),
     }).then((res) => {
       if (res.status === 200) {
         notifications.showNotification({
@@ -180,7 +180,11 @@ export async function getServerSideProps(context) {
   let produk = {};
   let action = "add";
   if (Array.isArray(id)) {
-    const res = await fetch(`${process.env.API_URL}/api/produk`);
+    const res = await fetch(`${process.env.API_URL}/api/produk`, {
+      headers: {
+        Cookie: context.req.headers.cookie,
+      },
+    });
     produk = await res.json();
     produk = produk.filter((item, i) => {
       for (let i = 0; i < id.length; i++) {
@@ -191,17 +195,29 @@ export async function getServerSideProps(context) {
     });
   } else {
     if (id) {
-      let res = await fetch(`${process.env.API_URL}/api/produk/${id}`);
+      let res = await fetch(`${process.env.API_URL}/api/produk/${id}`, {
+        headers: {
+          Cookie: context.req.headers.cookie,
+        },
+      });
       action = "edit";
       produk = await res.json();
       if (res.status === 403) {
-        let res = await fetch(`${process.env.API_URL}/api/produk`);
+        let res = await fetch(`${process.env.API_URL}/api/produk`, {
+          headers: {
+            Cookie: context.req.headers.cookie,
+          },
+        });
         const produks = await res.json();
         produk = produks.result.length > 0 ? produks.result[0] : produks;
         action = "add";
       }
     } else {
-      let res = await fetch(`${process.env.API_URL}/api/produk`);
+      let res = await fetch(`${process.env.API_URL}/api/produk`, {
+        headers: {
+          Cookie: context.req.headers.cookie,
+        },
+      });
       const produks = await res.json();
       produk = produks.result.length > 0 ? produks.result[0] : produks;
       action = "add";

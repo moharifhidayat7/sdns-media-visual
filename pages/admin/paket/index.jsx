@@ -23,7 +23,7 @@ export default function Index({ paket }) {
   }, []);
   const deleteHandler = async (selected, isLoading, type = "delete") => {
     const data = { id: selected };
-    const url = type == "delete" ?`${URL}/${selected}` : URL;
+    const url = type == "delete" ? `${URL}/${selected}` : URL;
     await fetch(url, {
       method: "DELETE",
       headers: {
@@ -96,7 +96,9 @@ export default function Index({ paket }) {
   return (
     <Layout>
       <Head>
-        <title style={{ textTransform: "capitalize" }}>Master {NAMEPAGE} </title>
+        <title style={{ textTransform: "capitalize" }}>
+          Master {NAMEPAGE}{" "}
+        </title>
       </Head>
       <Title
         order={2}
@@ -137,7 +139,9 @@ export default function Index({ paket }) {
                     <Text className="uppercase">{row.nama}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase">{row.produk?row.produk.nama:""}</Text>
+                    <Text className="uppercase">
+                      {row.produk ? row.produk.nama : ""}
+                    </Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text className="uppercase">Rp.{row.harga}</Text>
@@ -168,7 +172,11 @@ export default function Index({ paket }) {
 }
 
 export async function getServerSideProps(context) {
-  const res = await fetch(`${process.env.API_URL}/api/paket`);
+  const res = await fetch(`${process.env.API_URL}/api/paket`, {
+    headers: {
+      Cookie: context.req.headers.cookie,
+    },
+  });
   const paket = await res.json();
   return {
     props: {

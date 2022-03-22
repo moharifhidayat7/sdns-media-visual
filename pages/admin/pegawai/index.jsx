@@ -10,10 +10,12 @@ import { useEffect } from "react";
 import { useNotifications } from "@mantine/notifications";
 import dateFormat from "dateformat";
 import { Check, X } from "tabler-icons-react";
+import { useSession, getSession } from "next-auth/react";
 
 export default function Index({ users }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
+  const { data, status } = useSession();
 
   const form = useForm({
     initialValues: {
@@ -83,8 +85,12 @@ export default function Index({ users }) {
               payload: selected,
             });
           }}
-          onRefresh={(isLoading) => {
+          onRefresh={async (isLoading) => {
             // fetch data
+            const users = await fetch(`/api/user`).then((res) => res.json());
+
+            console.log(users);
+
             console.log("fetch data");
             const result = [
               {
@@ -170,7 +176,7 @@ export default function Index({ users }) {
           withAction={true}
           name="User"
         >
-          {state.data &&
+          {/* {state.data &&
             state.data.map((row) => {
               return (
                 <CustomTable.Row
@@ -202,7 +208,7 @@ export default function Index({ users }) {
                   </CustomTable.Col>
                 </CustomTable.Row>
               );
-            })}
+            })} */}
         </CustomTable>
         <DataTable.Footer />
       </DataTable>
@@ -211,13 +217,18 @@ export default function Index({ users }) {
 }
 
 export const getServerSideProps = async (ctx) => {
-  const users = await fetch(`${process.env.API_URL}/api/user`).then((res) =>
-    res.json()
-  );
+  const session = await getSession(ctx);
+
+  const users = await fetch(`${process.env.API_URL}/api/user`, {
+    headers: {
+      Cookie: ctx.req.headers.cookie,
+    },
+  }).then((res) => res.json());
 
   return {
     props: {
       users,
+      session,
     },
   };
 };
