@@ -56,7 +56,7 @@ model Fitur {
 
 model Paket {
   id        Int              @id @default(autoincrement())
-  kode      String           @unique
+  kode      String          
   nama      String
   harga     Int
   produk    Produk?          @relation(fields: [produkId], references: [id], name: "paketproduk")

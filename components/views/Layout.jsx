@@ -33,8 +33,7 @@ const Layout = ({ children }) => {
         { label: "Suppliers", link: "/admin/supplier" },
         { label: "Gudang", link: "/admin/gudang" },
         { label: "Fitur", link: "/admin/fitur" },
-        { label: "Paket", link: "/admin/paket" },
-        { label: "Area", link: "/admin/area" },
+        { label: "Paket", link: "/admin/paket" }
       ],
     },
     {

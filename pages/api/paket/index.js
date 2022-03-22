@@ -8,6 +8,8 @@ export default async (req, res) => {
          const paket = await prisma.paket.create({
             data: {
                ...data,
+               harga:parseInt(data.harga),
+               produkId:parseInt(data.produkId),
                fiturs: {
                   create: data.fiturs.map((fitur) => {
                      return {
@@ -44,6 +46,7 @@ export default async (req, res) => {
             include: {
                createdBy: true,
                updatedBy: true,
+               produk:true,
                fiturs: {
                   include: {
                      fitur: true
