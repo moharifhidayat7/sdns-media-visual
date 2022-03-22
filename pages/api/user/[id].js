@@ -1,6 +1,9 @@
 import prisma from "lib/prisma";
+import { getSession } from "next-auth/react";
 
 export default async function handler(req, res) {
+  const session = await getSession({ req });
+
   if (req.method === "GET") {
     try {
       const result = await prisma.user.findUnique({
@@ -23,7 +26,10 @@ export default async function handler(req, res) {
         where: {
           id: req.query.id,
         },
-        data: req.body,
+        data: {
+          ...req.body,
+          updatedBy: session.user ? session.user.id : null,
+        },
       });
 
       delete user.password;

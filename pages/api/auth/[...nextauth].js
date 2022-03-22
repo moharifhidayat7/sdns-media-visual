@@ -6,7 +6,7 @@ import bcrypt from "bcrypt";
 export default NextAuth({
   providers: [
     CredentialsProvider({
-      name: "Credentials",
+      name: "credentials",
       credentials: {
         email: {
           label: "Email",
@@ -36,9 +36,15 @@ export default NextAuth({
   session: { strategy: "jwt", maxAge: 12 * 60 * 60 },
   callbacks: {
     async jwt({ token, user }) {
+      if (user) {
+        token.user = user;
+      }
       return token;
     },
     async session({ session, token, user }) {
+      if (token.user) {
+        session.user = token.user;
+      }
       return session;
     },
   },
