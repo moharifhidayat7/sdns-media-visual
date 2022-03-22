@@ -33,8 +33,7 @@ const Layout = ({ children }) => {
         { label: "Suppliers", link: "/admin/supplier" },
         { label: "Gudang", link: "/admin/gudang" },
         { label: "Fitur", link: "/admin/fitur" },
-        { label: "Paket", link: "/admin/paket" },
-        { label: "Area", link: "/admin/area" },
+        { label: "Paket", link: "/admin/paket" }
       ],
     },
     {
@@ -42,7 +41,7 @@ const Layout = ({ children }) => {
       icon: Notification,
       links: [
         { label: "Permintaan", link: "/" },
-        { label: "Kirim Pesan", link: "/" }
+        { label: "Kirim Pesan", link: "/" },
       ],
     },
     {
@@ -52,10 +51,10 @@ const Layout = ({ children }) => {
         { label: "Pelanggan Aktif", link: "/" },
         { label: "Pelanggan Non Aktif", link: "/" },
         { label: "Tagihan Pelanggan", link: "/" },
-        { label: "Pembayaran Tagihan", link: "/" }
+        { label: "Pembayaran Tagihan", link: "/" },
       ],
     },
-  
+
     {
       label: "Instalasi",
       icon: Server,
@@ -72,7 +71,7 @@ const Layout = ({ children }) => {
         { label: "Inventori Stok Masuk", link: "/" },
         { label: "Inventori Opname", link: "/" },
         { label: "Tagihan Pelanggan", link: "/" },
-        { label: "Pembayaran Tagihan", link: "/" }
+        { label: "Pembayaran Tagihan", link: "/" },
       ],
     },
     {
@@ -91,7 +90,7 @@ const Layout = ({ children }) => {
       icon: Lock,
       links: [
         { label: "Roles", link: "/" },
-        { label: "Pegawai", link: "/pegawai" },
+        { label: "Pegawai", link: "/admin/pegawai" },
       ],
     },
   ];

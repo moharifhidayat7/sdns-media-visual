@@ -1,11 +1,11 @@
 import bcrypt from "bcrypt";
 import prisma from "lib/prisma";
-import { getToken } from "next-auth/jwt";
+import { getSession } from "next-auth/react";
 
 export default async function handler(req, res) {
-  const secret = process.env.NEXTAUTH_SECRET;
+  const session = await getSession({ req });
+
   if (req.method === "GET") {
-    const token = await getToken({ req, secret });
     try {
       const result = await prisma.user.findMany();
       const userWithoutPassword = result.map((user) => {
@@ -26,6 +26,7 @@ export default async function handler(req, res) {
         data: {
           ...req.body,
           password: hash,
+          createdBy: session.user ? session.user.id : null,
         },
       });
 

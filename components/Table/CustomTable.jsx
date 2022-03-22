@@ -236,7 +236,7 @@ const Row = ({
         <td>
           <Group spacing="xs" noWrap className="justify-end">
             {readLink && (
-              <ActionIcon color="blue" variant="filled" onClick={() => router.push(readLink)}>
+              <ActionIcon color="blue" variant="filled" onClick={() =>  router.push(router.asPath.split("?")[0] + readLink)}>
                 <EyeCheck size={16} />
               </ActionIcon>)
             }

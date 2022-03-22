@@ -8,8 +8,7 @@ import DataTable from "@components/Table/DataTable";
 import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useEffect } from "react";
 import { useNotifications } from "@mantine/notifications";
-import { useDebouncedValue } from "@mantine/hooks";
-import { formatDate } from "helpers/functions";
+import dateFormat from "dateformat";
 import { Check, X } from "tabler-icons-react";
 
 export default function Index({ users }) {
@@ -51,10 +50,10 @@ export default function Index({ users }) {
   return (
     <Layout>
       <Head>
-        <title>User</title>
+        <title>Pegawai</title>
       </Head>
       <Title order={1} style={{ marginBottom: "1.5rem" }}>
-        Data User
+        Data Pegawai
       </Title>
 
       <DataTable>
@@ -199,7 +198,7 @@ export default function Index({ users }) {
                     <Text>{row.email}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text>{formatDate(row.createdAt)}</Text>
+                    <Text>{dateFormat(row.createdAt, "dd-mm-yyyy")}</Text>
                   </CustomTable.Col>
                 </CustomTable.Row>
               );

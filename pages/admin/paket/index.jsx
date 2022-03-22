@@ -1,8 +1,6 @@
 import Head from "next/head";
-
 import Layout from "@components/views/Layout";
 import { Title, Text, Button, Modal, Table } from "@mantine/core";
-
 import { CustomTable } from "@components/Table/CustomTable";
 import DataTable from "@components/Table/DataTable";
 import { useContext, useEffect, useState } from "react";
@@ -11,7 +9,7 @@ import { useNotifications } from "@mantine/notifications";
 import dateFormat from "dateformat";
 import { Check, H3, X } from "tabler-icons-react";
 const URL = "/api/paket";
-const NAMEPAGE = "Paket";
+const NAMEPAGE = "paket";
 export default function Index({ paket }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
@@ -143,6 +141,18 @@ export default function Index({ paket }) {
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text className="uppercase">{row.nama}</Text>
+                  </CustomTable.Col>
+                  <CustomTable.Col>
+                    <Text className="uppercase">{row.produk?row.produk.nama:""}</Text>
+                  </CustomTable.Col>
+                  <CustomTable.Col>
+                    <Text className="uppercase">Rp.{row.harga}</Text>
+                  </CustomTable.Col>
+                  <CustomTable.Col>
+                    <Text className="uppercase"></Text>
+                  </CustomTable.Col>
+                  <CustomTable.Col>
+                    <Text className="uppercase">{row.status}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text className="uppercase">
