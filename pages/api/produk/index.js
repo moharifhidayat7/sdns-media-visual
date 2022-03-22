@@ -1,7 +1,10 @@
 import prisma from "lib/prisma";
+import { getSession } from "next-auth/react";
+
 //prisma create produk
 export default async (req, res) => {
   const data = req.body;
+  const session = await getSession({ req });
   if (req.method == "POST") {
     try {
       const produk = await prisma.produk.create({
@@ -9,8 +12,8 @@ export default async (req, res) => {
           nama: data.nama,
           kode: data.kode,
           status: data.status,
-          createdId: parseInt(data.createdId),
-          updatedId: parseInt(data.updatedId),
+          createdId: session.user.id,
+          updatedId: session.user.id,
         },
       });
       res.statusCode = 200;

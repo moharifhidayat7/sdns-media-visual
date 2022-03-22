@@ -2,8 +2,11 @@ import Head from "next/head";
 import { Title, Box, Button } from "@mantine/core";
 
 import Layout from "@components/views/Layout";
+import { useSession, getSession } from "next-auth/react";
 
 export default function Home() {
+  const { data: session } = useSession();
+
   return (
     <Layout>
       <Head>
@@ -29,4 +32,12 @@ export default function Home() {
       </Box>
     </Layout>
   );
+}
+
+export async function getServerSideProps(context) {
+  return {
+    props: {
+      session: await getSession(context),
+    },
+  };
 }

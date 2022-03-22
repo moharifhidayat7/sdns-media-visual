@@ -1,15 +1,17 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import prisma from "lib/prisma";
+import { getSession } from "next-auth/react";
+
 //prisma create produk
 export default async (req, res) => {
    const data = req.body;
+   const session = await getSession({req})
    if (req.method == "POST") {
       try {
          const supplier = await prisma.supplier.create({
             data: {
                ...data,
-               createdId: parseInt(data.createdId),
-               updatedId: parseInt(data.updatedId),
+               createdId: session.user.id,
+               updatedId: session.user.id,
             }
          });
          res.statusCode = 200;

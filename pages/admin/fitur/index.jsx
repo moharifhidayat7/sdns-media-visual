@@ -148,7 +148,11 @@ export default function Index({ fitur }) {
 }
 
 export async function getServerSideProps(context) {
-  const res = await fetch(`${process.env.API_URL}/api/fitur/`);
+  const res = await fetch(`${process.env.API_URL}/api/fitur/`, {
+    headers: {
+      Cookie: context.req.headers.cookie,
+    },
+  });
   const fitur = await res.json();
   return {
     props: {

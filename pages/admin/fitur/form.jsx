@@ -181,17 +181,29 @@ export async function getServerSideProps(context) {
   let fitur = [];
   let action = "add";
   if (id) {
-    let res = await fetch(`${process.env.API_URL}/api/fitur/${id}`);
+    let res = await fetch(`${process.env.API_URL}/api/fitur/${id}`, {
+      headers: {
+        Cookie: context.req.headers.cookie,
+      },
+    });
     action = "edit";
     fitur = await res.json();
     if (res.status === 403) {
-      let res = await fetch(`${url}/api/fitur`);
+      let res = await fetch(`${url}/api/fitur`, {
+        headers: {
+          Cookie: context.req.headers.cookie,
+        },
+      });
       const fiturs = await res.json();
       fitur = fiturs.result.length > 0 ? fiturs.result[0] : fiturs;
       action = "add";
     }
   } else {
-    let res = await fetch(`${process.env.API_URL}/api/fitur`);
+    let res = await fetch(`${process.env.API_URL}/api/fitur`, {
+      headers: {
+        Cookie: context.req.headers.cookie,
+      },
+    });
     const fiturs = await res.json();
     fitur = fiturs.result.length > 0 ? fiturs.result[0] : fiturs;
     action = "add";

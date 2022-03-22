@@ -177,7 +177,11 @@ export default function Index({ supplier }) {
 }
 
 export async function getServerSideProps(context) {
-  const res = await fetch(`${process.env.API_URL}/api/supplier/`);
+  const res = await fetch(`${process.env.API_URL}/api/supplier/`, {
+    headers: {
+      Cookie: context.req.headers.cookie,
+    },
+  });
   const supplier = await res.json();
   return {
     props: {

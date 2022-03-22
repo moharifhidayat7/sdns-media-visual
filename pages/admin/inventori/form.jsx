@@ -255,18 +255,30 @@ export async function getServerSideProps(context) {
   let inventori = {};
   let action = "add";
   if (id) {
-    let res = await fetch(`${process.env.API_URL}/api/inventori/${id}`);
+    let res = await fetch(`${process.env.API_URL}/api/inventori/${id}`, {
+      headers: {
+        Cookie: context.req.headers.cookie,
+      },
+    });
     action = "edit";
     inventori = await res.json();
     if (res.status === 403) {
-      let res = await fetch(`${process.env.API_URL}/api/inventori`);
+      let res = await fetch(`${process.env.API_URL}/api/inventori`, {
+        headers: {
+          Cookie: context.req.headers.cookie,
+        },
+      });
       const inventoris = await res.json();
       inventori =
         inventoris.result.length > 0 ? inventoris.result[0] : inventoris;
       action = "add";
     }
   } else {
-    let res = await fetch(`${process.env.API_URL}/api/inventori`);
+    let res = await fetch(`${process.env.API_URL}/api/inventori`, {
+      headers: {
+        Cookie: context.req.headers.cookie,
+      },
+    });
     const inventoris = await res.json();
     inventori =
       inventoris.result.length > 0 ? inventoris.result[0] : inventoris;
