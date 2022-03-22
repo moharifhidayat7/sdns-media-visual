@@ -176,17 +176,29 @@ export async function getServerSideProps(context) {
   let gudang = {};
   let action = "add";
   if (id) {
-    let res = await fetch(`${process.env.API_URL}/api/gudang/${id}`);
+    let res = await fetch(`${process.env.API_URL}/api/gudang/${id}`, {
+      headers: {
+        Cookie: context.req.headers.cookie,
+      },
+    });
     action = "edit";
     gudang = await res.json();
     if (res.status === 403) {
-      let res = await fetch(`${process.env.API_URL}/api/gudang`);
+      let res = await fetch(`${process.env.API_URL}/api/gudang`, {
+        headers: {
+          Cookie: context.req.headers.cookie,
+        },
+      });
       const gudangs = await res.json();
       gudang = gudangs.result.length > 0 ? gudangs.result[0] : gudangs;
       action = "add";
     }
   } else {
-    let res = await fetch(`${process.env.API_URL}/api/gudang`);
+    let res = await fetch(`${process.env.API_URL}/api/gudang`, {
+      headers: {
+        Cookie: context.req.headers.cookie,
+      },
+    });
     const gudangs = await res.json();
     gudang = gudangs.result.length > 0 ? gudangs.result[0] : gudangs;
     action = "add";

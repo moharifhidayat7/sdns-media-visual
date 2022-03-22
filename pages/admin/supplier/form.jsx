@@ -236,17 +236,29 @@ export async function getServerSideProps(context) {
   let supplier = [];
   let action = "add";
   if (id) {
-    let res = await fetch(`${process.env.API_URL}/api/supplier/${id}`);
+    let res = await fetch(`${process.env.API_URL}/api/supplier/${id}`, {
+      headers: {
+        Cookie: context.req.headers.cookie,
+      },
+    });
     action = "edit";
     supplier = await res.json();
     if (res.status === 403) {
-      let res = await fetch(`${process.env.API_URL}/api/supplier`);
+      let res = await fetch(`${process.env.API_URL}/api/supplier`, {
+        headers: {
+          Cookie: context.req.headers.cookie,
+        },
+      });
       const suppliers = await res.json();
       supplier = suppliers.result.length > 0 ? suppliers.result[0] : suppliers;
       action = "add";
     }
   } else {
-    let res = await fetch(`${process.env.API_URL}/api/supplier`);
+    let res = await fetch(`${process.env.API_URL}/api/supplier`, {
+      headers: {
+        Cookie: context.req.headers.cookie,
+      },
+    });
     const suppliers = await res.json();
     supplier = suppliers.result.length > 0 ? suppliers.result[0] : suppliers;
     action = "add";

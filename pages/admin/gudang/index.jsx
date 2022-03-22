@@ -148,7 +148,11 @@ export default function Index({ gudang }) {
 }
 
 export async function getServerSideProps(context) {
-  const res = await fetch(`${process.env.API_URL}/api/gudang/`);
+  const res = await fetch(`${process.env.API_URL}/api/gudang/`, {
+    headers: {
+      Cookie: context.req.headers.cookie,
+    },
+  });
   const gudang = await res.json();
   return {
     props: {

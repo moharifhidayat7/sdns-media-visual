@@ -102,7 +102,9 @@ export default function Index({ paket }) {
   return (
     <Layout>
       <Head>
-        <title style={{ textTransform: "capitalize" }}>Master {NAMEPAGE} </title>
+        <title style={{ textTransform: "capitalize" }}>
+          Master {NAMEPAGE}{" "}
+        </title>
       </Head>
       <Title
         order={2}
@@ -143,7 +145,9 @@ export default function Index({ paket }) {
                     <Text className="uppercase">{row.nama}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase">{row.produk?row.produk.nama:""}</Text>
+                    <Text className="uppercase">
+                      {row.produk ? row.produk.nama : ""}
+                    </Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text className="uppercase">Rp.{row.harga}</Text>
@@ -197,7 +201,11 @@ const ViewModalLogStok = ({ logstok, setModalStokLog }) => {
   );
 };
 export async function getServerSideProps(context) {
-  const res = await fetch(`${process.env.API_URL}/api/paket`);
+  const res = await fetch(`${process.env.API_URL}/api/paket`, {
+    headers: {
+      Cookie: context.req.headers.cookie,
+    },
+  });
   const paket = await res.json();
   return {
     props: {

@@ -16,7 +16,7 @@ import { useRouter } from "next/router";
 import { useNotifications } from "@mantine/notifications";
 import { Check } from "tabler-icons-react";
 
-import { useSession, getSession } from "next-auth/react";
+import { getSession } from "next-auth/react";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -57,7 +57,6 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export default function Login() {
-  const { data: session } = useSession();
   const { classes } = useStyles();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -82,6 +81,7 @@ export default function Login() {
     const login = await signIn("credentials", {
       ...values,
       redirect: false,
+      callbackUrl: router.query.callbackUrl,
     });
     if (login.error == null) {
       notifications.showNotification({
@@ -93,18 +93,12 @@ export default function Login() {
         icon: <Check />,
         loading: false,
       });
-      router.push(router.query.r || "/admin");
+      router.push(login.url || "/dashboard");
     } else {
       setShowError(true);
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (session) {
-      router.push("/admin");
-    }
-  }, [session, router]);
 
   return (
     <>

@@ -240,7 +240,11 @@ const ViewModalLogStok = ({ logstok, setModalStokLog }) => {
 };
 
 export async function getServerSideProps(context) {
-  const res = await fetch(`${process.env.API_URL}/api/inventori/`);
+  const res = await fetch(`${process.env.API_URL}/api/inventori/`, {
+    headers: {
+      Cookie: context.req.headers.cookie,
+    },
+  });
   const inventori = await res.json();
   return {
     props: {
