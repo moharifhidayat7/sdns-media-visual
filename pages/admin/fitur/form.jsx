@@ -185,7 +185,7 @@ export async function getServerSideProps(context) {
     action = "edit";
     fitur = await res.json();
     if (res.status === 403) {
-      let res = await fetch(`${process.env.API_URL}/api/fitur`);
+      let res = await fetch(`${url}/api/fitur`);
       const fiturs = await res.json();
       fitur = fiturs.result.length > 0 ? fiturs.result[0] : fiturs;
       action = "add";

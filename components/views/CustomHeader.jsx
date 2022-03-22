@@ -102,7 +102,7 @@ export default function CustomHeader({ links, ...props }) {
   const { classes, theme, cx } = useStyles();
 
   const user = {
-    name: "Jane Spoonfighter",
+    name: "J",
     email: "janspoon@fighter.dev",
     image:
       "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=255&q=80",
@@ -141,7 +141,7 @@ export default function CustomHeader({ links, ...props }) {
             ]}
           />
 
-          <UserMenu user={user} />
+          <UserMenu user={user}  />
           <Burger
             opened={state.showSidebar}
             onClick={() => dispatch({ type: "toggle_sidebar" })}

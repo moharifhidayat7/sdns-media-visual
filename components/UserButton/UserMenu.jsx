@@ -116,6 +116,7 @@ const UserMenu = ({ user }) => {
       placement="end"
       transition="pop-top-right"
       classNames={classes}
+      className="hidden md:block"
       onClose={() => setUserMenuOpened(false)}
       onOpen={() => setUserMenuOpened(true)}
       control={<MenuControl user={user} userMenuOpened={userMenuOpened} />}
