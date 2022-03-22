@@ -27,19 +27,23 @@ export async function getServerSideProps(context) {
   const read = context.query.read;
   let paket = [];
   let action = "add";
-
+  const OPTIONFETCH = {
+    headers: {
+      Cookie: context.req.headers.cookie,
+    },
+  };
   if (id) {
-    let res = await fetch(`${process.env.API_URL}/api/paket/${id}`);
+    let res = await fetch(`${process.env.API_URL}/api/paket/${id}`, OPTIONFETCH);
     action = "edit";
     paket = await res.json();
-    if (res.status === 403) {
-      let res = await fetch(`${process.env.API_URL}/api/paket`);
+    if (res.status != 200) {
+      let res = await fetch(`${process.env.API_URL}/api/paket`,OPTIONFETCH);
       const pakets = await res.json();
       paket = pakets.result.length > 0 ? pakets.result[0] : pakets;
       action = "add";
     }
   } else {
-    let res = await fetch(`${process.env.API_URL}/api/paket`);
+    let res = await fetch(`${process.env.API_URL}/api/paket`,OPTIONFETCH);
     const pakets = await res.json();
     paket = pakets.result.length > 0 ? pakets.result[0] : pakets;
     action = "add";
@@ -48,10 +52,10 @@ export async function getServerSideProps(context) {
   if (read) {
     action = "read";
   }
-  const fetchProduk = await fetch(`${process.env.API_URL}/api/produk?limit=9999`);
+  const fetchProduk = await fetch(`${process.env.API_URL}/api/produk?limit=9999`,OPTIONFETCH);
   const produks = await fetchProduk.json();
   const produk = produks.result.filter((item) => item.status === "ACTIVE");
-  const fetchFitur = await fetch(`${process.env.API_URL}/api/fitur?limit=9999`);
+  const fetchFitur = await fetch(`${process.env.API_URL}/api/fitur?limit=9999`,OPTIONFETCH);
   const fiturs = await fetchFitur.json();
   const fitur = fiturs.result.filter((item) => item.status === "ACTIVE");
   return {
@@ -205,7 +209,7 @@ function Form({ data, action, produk, fitur }) {
                 <TextInput
                   label="Harga"
                   icon={"Rp"}
-                  onInput={(e)=>inputNumberOnly(e)}
+                  onInput={(e) => inputNumberOnly(e)}
                   disabled={disabled}
                   {...form.getInputProps("harga")}
                   value={form.values.harga}
@@ -213,7 +217,7 @@ function Form({ data, action, produk, fitur }) {
                     form.setFieldValue("harga", e.currentTarget.value)
                   }
                 />
-                <Select                
+                <Select
                   label="Produk"
                   {...form.getInputProps("produkId")}
                   onChange={(e) => form.setFieldValue("produkId", e)}
@@ -229,15 +233,15 @@ function Form({ data, action, produk, fitur }) {
             <Grid.Col sm={12} md={6}>
               <CheckboxGroup
                 value={form.values.fiturs}
-                label="Fiturs"           
-                                {...form.getInputProps("fiturs")}
+                label="Fiturs"
+                {...form.getInputProps("fiturs")}
                 onChange={(e) => form.setFieldValue("fiturs", e)}
                 required
               >
                 {fitur.map((item) => {
                   return (
                     <Checkbox
-                    disabled={disabled}
+                      disabled={disabled}
                       key={item.id}
                       label={item.nama}
                       value={`${item.id}`} radius="md"
