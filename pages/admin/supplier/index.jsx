@@ -131,7 +131,7 @@ export default function Index({ supplier }) {
                 <CustomTable.Row
                   key={row.id}
                   id={row.id}
-                  readLink={`supplier/form?id=${row.id}&read=true`}
+                  readLink={`/form?id=${row.id}&read=true`}
                   editLink={`/form?id=${row.id}`}
                   deleteField={row.nama}
                   onDelete={(isLoading) => deleteHandler(row.id, isLoading)}

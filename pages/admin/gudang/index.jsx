@@ -114,7 +114,7 @@ export default function Index({ gudang }) {
                 <CustomTable.Row
                   key={row.id}
                   id={row.id}
-                  readLink={`gudang/form?id=${row.id}&read=true`}
+                  readLink={`/form?id=${row.id}&read=true`}
                   editLink={`/form?id=${row.id}`}
                   deleteField={row.nama}
                   onDelete={(isLoading) => deleteHandler(row.id, isLoading)}

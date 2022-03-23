@@ -70,6 +70,8 @@ const Layout = ({ children }) => {
       links: [
         { label: "Inventori Stok Masuk", link: "/" },
         { label: "Inventori Opname", link: "/" },
+        { label: "Inventori Pre Order", link: "/" },
+        { label: "Inventori Pengembalian", link: "/" },
         { label: "Tagihan Pelanggan", link: "/" },
         { label: "Pembayaran Tagihan", link: "/" },
       ],
