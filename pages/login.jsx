@@ -93,7 +93,7 @@ export default function Login() {
         icon: <Check />,
         loading: false,
       });
-      router.push(login.url || "/dashboard");
+      router.push(login.url || "/admin");
     } else {
       setShowError(true);
       setLoading(false);
