@@ -20,8 +20,10 @@ model User {
   updatedAt          DateTime    @updatedAt
   deletedAt          DateTime?
   isDeleted          Boolean?    @default(false)
-  updatedBy          Int?
-  createdBy          Int?
+  updatedId          Int?
+  createdId          Int?
+  updatedBy          User?       @relation("updatedBy", references: [id], fields: [updatedId])
+  createdBy          User?       @relation("createdBy", references: [id], fields: [createdId])
   createdProduk      Produk[]    @relation("produkcreatedBy")
   updatedProduk      Produk[]    @relation("produkupdatedBy")
   createdInventori   Inventori[] @relation("userInventoriCreate")
@@ -36,6 +38,8 @@ model User {
   updatedFitur       Fitur[]     @relation("fiturupdatedBy")
   createdPaket       Paket[]     @relation("paketcreatedBy")
   updatedPaket       Paket[]     @relation("paketupdatedBy")
+  updatedUser        User[]      @relation("updatedBy")
+  createdUser        User[]      @relation("createdBy")
 }
 
 model Fitur {
@@ -56,7 +60,7 @@ model Fitur {
 
 model Paket {
   id        Int              @id @default(autoincrement())
-  kode      String          
+  kode      String
   nama      String
   harga     Int
   produk    Produk?          @relation(fields: [produkId], references: [id], name: "paketproduk")

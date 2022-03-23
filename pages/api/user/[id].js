@@ -17,7 +17,7 @@ export default async function handler(req, res) {
 
       res.status(200).json(result);
     } catch (error) {
-      res.status(403).json({ err: "Error occured." });
+      res.status(400).json({ err: "Error occured." });
     }
   }
   if (req.method === "PUT") {
@@ -35,12 +35,37 @@ export default async function handler(req, res) {
       delete user.password;
       delete user.resetPasswordToken;
 
-      res.statusCode(200).json({
+      res.status(200).json({
         message: "User updated",
         user,
       });
     } catch (error) {
-      res.status(403).json({ err: "Error occured." });
+      res.status(400).json({ err: "Error occured." });
+    }
+  }
+  if (req.method === "DELETE") {
+    try {
+      const user = await prisma.user.update({
+        where: {
+          id: parseInt(req.query.id),
+        },
+        data: {
+          isDeleted: true,
+          deletedAt: new Date(),
+          updatedId: session.user ? session.user.id : null,
+        },
+      });
+
+      delete user.password;
+      delete user.resetPasswordToken;
+
+      res.status(200).json({
+        message: "User deleted",
+        user,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(400).json({ err: "Error occured." });
     }
   }
 }
