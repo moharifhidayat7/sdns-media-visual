@@ -1,5 +1,3 @@
-import { data } from "autoprefixer";
-import bcrypt from "bcrypt";
 import prisma from "lib/prisma";
 import { getSession } from "next-auth/react";
 
@@ -14,7 +12,7 @@ export default async function handler(req, res) {
 
     try {
       const [result, totalResult] = await prisma.$transaction([
-        prisma.user.findMany({
+        prisma.role.findMany({
           skip,
           take: limit,
           include: {
@@ -25,12 +23,7 @@ export default async function handler(req, res) {
             isDeleted: false,
             OR: [
               {
-                email: {
-                  contains: search,
-                },
-              },
-              {
-                username: {
+                nama: {
                   contains: search,
                 },
               },
@@ -40,17 +33,12 @@ export default async function handler(req, res) {
             createdAt: "desc",
           },
         }),
-        prisma.user.count({
+        prisma.role.count({
           where: {
             isDeleted: false,
             OR: [
               {
-                email: {
-                  contains: search,
-                },
-              },
-              {
-                username: {
+                nama: {
                   contains: search,
                 },
               },
@@ -58,17 +46,13 @@ export default async function handler(req, res) {
           },
         }),
       ]);
-      const userWithoutPassword = result.map((user) => {
-        const { password, resetPasswordToken, ...other } = user;
-        return other;
-      });
 
       const pages = Math.ceil(totalResult / limit);
 
       res.status(200).json({
         status: "success",
-        message: "Berhasil mengambil data user",
-        result: userWithoutPassword,
+        message: "Berhasil mengambil data role",
+        result: result,
         total: totalResult,
         pages,
         page,
@@ -80,24 +64,17 @@ export default async function handler(req, res) {
   }
   if (req.method === "POST") {
     try {
-      const { password } = req.body;
-      const saltRounds = 10;
-      const hash = await bcrypt.hash(password, saltRounds);
-      const user = await prisma.user.create({
+      const role = await prisma.role.create({
         data: {
           ...req.body,
-          password: hash,
-          createdId: session.user ? session.user.id : null,
+          createdId: session.role ? session.role.id : null,
         },
       });
 
-      delete user.password;
-      delete user.resetPasswordToken;
-
       res.statusCode = 200;
       res.json({
-        message: "User created",
-        user,
+        message: "role created",
+        role,
       });
     } catch (error) {
       res.status(400).json({ err: "Error occured." });
@@ -105,7 +82,7 @@ export default async function handler(req, res) {
   }
   if (req.method === "DELETE") {
     try {
-      const user = await prisma.user.updateMany({
+      const role = await prisma.role.updateMany({
         where: {
           id: { in: req.body.id },
         },
@@ -118,8 +95,8 @@ export default async function handler(req, res) {
 
       res.statusCode = 200;
       res.json({
-        message: "User deleted",
-        user,
+        message: "role deleted",
+        role,
       });
     } catch (error) {
       res.status(400).json({ err: "Error occured." });

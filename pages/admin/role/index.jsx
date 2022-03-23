@@ -11,16 +11,16 @@ import { useNotifications } from "@mantine/notifications";
 import dateFormat from "dateformat";
 import { Check, X } from "tabler-icons-react";
 
-export default function Index({ users }) {
+export default function Index({ roles }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
 
   useEffect(() => {
-    dispatch({ type: "set_data", payload: users });
+    dispatch({ type: "set_data", payload: roles });
   }, []);
   const deleteHandler = async (selected, isLoading, type = "delete") => {
     const data = { id: selected };
-    const url = type == "delete" ? `/api/user/${selected}` : `/api/user`;
+    const url = type == "delete" ? `/api/role/${selected}` : `/api/role`;
     await fetch(url, {
       method: "DELETE",
       headers: {
@@ -34,8 +34,8 @@ export default function Index({ users }) {
         notifications.showNotification({
           disallowClose: true,
           autoClose: 5000,
-          title: "Delete User",
-          message: "Delete user berhasil",
+          title: "Delete role",
+          message: "Delete role berhasil",
           color: "green",
           icon: <Check />,
           loading: false,
@@ -44,8 +44,8 @@ export default function Index({ users }) {
         notifications.showNotification({
           disallowClose: true,
           autoClose: 5000,
-          title: "Delete User",
-          message: "Delete user gagal",
+          title: "Delete role",
+          message: "Delete role gagal",
           color: "red",
           icon: <X />,
           loading: false,
@@ -54,7 +54,7 @@ export default function Index({ users }) {
     });
   };
   const refreshHandler = async (isLoading = null, page = 1, search = "") => {
-    const url = `/api/user?page=${page}&search=${search}`;
+    const url = `/api/role?page=${page}&search=${search}`;
     const res = await fetch(url);
     const data = await res.json();
 
@@ -63,28 +63,20 @@ export default function Index({ users }) {
   };
   const header = [
     {
-      key: "username",
-      label: "Username",
-    },
-    {
-      key: "email",
-      label: "Email",
-    },
-    {
-      key: "createdAt",
-      label: "Created At",
+      key: "nama",
+      label: "Role",
     },
   ];
   return (
     <Layout>
       <Head>
-        <title style={{ textTransform: "capitalize" }}>Pegawai</title>
+        <title style={{ textTransform: "capitalize" }}>Role</title>
       </Head>
       <Title
         order={2}
         style={{ marginBottom: "1.5rem", textTransform: "capitalize" }}
       >
-        Data Pegawai
+        Data Role
       </Title>
       <DataTable>
         <DataTable.Action
@@ -107,7 +99,6 @@ export default function Index({ users }) {
                 <CustomTable.Row
                   key={row.id}
                   id={row.id}
-                  readLink={`user/form?id=${row.id}&read=true`}
                   editLink={`/form?id=${row.id}`}
                   deleteField={row.nama}
                   onDelete={(isLoading) => {
@@ -115,15 +106,7 @@ export default function Index({ users }) {
                   }}
                 >
                   <CustomTable.Col>
-                    <Text>{row.username}</Text>
-                  </CustomTable.Col>
-                  <CustomTable.Col>
-                    <Text>{row.email}</Text>
-                  </CustomTable.Col>
-                  <CustomTable.Col>
-                    <Text className="uppercase">
-                      {dateFormat(row.createdAt, "dd-mm-yyyy")}
-                    </Text>
+                    <Text>{row.nama}</Text>
                   </CustomTable.Col>
                 </CustomTable.Row>
               );
@@ -142,16 +125,16 @@ export default function Index({ users }) {
 }
 //function get server side props produk
 export async function getServerSideProps(context) {
-  const res = await fetch(`${process.env.API_URL}/api/user?page=0`, {
+  const res = await fetch(`${process.env.API_URL}/api/role?page=0`, {
     headers: {
       Cookie: context.req.headers.cookie,
     },
   });
-  const users = await res.json();
+  const roles = await res.json();
 
   return {
     props: {
-      users,
+      roles,
     },
   };
 }
