@@ -7,25 +7,20 @@ import { useContext, useEffect, useState } from "react";
 import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useNotifications } from "@mantine/notifications";
 import dateFormat from "dateformat";
-import { Check, H3, X } from "tabler-icons-react";
+import { Check, X, CircleCheck } from "tabler-icons-react";
 const URL = "/api/paket";
 const NAMEPAGE = "paket";
-export default function Index({ paket }) {
+export default function Index({ paket, fiturs }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
-  const [modalStokLog, setModalStokLog] = useState({
+  const [modal, setModal] = useState({
     opened: false,
+    title: "",
     data: [],
   });
-  const [fiturs, setFiturs] = useState([]);
-  const getFitur = async () => {
-    const res = await fetch(`/api/fitur`);
-    const datares = await res.json();
-    setFiturs(datares);
-  };
+
   useEffect(() => {
     dispatch({ type: "set_data", payload: paket });
-    getFitur()
   }, []);
   const deleteHandler = async (selected, isLoading, type = "delete") => {
     const data = { id: selected };
@@ -153,7 +148,20 @@ export default function Index({ paket }) {
                     <Text className="uppercase">Rp.{row.harga}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase"></Text>
+                    <Text className="uppercase">
+                      <Button
+                        variant="subtle"
+                        onClick={() =>
+                          setModal({
+                            opened: true,
+                            title: `${row.kode} - ${row.nama}`,
+                            data: row.fiturs,
+                          })
+                        }
+                      >
+                        VIEW({row.fiturs ? row.fiturs.length : 0})
+                      </Button>
+                    </Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text className="uppercase">{row.status}</Text>
@@ -173,43 +181,77 @@ export default function Index({ paket }) {
           onChange={(page, isLoading) => refreshHandler(isLoading, page)}
         />
       </DataTable>
-      <ViewModalLogStok
-        logstok={modalStokLog}
-        setModalStokLog={setModalStokLog}
+      <ViewModal
+        modal={{ modal, setModal }}
+        fiturs={fiturs}
       />
     </Layout>
   );
 }
-const ViewModalLogStok = ({ logstok, setModalStokLog }) => {
+const ViewModal = ({ modal, fiturs }) => {
+
+  const [fiturPaket, setFiturPaket] = useState([])
+  useEffect(() => {
+    if (modal.modal.opened == true) {
+      const data = modal.modal.data.map((row) => {
+        return row.fiturId
+      })
+     setFiturPaket(data)
+    }
+  }, [modal.modal.opened])
 
 
   return (
     <Modal
-      opened={logstok.opened}
-      onClose={() =>
-        setModalStokLog({
+      opened={modal.modal.opened}
+      onClose={() => {
+        modal.setModal({
           opened: false,
-          data: [],
+          data: []
         })
       }
-      size="lg"
+      }
+      size="sm"
       transition="rotate-left"
-      title={logstok.title}
+      title={<div className="uppercase">{modal.modal.title}</div>}
+
     >
-  
+      <Table>
+        <thead>
+          <tr>
+            <th>Fitur</th>
+            <th style={{ textAlign: "right" }}>Include</th>
+          </tr>
+        </thead>
+        <tbody>
+          {fiturs.result && fiturs.result.map((row) => {
+            return (
+              <tr key={row.id}>
+                <td>{row.nama}</td>
+                <td className="text-right"><CircleCheck color={fiturPaket.includes(row.id) ? 'green' : 'gray'} className={`text-gray-500 ml-5`} /></td>
+              </tr>
+            )
+          })
+          }
+        </tbody>
+      </Table>
+
     </Modal>
   );
-};
+}
 export async function getServerSideProps(context) {
-  const res = await fetch(`${process.env.API_URL}/api/paket`, {
+  const OPTION = {
     headers: {
       Cookie: context.req.headers.cookie,
     },
-  });
+  };
+  const res = await fetch(`${process.env.API_URL}/api/paket`, OPTION);
   const paket = await res.json();
+  const fiturs = await fetch(`${process.env.API_URL}/api/fitur`, OPTION).then(res => res.json());
   return {
     props: {
       paket,
+      fiturs
     },
   };
 }

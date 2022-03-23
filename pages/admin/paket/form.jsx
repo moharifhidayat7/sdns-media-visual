@@ -74,6 +74,7 @@ function Form({ data, action, produk, fitur }) {
       nama: (value) => (value.length < 1 ? "Plese input nama." : null),
       harga: (value) => (value.length < 1 ? "Plese input harga." : null),
       produkId: (value) => (value.length < 1 ? "Plese input produk." : null),
+      fiturs: (value) => (value.length < 1 ? "Plese input fiturs." : null),
     },
   });
   const [opened, setOpened] = useState(true);
