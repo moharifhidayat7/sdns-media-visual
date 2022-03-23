@@ -1,39 +1,69 @@
 import Head from "next/head";
-import { Title, Text, MultiSelect } from "@mantine/core";
-import { useForm } from "@mantine/form";
+
+import Layout from "@components/views/Layout";
+import { Title, Text, Button } from "@mantine/core";
 
 import { CustomTable } from "@components/Table/CustomTable";
-import Layout from "@components/views/Layout";
 import DataTable from "@components/Table/DataTable";
+import { useContext, useEffect } from "react";
 import { useGlobalContext } from "@components/contexts/GlobalContext";
-import { useEffect } from "react";
 import { useNotifications } from "@mantine/notifications";
 import dateFormat from "dateformat";
 import { Check, X } from "tabler-icons-react";
-import { useSession, getSession } from "next-auth/react";
 
-export default function Index({ users }) {
+export default function Index({ produk }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
-  const { data, status } = useSession();
-
-  const form = useForm({
-    initialValues: {
-      roles: "",
-      roles2: "",
-    },
-  });
-
+  const getProdukProp = () => {
+    const data = produk ? produk : [];
+    dispatch({ type: "set_data", payload: data });
+  };
   useEffect(() => {
-    const getUsersProp = () => {
-      const data = users;
-
-      dispatch({ type: "set_data", payload: data });
-    };
-
-    getUsersProp();
+    getProdukProp();
   }, []);
+  const deleteHandler = async (selected, isLoading, type = "delete") => {
+    const data = { id: selected };
+    const url = type == "delete" ? `/api/user/${selected}` : `/api/user`;
+    await fetch(url, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }).then((res) => {
+      isLoading(false);
+      if (res.status === 200) {
+        dispatch({ type: type, payload: selected });
+        notifications.showNotification({
+          disallowClose: true,
+          autoClose: 5000,
+          title: "Delete User",
+          message: "Delete user berhasil",
+          color: "green",
+          icon: <Check />,
+          loading: false,
+        });
+      } else {
+        notifications.showNotification({
+          disallowClose: true,
+          autoClose: 5000,
+          title: "Delete User",
+          message: "Delete user gagal",
+          color: "red",
+          icon: <X />,
+          loading: false,
+        });
+      }
+    });
+  };
+  const refreshHandler = async (isLoading = null, page = 1, search = "") => {
+    const url = `/api/user?page=${page}&search=${search}`;
+    const res = await fetch(url);
+    const data = await res.json();
 
+    dispatch({ type: "set_data", payload: { ...data, search, page } });
+    isLoading(false);
+  };
   const header = [
     {
       key: "username",
@@ -48,154 +78,44 @@ export default function Index({ users }) {
       label: "Created At",
     },
   ];
-
   return (
     <Layout>
       <Head>
-        <title>Pegawai</title>
+        <title style={{ textTransform: "capitalize" }}>Pegawai</title>
       </Head>
-      <Title order={1} style={{ marginBottom: "1.5rem" }}>
+      <Title
+        order={2}
+        style={{ marginBottom: "1.5rem", textTransform: "capitalize" }}
+      >
         Data Pegawai
       </Title>
-
       <DataTable>
         <DataTable.Action
-          onSearch={(keyword) => {
-            console.log(keyword); // search keyword
-            console.log(form.values); // filter values
-
-            // fetch search & filter
-            const data = [];
-            // then
-
-            // set data
-            dispatch({ type: "set_data", payload: data });
-          }}
-          onEdit={(selected) => console.log(selected)}
+          filterVisibility={false}
           onDelete={(selected, isLoading) => {
-            // fetch delete many
-            console.log("fetch delete many: ", selected);
-
-            // if error set loading to false
-            setTimeout(() => isLoading(false), 3000);
-
-            // if success delete data from state
-            dispatch({
-              type: "delete_many",
-              payload: selected,
-            });
+            deleteHandler(selected, isLoading, "delete_many");
           }}
-          onRefresh={async (isLoading) => {
-            // fetch data
-            const users = await fetch(`/api/user`).then((res) => res.json());
-
-            console.log(users);
-
-            console.log("fetch data");
-            const result = [
-              {
-                id: 1,
-                username: "tes refresh",
-                email: "tes refresh",
-                createdAt: new Date(),
-              },
-            ];
-
-            // if error set loading to false
-            setTimeout(() => isLoading(false), 3000);
-            notifications.showNotification({
-              disallowClose: true,
-              autoClose: 5000,
-              title: "Refresh Data",
-              message: "Refresh data gagal",
-              color: "red",
-              icon: <X />,
-              loading: false,
-            });
-            // if success set data
-            dispatch({ type: "set_data", payload: result });
-            notifications.showNotification({
-              disallowClose: true,
-              autoClose: 5000,
-              title: "Refresh Data",
-              message: "Refresh data berhasil",
-              color: "green",
-              icon: <Check />,
-              loading: false,
-            });
-          }}
+          onRefresh={(isLoading) => refreshHandler(isLoading)}
+          onSearch={(value, isLoading) => refreshHandler(isLoading, 1, value)}
         />
-        <DataTable.Filter
-          form={form}
-          onFilter={(values) => console.log(values)}
-        >
-          <div>
-            <MultiSelect
-              data={[
-                "React",
-                "Angular",
-                "Svelte",
-                "Vue",
-                "Riot",
-                "Next.js",
-                "Blitz.js",
-              ]}
-              label="Roles"
-              placeholder="Pick all that you like"
-              clearButtonLabel="Clear selection"
-              clearable
-              searchable
-              nothingFound="Nothing found"
-              {...form.getInputProps("roles")}
-            />
-          </div>
-          <div>
-            <MultiSelect
-              data={[
-                "React",
-                "Angular",
-                "Svelte",
-                "Vue",
-                "Riot",
-                "Next.js",
-                "Blitz.js",
-              ]}
-              label="Roles"
-              placeholder="Pick all that you like"
-              clearButtonLabel="Clear selection"
-              clearable
-              searchable
-              nothingFound="Nothing found"
-              {...form.getInputProps("roles2")}
-            />
-          </div>
-        </DataTable.Filter>
         <CustomTable
           header={header}
+          name="produk"
           withSelection={true}
           withAction={true}
-          name="User"
         >
-          {/* {state.data &&
-            state.data.map((row) => {
+          {state.data.result &&
+            state.data.result.map((row) => {
               return (
                 <CustomTable.Row
                   key={row.id}
                   id={row.id}
+                  readLink={`user/form?id=${row.id}&read=true`}
+                  editLink={`/form?id=${row.id}`}
+                  deleteField={row.nama}
                   onDelete={(isLoading) => {
-                    // fetch delete
-                    console.log("fetch delete");
-                    // if error set loading to false
-                    setTimeout(() => isLoading(false), 3000);
-
-                    // if success delete data from state
-                    dispatch({
-                      type: "delete",
-                      payload: row.id,
-                    });
+                    deleteHandler(row.id, isLoading);
                   }}
-                  editLink={`/form?${row.id}`}
-                  deleteField={row.username}
                 >
                   <CustomTable.Col>
                     <Text>{row.username}</Text>
@@ -204,31 +124,36 @@ export default function Index({ users }) {
                     <Text>{row.email}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text>{dateFormat(row.createdAt, "dd-mm-yyyy")}</Text>
+                    <Text className="uppercase">
+                      {dateFormat(row.createdAt, "dd-mm-yyyy")}
+                    </Text>
                   </CustomTable.Col>
                 </CustomTable.Row>
               );
-            })} */}
+            })}
         </CustomTable>
-        <DataTable.Footer />
+        <DataTable.Footer
+          total={state.data.total}
+          pages={state.data.pages}
+          onChange={(page, isLoading) =>
+            refreshHandler(isLoading, page, state.data.search)
+          }
+        />
       </DataTable>
     </Layout>
   );
 }
-
-export const getServerSideProps = async (ctx) => {
-  const session = await getSession(ctx);
-
-  const users = await fetch(`${process.env.API_URL}/api/user`, {
+//function get server side props produk
+export async function getServerSideProps(context) {
+  const res = await fetch(`${process.env.API_URL}/api/user?page=0`, {
     headers: {
-      Cookie: ctx.req.headers.cookie,
+      Cookie: context.req.headers.cookie,
     },
-  }).then((res) => res.json());
-
+  });
+  const users = await res.json();
   return {
     props: {
       users,
-      session,
     },
   };
-};
+}
