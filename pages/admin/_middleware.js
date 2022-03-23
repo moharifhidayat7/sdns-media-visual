@@ -8,6 +8,6 @@ export async function middleware(req) {
   if (token) {
     return NextResponse.next();
   } else {
-    return NextResponse.redirect(url + "/login?r=" + req.url);
+    return NextResponse.redirect(url + "/login?callbackUrl=" + req.url);
   }
 }
