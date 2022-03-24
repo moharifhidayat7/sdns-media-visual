@@ -17,9 +17,11 @@ import {
 } from "tabler-icons-react";
 
 import { useGlobalContext } from "@components/contexts/GlobalContext";
+import { useState } from "react";
 
 const Layout = ({ children }) => {
   const [state, dispatch] = useGlobalContext();
+  const [toggler,setToggler]=useState(false)
 
   const menu = [
     { label: "Dashboard", icon: Gauge, link: "/" },
@@ -124,12 +126,12 @@ const Layout = ({ children }) => {
         <CustomNavbar
           p="md"
           hiddenBreakpoint="sm"
-          hidden={!state.showSidebar}
+          hidden={!toggler}
           width={{ sm: 250, lg: 300 }}
           menu={menu}
         />
       }
-      header={<CustomHeader height={70} p="md" links={links} />}
+      header={<CustomHeader height={70} p="md" links={links} toggler={{toggler,setToggler}}/>}
       styles={(theme) => ({
         main: {
           backgroundColor:
