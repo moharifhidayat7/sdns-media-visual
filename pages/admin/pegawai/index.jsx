@@ -11,12 +11,15 @@ import { useNotifications } from "@mantine/notifications";
 import dateFormat from "dateformat";
 import { Check, X } from "tabler-icons-react";
 
-export default function Index({ users }) {
+export default function Index({ produk }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
-
+  const getProdukProp = () => {
+    const data = produk ? produk : [];
+    dispatch({ type: "set_data", payload: data });
+  };
   useEffect(() => {
-    dispatch({ type: "set_data", payload: users });
+    getProdukProp();
   }, []);
   const deleteHandler = async (selected, isLoading, type = "delete") => {
     const data = { id: selected };
@@ -148,7 +151,6 @@ export async function getServerSideProps(context) {
     },
   });
   const users = await res.json();
-
   return {
     props: {
       users,

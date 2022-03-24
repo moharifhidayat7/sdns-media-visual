@@ -10,28 +10,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Role {
-  id        Int       @id @default(autoincrement())
-  nama      String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-  isDeleted Boolean?  @default(false)
-  updatedId Int?
-  createdId Int?
-  updatedBy User?     @relation("roleupdatedBy", references: [id], fields: [updatedId])
-  createdBy User?     @relation("rolecreatedBy", references: [id], fields: [createdId])
-  User      User[]    @relation("userRole")
-}
-
 model User {
   id                 Int         @id @default(autoincrement())
   email              String      @unique
   username           String      @unique
   password           String
   resetPasswordToken String?
-  roleId             Int
-  role               Role        @relation("userRole", references: [id], fields: [roleId])
   createdAt          DateTime    @default(now())
   updatedAt          DateTime    @updatedAt
   deletedAt          DateTime?
@@ -56,8 +40,6 @@ model User {
   updatedPaket       Paket[]     @relation("paketupdatedBy")
   updatedUser        User[]      @relation("updatedBy")
   createdUser        User[]      @relation("createdBy")
-  updatedRole        Role[]      @relation("roleupdatedBy")
-  createdRole        Role[]      @relation("rolecreatedBy")
 }
 
 model Fitur {
