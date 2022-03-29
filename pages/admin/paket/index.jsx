@@ -247,7 +247,7 @@ export async function getServerSideProps(context) {
   };
   const res = await fetch(`${process.env.API_URL}/api/paket`, OPTION);
   const paket = await res.json();
-  const fiturs = await fetch(`${process.env.API_URL}/api/fitur`, OPTION).then(res => res.json());
+  const fiturs = await fetch(`${process.env.API_URL}/api/fitur?status=ACTIVE`, OPTION).then(res => res.json());
   return {
     props: {
       paket,

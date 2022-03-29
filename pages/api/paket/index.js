@@ -37,6 +37,7 @@ export default async (req, res) => {
     }
   } else if (req.method == "GET") {
     const search = req.query.search || "";
+    const status = req.query.status || undefined;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
@@ -50,12 +51,19 @@ export default async (req, res) => {
           produk: true,
           fiturs: {
             include: {
-              fitur: true,
+              fitur: true
             },
           },
         },
         where: {
           isDeleted: false,
+          fiturs: {
+            none: {
+              fitur: {
+                status: status
+              }
+            }
+          },
           OR: [
             {
               nama: {
