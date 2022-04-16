@@ -20,12 +20,12 @@ import { useRouter } from "next/router";
 import { useForm } from "@mantine/form";
 import { useNotifications } from "@mantine/notifications";
 import { Check, X } from "tabler-icons-react";
-function Form({ produk, action }) {
+function Form({ user, action }) {
   const form = useForm({
     initialValues: {
-      email: "",
-      username: "",
-      password: "",
+      email: user.email || "",
+      username: user.username || "",
+      password: user.password || "",
     },
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
@@ -41,7 +41,7 @@ function Form({ produk, action }) {
   const onSubmit = async (values) => {
     setLoading(false);
     const method = action === "edit" ? "PUT" : "POST";
-    const url = action === "edit" ? `/api/user/${produk.id}` : `/api/user`;
+    const url = action === "edit" ? `/api/user/${user.id}` : `/api/user`;
     await fetch(url, {
       method,
       headers: {
@@ -143,7 +143,7 @@ function Form({ produk, action }) {
 export async function getServerSideProps(context) {
   const id = context.query.id;
   const read = context.query.read;
-  let produk = {};
+  let user = {};
   let action = "add";
   if (Array.isArray(id)) {
     const res = await fetch(`${process.env.API_URL}/api/user`, {
@@ -151,8 +151,8 @@ export async function getServerSideProps(context) {
         Cookie: context.req.headers.cookie,
       },
     });
-    produk = await res.json();
-    produk = produk.filter((item, i) => {
+    user = await res.json();
+    user = user.filter((item, i) => {
       for (let i = 0; i < id.length; i++) {
         if (item.id == id[i]) {
           return item;
@@ -167,15 +167,15 @@ export async function getServerSideProps(context) {
         },
       });
       action = "edit";
-      produk = await res.json();
+      user = await res.json();
       if (res.status === 403) {
         let res = await fetch(`${process.env.API_URL}/api/user`, {
           headers: {
             Cookie: context.req.headers.cookie,
           },
         });
-        const produks = await res.json();
-        produk = produks.result.length > 0 ? produks.result[0] : produks;
+        const users = await res.json();
+        user = users.result.length > 0 ? users.result[0] : users;
         action = "add";
       }
     } else {
@@ -184,8 +184,8 @@ export async function getServerSideProps(context) {
           Cookie: context.req.headers.cookie,
         },
       });
-      const produks = await res.json();
-      produk = produks.result.length > 0 ? produks.result[0] : produks;
+      const users = await res.json();
+      user = users.result.length > 0 ? users.result[0] : users;
       action = "add";
     }
   }
@@ -195,7 +195,7 @@ export async function getServerSideProps(context) {
   return {
     props: {
       action,
-      produk,
+      user,
     },
   };
 }

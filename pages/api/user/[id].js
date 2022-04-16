@@ -3,12 +3,11 @@ import { getSession } from "next-auth/react";
 
 export default async function handler(req, res) {
   const session = await getSession({ req });
-
   if (req.method === "GET") {
     try {
       const result = await prisma.user.findUnique({
         where: {
-          id: req.query.id,
+          id: parseInt(req.query.id),
         },
       });
 
