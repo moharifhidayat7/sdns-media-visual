@@ -75,8 +75,12 @@ export default function Index({ mkas, userSession }) {
       key: "createdAt",
       label: "Created At",
     },
+    {
+      key: "akses",
+      sortable: false,
+      label: "Akses",
+    },
   ];
-
   return (
     <Layout>
       <Head>
@@ -131,6 +135,18 @@ export default function Index({ mkas, userSession }) {
                       {dateFormat(row.createdAt, "dd-mm-yyyy")}
                     </Text>
                   </CustomTable.Col>
+                  <CustomTable.Col>
+                    <Text>
+                      <Button
+                        variant="subtle"
+                        onClick={() => {
+                          openAksesModal(row);
+                        }}
+                      >
+                        VIEW
+                      </Button>
+                    </Text>
+                  </CustomTable.Col>
                 </CustomTable.Row>
               );
             })}
@@ -141,7 +157,6 @@ export default function Index({ mkas, userSession }) {
           onChange={(page, isLoading) => refreshHandler(isLoading, page)}
         />
       </DataTable>
-
     </Layout>
   );
 }
@@ -158,7 +173,7 @@ export async function getServerSideProps(context) {
   return {
     props: {
       mkas,
-      userSession
+      userSession,
     },
   };
 }

@@ -10,12 +10,41 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Akses {
+  nama   String
+  path   String
+  read   Boolean?
+  write  Boolean?
+  roleId Int
+  role   Role     @relation("roleAkses", references: [id], fields: [roleId], onDelete: Cascade)
+
+  @@unique([roleId, path], name: "uniqueRole")
+}
+
+model Role {
+  id        Int       @id @default(autoincrement())
+  nama      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  isDeleted Boolean?  @default(false)
+  updatedId Int?
+  createdId Int?
+  updatedBy User?     @relation("roleupdatedBy", references: [id], fields: [updatedId])
+  createdBy User?     @relation("rolecreatedBy", references: [id], fields: [createdId])
+  user      User[]    @relation("userRole")
+  akses     Akses[]   @relation("roleAkses")
+}
+
 model User {
   id                     Int               @id @default(autoincrement())
+  nama                   String?
   email                  String            @unique
-  username               String            @unique
   password               String
   resetPasswordToken     String?
+  roleId                 Int
+  role                   Role              @relation("userRole", references: [id], fields: [roleId])
+  telepon                String?
   createdAt              DateTime          @default(now())
   updatedAt              DateTime          @updatedAt
   deletedAt              DateTime?
@@ -38,31 +67,33 @@ model User {
   updatedFitur           Fitur[]           @relation("fiturupdatedBy")
   createdPaket           Paket[]           @relation("paketcreatedBy")
   updatedPaket           Paket[]           @relation("paketupdatedBy")
+  updatedUser            User[]            @relation("updatedBy")
+  createdUser            User[]            @relation("createdBy")
   createdMkas            Mkas[]            @relation("mkascreatedBy")
   updatedMkas            Mkas[]            @relation("mkasupdatedBy")
   createdFakturStokMasuk FakturStokMasuk[] @relation("fakturstokmasukcreatedBy")
   updatedFakturStokMasuk FakturStokMasuk[] @relation("fakturstokmasukupdatedBy")
-  updatedUser            User[]            @relation("updatedBy")
-  createdUser            User[]            @relation("createdBy")
+  updatedRole            Role[]            @relation("roleupdatedBy")
+  createdRole            Role[]            @relation("rolecreatedBy")
 }
 
 model FakturStokMasuk {
-  id               Int                   @id @default(autoincrement())
-  faktur           String                @unique
-  nomortransaksi   String                @unique
-  tanggalinput DateTime              @default(now())
-  status           Status                @default(INACTIVE)
-  createdAt        DateTime              @default(now())
-  updatedAt        DateTime              @updatedAt
-  deletedAt        DateTime?
-  isDeleted        Boolean?              @default(false)
-  updatedBy        User?                 @relation(fields: [updatedId], references: [id], name: "fakturstokmasukupdatedBy")
-  createdBy        User?                 @relation(fields: [createdId], references: [id], name: "fakturstokmasukcreatedBy")
-  updatedId        Int?
-  createdId        Int?
-  items            FakturStokMasukItem[] @relation("fakturstokmasukitems")
-  supplier         Supplier?             @relation(fields: [supplierId], references: [id], name: "supplierstokmasuk")
-  supplierId       Int?
+  id             Int                   @id @default(autoincrement())
+  faktur         String                @unique
+  nomortransaksi String                @unique
+  tanggalinput   DateTime              @default(now())
+  status         Status                @default(INACTIVE)
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  deletedAt      DateTime?
+  isDeleted      Boolean?              @default(false)
+  updatedBy      User?                 @relation(fields: [updatedId], references: [id], name: "fakturstokmasukupdatedBy")
+  createdBy      User?                 @relation(fields: [createdId], references: [id], name: "fakturstokmasukcreatedBy")
+  updatedId      Int?
+  createdId      Int?
+  items          FakturStokMasukItem[] @relation("fakturstokmasukitems")
+  supplier       Supplier?             @relation(fields: [supplierId], references: [id], name: "supplierstokmasuk")
+  supplierId     Int?
 }
 
 model FakturStokMasukItem {
