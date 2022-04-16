@@ -10,6 +10,7 @@ import { useContext, useState, useEffect } from "react";
 import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useNotifications } from "@mantine/notifications";
 import { Check, X } from "tabler-icons-react";
+import { useSession, getSession } from "next-auth/react";
 
 export default function Index({ roles }) {
   const [state, dispatch] = useGlobalContext();
@@ -184,7 +185,7 @@ export default function Index({ roles }) {
     </Layout>
   );
 }
-//function get server side props produk
+
 export async function getServerSideProps(context) {
   const res = await fetch(`${process.env.API_URL}/api/role?page=0`, {
     headers: {
@@ -196,6 +197,7 @@ export async function getServerSideProps(context) {
   return {
     props: {
       roles,
+      session: await getSession(context),
     },
   };
 }
