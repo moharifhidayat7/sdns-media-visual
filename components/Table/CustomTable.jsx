@@ -24,7 +24,7 @@ import {
   Search,
   Pencil,
   Trash,
-  EyeCheck,
+  Eye,
 } from "tabler-icons-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
@@ -66,7 +66,6 @@ function Th({ children, reversed, sorted, onSort, ...props }) {
     <th className={classes.th} {...props}>
       <UnstyledButton onClick={onSort} className={classes.control}>
         <Group position="apart" noWrap>
-      
           <Text weight={500} size="sm">
             {children}
           </Text>
@@ -148,9 +147,11 @@ const CustomTable = ({
               <th style={{ width: 40 }}>
                 <Checkbox
                   onChange={() => {
-                    dispatch({ type: "toggle_all", payload: globalState.data.result })
-                  }
-                  }
+                    dispatch({
+                      type: "toggle_all",
+                      payload: globalState.data.result,
+                    });
+                  }}
                   checked={state.selection.length === globalState.data.length}
                   indeterminate={
                     state.selection.length > 0 &&
@@ -186,7 +187,7 @@ const Row = ({
   children,
   id,
   editLink = "",
-  onDelete = () => { },
+  onDelete = () => {},
   deleteField,
   readLink = "",
 }) => {
@@ -236,10 +237,16 @@ const Row = ({
         <td>
           <Group spacing="xs" noWrap className="justify-end">
             {readLink && (
-              <ActionIcon color="blue" variant="filled" onClick={() =>  router.push(router.asPath.split("?")[0] + readLink)}>
-                <EyeCheck size={16} />
-              </ActionIcon>)
-            }
+              <ActionIcon
+                color="blue"
+                variant="filled"
+                onClick={() =>
+                  router.push(router.asPath.split("?")[0] + readLink)
+                }
+              >
+                <Eye size={16} />
+              </ActionIcon>
+            )}
 
             <ActionIcon
               color="yellow"
