@@ -8,9 +8,6 @@ import {
   Button,
   TextInput,
   Loader,
-  Checkbox,
-  Select,
-  CheckboxGroup,
 } from "@mantine/core";
 import Head from "next/head";
 import Layout from "@components/views/Layout";
@@ -21,7 +18,7 @@ import { generateCode, getTitle, inputNumberOnly } from "helpers/functions";
 import { useNotifications } from "@mantine/notifications";
 import { Check, X } from "tabler-icons-react";
 import { getSession } from "next-auth/react";
-const PAGENAME = "mkas";
+const PAGENAME = "Kas";
 export async function getServerSideProps(context) {
   const id = context.query.id;
   const read = context.query.read;
