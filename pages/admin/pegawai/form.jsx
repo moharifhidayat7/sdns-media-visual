@@ -130,7 +130,7 @@ function Form({ user, role, action }) {
                   <PasswordInput
                     required
                     label={
-                      <div className="flex space-x-2 items-center">
+                      <div className="inline-flex space-x-2 items-center">
                         <Text weight={500} size="sm">
                           Password
                         </Text>
