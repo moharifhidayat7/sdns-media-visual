@@ -136,7 +136,7 @@ function Form({ role, action }) {
           <div className="mb-2">
             <Accordion multiple initialState={[1, 2, 3]}>
               {menu.map((item) => {
-                if (item.link == "/") {
+                if (item.link == "/admin") {
                   return;
                 }
                 if (item.links && item.links.length > 0) {
