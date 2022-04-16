@@ -21,7 +21,7 @@ import { useState } from "react";
 
 const Layout = ({ children }) => {
   const [state, dispatch] = useGlobalContext();
-  const [toggler,setToggler]=useState(false)
+  const [toggler, setToggler] = useState(false)
 
   const menu = [
     { label: "Dashboard", icon: Gauge, link: "/" },
@@ -71,7 +71,7 @@ const Layout = ({ children }) => {
       label: "Transaksi",
       icon: Receipt2,
       links: [
-        { label: "Inventori Stok Masuk", link: "/" },
+        { label: "Inventori Stok Masuk", link: "/admin/fakturin/form" },
         { label: "Inventori Opname", link: "/" },
         { label: "Inventori Pre Order", link: "/" },
         { label: "Inventori Pengembalian", link: "/" },
@@ -132,7 +132,7 @@ const Layout = ({ children }) => {
           menu={menu}
         />
       }
-      header={<CustomHeader height={70} p="md" links={links} toggler={{toggler,setToggler}}/>}
+      header={<CustomHeader height={70} p="md" links={links} toggler={{ toggler, setToggler }} />}
       styles={(theme) => ({
         main: {
           backgroundColor:

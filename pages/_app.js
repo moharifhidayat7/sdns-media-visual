@@ -8,8 +8,9 @@ import { SessionProvider } from "next-auth/react";
 import DeleteModal from "@components/Modals/DeleteModal";
 import { GlobalContextProvider } from "@components/contexts/GlobalContext";
 
+// import 'tailwindcss/tailwind.css'
 import "@styles/globals.css";
-
+import "@styles/custom.css";
 export default function App({
   Component,
   pageProps: { session, ...pageProps },

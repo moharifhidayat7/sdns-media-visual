@@ -1,0 +1,42 @@
+table.table-bordered{
+   border:1px solid #ddd;
+border-spacing: 0;
+border-radius: 5px;
+th{
+   border-right: 1px solid #ddd;
+   font-weight: 600;
+   padding: 5px;
+   border-bottom: 1px solid #ddd;
+   &:last-child{
+      border-right: none;
+   }
+}
+
+td{
+   border-right: 1px solid #ddd; 
+   border-bottom: 1px solid #ddd;
+   padding: 5px;
+   &:last-child{
+      border-right: none;
+   }
+}
+//last tr border none
+tr:last-child td{
+   border-bottom: none;
+}
+  
+}
+//input border hide
+.input-border-none{
+   border: none;
+   box-sizing: border-box;
+   -moz-box-sizing: border-box;
+   -webkit-box-sizing: border-box;
+   &:focus{
+      outline: none;
+      border: none;
+   }
+   &:hover{
+      border: none;
+   }
+}

@@ -189,7 +189,6 @@ export default function Index({ paket, fiturs }) {
   );
 }
 const ViewModal = ({ modal, fiturs }) => {
-
   const [fiturPaket, setFiturPaket] = useState([])
   useEffect(() => {
     if (modal.modal.opened == true) {
@@ -199,8 +198,6 @@ const ViewModal = ({ modal, fiturs }) => {
      setFiturPaket(data)
     }
   }, [modal.modal.opened])
-
-
   return (
     <Modal
       opened={modal.modal.opened}
