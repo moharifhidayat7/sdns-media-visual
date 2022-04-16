@@ -24,6 +24,7 @@ const menu = [
       { label: "Gudang", link: "/admin/gudang" },
       { label: "Fitur", link: "/admin/fitur" },
       { label: "Paket", link: "/admin/paket" },
+      { label: "Kas", link: "/admin/mkas" },
     ],
   },
   {
@@ -58,8 +59,10 @@ const menu = [
     label: "Transaksi",
     icon: Receipt2,
     links: [
-      { label: "Inventori Stok Masuk", link: "/" },
+      { label: "Inventori Stok Masuk", link: "/admin/fakturin/form" },
       { label: "Inventori Opname", link: "/" },
+      { label: "Inventori Pre Order", link: "/" },
+      { label: "Inventori Pengembalian", link: "/" },
       { label: "Tagihan Pelanggan", link: "/" },
       { label: "Pembayaran Tagihan", link: "/" },
     ],
@@ -74,12 +77,12 @@ const menu = [
       { label: "Ringkasan Stok", link: "/" },
     ],
   },
-  { label: "Settings", icon: Adjustments, link: "#" },
+  { label: "Settings", icon: Adjustments, link: "/settings" },
   {
     label: "Kontrol Akses",
     icon: Lock,
     links: [
-      { label: "Roles", link: "/" },
+      { label: "Roles", link: "/admin/role" },
       { label: "Pegawai", link: "/admin/pegawai" },
     ],
   },
