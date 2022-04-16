@@ -114,11 +114,7 @@ export default function Index({ produk }) {
                 <CustomTable.Row
                   key={row.id}
                   id={row.id}
-<<<<<<< HEAD
                   readLink={`/form?id=${row.id}&readOnly`}
-=======
-                  readLink={`/form?id=${row.id}&read=true`}
->>>>>>> main
                   editLink={`/form?id=${row.id}`}
                   deleteField={row.nama}
                   onDelete={(isLoading) => {
