@@ -10,7 +10,6 @@ import {
   createStyles,
 } from "@mantine/core";
 import { CalendarStats, ChevronLeft, ChevronRight } from "tabler-icons-react";
-
 const useStyles = createStyles((theme) => ({
   control: {
     fontWeight: 500,
@@ -74,10 +73,7 @@ export function LinksGroup({
   const ChevronIcon = theme.dir === "ltr" ? ChevronRight : ChevronLeft;
   const items = (hasLinks ? links : []).map((link) => (
     <Link href={link.link} passHref key={link.label}>
-      <Text
-        component="a"
-        className={classes.link}
-      >
+      <Text component="a" className={classes.link}>
         {link.label}
       </Text>
     </Link>

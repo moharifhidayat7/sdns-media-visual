@@ -20,6 +20,13 @@ export default NextAuth({
           where: {
             email: credentials.email,
           },
+          include: {
+            role: {
+              include: {
+                akses: true,
+              },
+            },
+          },
         });
 
         const match = await bcrypt.compare(credentials.password, user.password);
