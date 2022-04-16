@@ -1,75 +1,25 @@
 import Head from "next/head";
-
 import Layout from "@components/views/Layout";
-import { Title, Text, Button, Table, Checkbox } from "@mantine/core";
-import { useModals } from "@mantine/modals";
-
+import { Title, Text, Button, Modal, Table } from "@mantine/core";
 import { CustomTable } from "@components/Table/CustomTable";
 import DataTable from "@components/Table/DataTable";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useNotifications } from "@mantine/notifications";
-import { Check, X } from "tabler-icons-react";
-
-export default function Index({ roles }) {
+import dateFormat from "dateformat";
+import { Check, X, CircleCheck } from "tabler-icons-react";
+import { getSession } from "next-auth/react";
+const URL = "/api/mkas";
+const NAMEPAGE = "Kas";
+export default function Index({ mkas, userSession }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
-  const [row, setRow] = useState([]);
-  const modals = useModals();
-
-  const openAksesModal = (row) => {
-    modals.openModal({
-      title: row.nama,
-      overflow: "inside",
-      size: "lg",
-      children: (
-        <Table>
-          <thead>
-            <tr>
-              <th>Nama</th>
-              <th>URL</th>
-              <th>Akses</th>
-            </tr>
-          </thead>
-          <tbody>
-            {row.akses.map((ak) => {
-              if (ak.read == false && ak.write == false) {
-                return;
-              }
-              return (
-                <tr key={`${ak.nama}_${ak.path}`}>
-                  <td>{ak.nama}</td>
-                  <td>{ak.path}</td>
-                  <td>
-                    {ak.read && (
-                      <Checkbox
-                        value="read"
-                        label="READ"
-                        checked={ak.read}
-                        disabled
-                      />
-                    )}
-                    {ak.write && (
-                      <Checkbox
-                        value="write"
-                        label="WRITE"
-                        checked={ak.write}
-                        disabled
-                      />
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
-      ),
-    });
-  };
-
+  useEffect(() => {
+    dispatch({ type: "set_data", payload: mkas });
+  }, []);
   const deleteHandler = async (selected, isLoading, type = "delete") => {
     const data = { id: selected };
-    const url = type == "delete" ? `/api/role/${selected}` : `/api/role`;
+    const url = type == "delete" ? `${URL}/${selected}` : URL;
     await fetch(url, {
       method: "DELETE",
       headers: {
@@ -83,8 +33,8 @@ export default function Index({ roles }) {
         notifications.showNotification({
           disallowClose: true,
           autoClose: 5000,
-          title: "Delete role",
-          message: "Delete role berhasil",
+          title: "Delete",
+          message: "Delete data berhasil",
           color: "green",
           icon: <Check />,
           loading: false,
@@ -93,8 +43,8 @@ export default function Index({ roles }) {
         notifications.showNotification({
           disallowClose: true,
           autoClose: 5000,
-          title: "Delete role",
-          message: "Delete role gagal",
+          title: "Delete",
+          message: "Delete data gagal",
           color: "red",
           icon: <X />,
           loading: false,
@@ -102,18 +52,28 @@ export default function Index({ roles }) {
       }
     });
   };
-  const refreshHandler = async (isLoading = null, page = 1, search = "") => {
-    const url = `/api/role?page=${page}&search=${search}`;
-    const res = await fetch(url);
+  const refreshHandler = async (isLoading, page = 1, search = "") => {
+    const res = await fetch(`${URL}?page=${page}&search=${search}`);
     const data = await res.json();
-
     dispatch({ type: "set_data", payload: { ...data, search, page } });
     isLoading(false);
   };
   const header = [
     {
+      key: "kode",
+      label: "Kode",
+    },
+    {
       key: "nama",
-      label: "Role",
+      label: "Nama",
+    },
+    {
+      key: "status",
+      label: "Status",
+    },
+    {
+      key: "createdAt",
+      label: "Created At",
     },
     {
       key: "akses",
@@ -121,41 +81,59 @@ export default function Index({ roles }) {
       label: "Akses",
     },
   ];
-  useEffect(() => {
-    dispatch({ type: "set_data", payload: roles });
-  }, []);
   return (
     <Layout>
       <Head>
-        <title style={{ textTransform: "capitalize" }}>Role</title>
+        <title style={{ textTransform: "capitalize" }}>
+          Master {NAMEPAGE}{" "}
+        </title>
       </Head>
       <Title
         order={2}
         style={{ marginBottom: "1.5rem", textTransform: "capitalize" }}
       >
-        Data Role
+        Data {NAMEPAGE}
       </Title>
       <DataTable>
         <DataTable.Action
           filterVisibility={false}
+          onDelete={(selected, isLoading) =>
+            deleteHandler(selected, isLoading, "delete_many")
+          }
           onRefresh={(isLoading) => refreshHandler(isLoading)}
-          onSearch={(value, isLoading) => refreshHandler(isLoading, 1, value)}
+          onSearch={(search, isLoading) => refreshHandler(isLoading, 1, search)}
         />
-        <CustomTable header={header} name="produk" withAction={true}>
+        <CustomTable
+          header={header}
+          name={NAMEPAGE}
+          withSelection={true}
+          withAction={true}
+        >
           {state.data.result &&
             state.data.result.map((row) => {
               return (
                 <CustomTable.Row
                   key={row.id}
                   id={row.id}
+                  readLink={`/form?id=${row.id}&read=true`}
                   editLink={`/form?id=${row.id}`}
                   deleteField={row.nama}
-                  onDelete={(isLoading) => {
-                    deleteHandler(row.id, isLoading);
-                  }}
+                  onDelete={(isLoading) => deleteHandler(row.id, isLoading)}
                 >
                   <CustomTable.Col>
-                    <Text>{row.nama}</Text>
+                    <Text>{row.kode}</Text>
+                  </CustomTable.Col>
+                  <CustomTable.Col>
+                    <Text className="uppercase">{row.nama}</Text>
+                  </CustomTable.Col>
+
+                  <CustomTable.Col>
+                    <Text className="uppercase">{row.status}</Text>
+                  </CustomTable.Col>
+                  <CustomTable.Col>
+                    <Text className="uppercase">
+                      {dateFormat(row.createdAt, "dd-mm-yyyy")}
+                    </Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text>
@@ -176,26 +154,26 @@ export default function Index({ roles }) {
         <DataTable.Footer
           total={state.data.total}
           pages={state.data.pages}
-          onChange={(page, isLoading) =>
-            refreshHandler(isLoading, page, state.data.search)
-          }
+          onChange={(page, isLoading) => refreshHandler(isLoading, page)}
         />
       </DataTable>
     </Layout>
   );
 }
-//function get server side props produk
 export async function getServerSideProps(context) {
-  const res = await fetch(`${process.env.API_URL}/api/role?page=0`, {
+  const OPTION = {
     headers: {
       Cookie: context.req.headers.cookie,
     },
-  });
-  const roles = await res.json();
-
+  };
+  const session = await getSession(context);
+  const res = await fetch(`${process.env.API_URL}/api/mkas`, OPTION);
+  const mkas = await res.json();
+  const userSession = session.user;
   return {
     props: {
-      roles,
+      mkas,
+      userSession,
     },
   };
 }

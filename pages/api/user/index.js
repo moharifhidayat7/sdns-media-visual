@@ -79,8 +79,12 @@ export default async function handler(req, res) {
         data: {
           ...req.body,
           password: hash,
+<<<<<<< HEAD
           roleId: parseInt(req.body.roleId),
           createdId: session.user ? session.user.id : null,
+=======
+          createdBy: session.user ? session.user.id : null,
+>>>>>>> main
         },
       });
 

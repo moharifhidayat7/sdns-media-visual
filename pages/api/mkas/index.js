@@ -1,27 +1,22 @@
 import prisma from "lib/prisma";
-import { getSession } from "next-auth/react";
 
 //prisma create produk
 export default async (req, res) => {
   const data = req.body;
-  const session = await getSession({ req });
   if (req.method == "POST") {
     try {
-      const fitur = await prisma.fitur.create({
+      const mkas = await prisma.mkas.create({
         data: {
           ...data,
-          createdId: session.user.id,
-          updatedId: session.user.id,
         },
       });
       res.statusCode = 200;
       res.json({
         message: "Add data success",
-        fitur,
+        mkas,
       });
     } catch (error) {
       res.statusCode = 400;
-
       res.json({ message: error.message });
     }
   } else if (req.method == "GET") {
@@ -31,16 +26,15 @@ export default async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
     try {
-      const fitur = await prisma.fitur.findMany({
+      const mkas = await prisma.mkas.findMany({
         skip,
-        take: limit == 9999 ? undefined : limit,
+        take: limit,
         include: {
           createdBy: true,
           updatedBy: true,
         },
         where: {
           isDeleted: false,
-          status: status,
           OR: [
             {
               nama: {
@@ -58,10 +52,9 @@ export default async (req, res) => {
           createdAt: "desc",
         },
       });
-      const total = await prisma.fitur.count({
+      const total = await prisma.mkas.count({
         where: {
           isDeleted: false,
-          status:status,
           OR: [
             {
               nama: {
@@ -79,8 +72,8 @@ export default async (req, res) => {
       const pages = Math.ceil(total / limit);
       res.json({
         status: "success",
-        message: "Berhasil mengambil data fitur",
-        result: fitur,
+        message: "Berhasil mengambil data mkas",
+        result: mkas,
         total,
         pages,
         page,
@@ -99,7 +92,7 @@ export default async (req, res) => {
     }
   } else if (req.method == "DELETE") {
     try {
-      const fitur = await prisma.fitur.updateMany({
+      const mkas = await prisma.mkas.updateMany({
         where: {
           id: { in: data.id },
         },
@@ -110,8 +103,8 @@ export default async (req, res) => {
       });
       res.statusCode = 200;
       res.json({
-        message: "fitur deleted",
-        fitur,
+        message: "mkas deleted",
+        mkas,
       });
     } catch (error) {
       res.status(403).json({ err: err.message });

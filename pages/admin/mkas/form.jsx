@@ -8,10 +8,6 @@ import {
   Button,
   TextInput,
   Loader,
-  Tooltip,
-  Checkbox,
-  Select,
-  CheckboxGroup,
 } from "@mantine/core";
 import Head from "next/head";
 import Layout from "@components/views/Layout";
@@ -21,11 +17,14 @@ import { useForm } from "@mantine/form";
 import { generateCode, getTitle, inputNumberOnly } from "helpers/functions";
 import { useNotifications } from "@mantine/notifications";
 import { Check, X } from "tabler-icons-react";
-const PAGENAME = "paket";
+import { getSession } from "next-auth/react";
+const PAGENAME = "mkas";
 export async function getServerSideProps(context) {
   const id = context.query.id;
   const read = context.query.read;
-  let paket = [];
+  const session = await getSession(context);
+  const userSession = session.user;
+  let mkas = [];
   let action = "add";
   const OPTIONFETCH = {
     headers: {
@@ -33,68 +32,55 @@ export async function getServerSideProps(context) {
     },
   };
   if (id) {
-    let res = await fetch(`${process.env.API_URL}/api/paket/${id}`, OPTIONFETCH);
+    let res = await fetch(`${process.env.API_URL}/api/mkas/${id}`, OPTIONFETCH);
     action = "edit";
-    paket = await res.json();
+    mkas = await res.json();
     if (res.status != 200) {
-      let res = await fetch(`${process.env.API_URL}/api/paket`,OPTIONFETCH);
-      const pakets = await res.json();
-      paket = pakets.result.length > 0 ? pakets.result[0] : pakets;
+      let res = await fetch(`${process.env.API_URL}/api/mkas`, OPTIONFETCH);
+      const mkass = await res.json();
+      mkas = mkass.result.length > 0 ? mkass.result[0] : mkass;
       action = "add";
     }
   } else {
-    let res = await fetch(`${process.env.API_URL}/api/paket`,OPTIONFETCH);
-    const pakets = await res.json();
-    paket = pakets.result.length > 0 ? pakets.result[0] : pakets;
+    let res = await fetch(`${process.env.API_URL}/api/mkas`, OPTIONFETCH);
+    const mkass = await res.json();
+    mkas = mkass.result.length > 0 ? mkass.result[0] : mkass;
     action = "add";
   }
-
   if (read) {
     action = "read";
   }
-  const fetchProduk = await fetch(`${process.env.API_URL}/api/produk?limit=9999`,OPTIONFETCH);
-  const produks = await fetchProduk.json();
-  const produk = produks.result.filter((item) => item.status === "ACTIVE");
-  const fetchFitur = await fetch(`${process.env.API_URL}/api/fitur?limit=9999`,OPTIONFETCH);
-  const fiturs = await fetchFitur.json();
-  const fitur = fiturs.result.filter((item) => item.status === "ACTIVE");
+
   return {
     props: {
       action,
-      data: { ...paket },
-      produk, fitur
+      userSession,
+      data: mkas
     },
   };
 }
 
-function Form({ data, action, produk, fitur }) {
+function Form({ data, action, userSession }) {
   const form = useForm({
-    initialValues: { kode: "", nama: "", harga: "", produkId: 0, fiturs: [], status: "" },
+    initialValues: { kode: "", nama: "", status: "" },
     validate: {
       nama: (value) => (value.length < 1 ? "Plese input nama." : null),
-      harga: (value) => (value.length < 1 ? "Plese input harga." : null),
-      produkId: (value) => (value.length < 1 ? "Plese input produk." : null),
-      fiturs: (value) => (value.length < 1 ? "Plese input fiturs." : null),
+      kode: (value) => (value.length < 1 ? "Plese input kode." : null),
     },
   });
-  const [opened, setOpened] = useState(true);
   const notifications = useNotifications();
   const [loading, setLoading] = useState(true);
   const [disabled, setDisabled] = useState(false);
-  const [selectProduk, setSelectProduk] = useState([]);
   const router = useRouter();
 
   useEffect(() => {
+    console.log(action)
     if (action != "add") {
       form.setValues({
         kode: data.kode,
         nama: data.nama,
-        harga: data.harga,
-        produkId: data.produkId.toString(),
-        fiturs: data.fiturs.map((item) => item.fiturId.toString()),
         status: data.status,
       });
-      setOpened(false);
       if (action == "read") {
         setDisabled(true);
       }
@@ -102,25 +88,14 @@ function Form({ data, action, produk, fitur }) {
       const codeInt = data.id ? data.id : 0;
       const code = generateCode("PKG", parseInt(codeInt) + 1);
       form.setValues({
-        kode: code,
+        kode: "",
         nama: "",
-        harga: "",
-        produkId: 0,
-        fiturs: [],
         status: "INACTIVE",
       });
     }
-    const selectProduks = produk.map((item) => {
-      return {
-        value: item.id.toString(),
-        label: `${item.kode} - ${item.nama}`
-      }
-    })
-    setSelectProduk(selectProduks);
   }, []);
   const submitHandler = async (e) => {
     e.preventDefault();
-
     if (form.validate().hasErrors) return false;
     setLoading(false);
     const FORMDATA = form.values;
@@ -132,7 +107,7 @@ function Form({ data, action, produk, fitur }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ ...FORMDATA, updatedId: 1, createdId: 1 }),
+      body: JSON.stringify({ ...FORMDATA, updatedId: userSession.id, createdId: userSession.id }),
     }).then(async (res) => {
       const result = await res.json();
       if (res.status === 200) {
@@ -195,8 +170,9 @@ function Form({ data, action, produk, fitur }) {
                   label="Kode"
                   disabled={disabled}
                   name="kode"
-                  readOnly
                   value={form.values.kode}
+                  {...form.getInputProps("kode")}
+                  onChange={(e) => { form.setFieldValue("kode", e.target.value) }}
                 />
                 <TextInput
                   label="Nama"
@@ -207,69 +183,27 @@ function Form({ data, action, produk, fitur }) {
                     form.setFieldValue("nama", e.currentTarget.value)
                   }
                 />
-                <TextInput
-                  label="Harga"
-                  icon={"Rp"}
-                  onInput={(e) => inputNumberOnly(e)}
-                  disabled={disabled}
-                  {...form.getInputProps("harga")}
-                  value={form.values.harga}
-                  onChange={(e) =>
-                    form.setFieldValue("harga", e.currentTarget.value)
-                  }
-                />
-                <Select
-                  label="Produk"
-                  {...form.getInputProps("produkId")}
-                  onChange={(e) => form.setFieldValue("produkId", e)}
-                  defaultValue={`${form.values.produkId.toString()}`}
-                  data={selectProduk}
-                  placeholder="Select items"
-                  nothingFound="Nothing found"
-                  searchable
-                  disabled={disabled}
-                />
+                <InputWrapper label="Status">
+                  <Switch
+                    disabled={disabled}
+                    name="status"
+                    checked={form.values.status === "ACTIVE"}
+                    onChange={(e) =>
+                      form.setFieldValue(
+                        "status",
+                        e.currentTarget.checked ? "ACTIVE" : "INACTIVE"
+                      )
+                    }
+                    onLabel="ON"
+                    offLabel="OFF"
+                    size="lg"
+                    radius="lg"
+                  />
+                </InputWrapper>
               </Group>
             </Grid.Col>
-            <Grid.Col sm={12} md={6}>
-              <CheckboxGroup
-                value={form.values.fiturs}
-                label="Fiturs"
-                {...form.getInputProps("fiturs")}
-                onChange={(e) => form.setFieldValue("fiturs", e)}
-                required
-              >
-                {fitur.map((item) => {
-                  return (
-                    <Checkbox
-                      disabled={disabled}
-                      key={item.id}
-                      label={item.nama}
-                      value={`${item.id}`} radius="md"
-                      size="md" />
-                  )
-                })}
-              </CheckboxGroup>
-            </Grid.Col>
-            <Grid.Col sm={12} md={6}>
-              <InputWrapper label="Status">
-                <Switch
-                  disabled={disabled}
-                  name="status"
-                  checked={form.values.status === "ACTIVE"}
-                  onChange={(e) =>
-                    form.setFieldValue(
-                      "status",
-                      e.currentTarget.checked ? "ACTIVE" : "INACTIVE"
-                    )
-                  }
-                  onLabel="ON"
-                  offLabel="OFF"
-                  size="lg"
-                  radius="lg"
-                />
-              </InputWrapper>
-            </Grid.Col>
+
+
 
           </Grid>
           <div className="space-x-2 mt-10">

@@ -122,7 +122,7 @@ export default function Index({ produk }) {
                 <CustomTable.Row
                   key={row.id}
                   id={row.id}
-                  readLink={`produk/form?id=${row.id}&read=true`}
+                  readLink={`/form?id=${row.id}&read=true`}
                   editLink={`/form?id=${row.id}`}
                   deleteField={row.nama}
                   onDelete={(isLoading) => {

@@ -184,7 +184,7 @@ function Form({ inventori, action }) {
                       {...form.getInputProps("satuan")}
                       onChange={(e) => form.setFieldValue("satuan", e)}
                       value={form.values.satuan}
-                      data={["Meter", "Kg", "Litre", "Box", "Pcs"]}
+                      data={["Meter", "Kg", "Litre", "Box", "Pcs","Unit"]}
                       placeholder="Select items"
                       nothingFound="Nothing found"
                       searchable

@@ -97,7 +97,7 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export default function CustomHeader({ links, ...props }) {
+export default function CustomHeader({ links,toggler, ...props }) {
   const [state, dispatch] = useGlobalContext();
   const { classes, theme, cx } = useStyles();
 
@@ -118,7 +118,8 @@ export default function CustomHeader({ links, ...props }) {
     <Header {...props} className={classes.header}>
       <div className={classes.inner}>
         <Group>
-          <MantineLogo />
+          {/* <MantineLogo /> */}
+        <div className="font-medium text-xl">MVB</div>
           <ThemeToggle />
         </Group>
 
@@ -143,13 +144,14 @@ export default function CustomHeader({ links, ...props }) {
 
           <UserMenu user={user}  />
           <Burger
-            opened={state.showSidebar}
-            onClick={() => dispatch({ type: "toggle_sidebar" })}
+            opened={toggler.toggler}
+            onClick={() => toggler.setToggler(!toggler.toggler)}
             className={classes.burger}
             size="sm"
           />
         </Group>
       </div>
+      
     </Header>
   );
 }

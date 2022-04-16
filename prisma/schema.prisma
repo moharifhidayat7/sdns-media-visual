@@ -37,40 +37,94 @@ model Role {
 }
 
 model User {
-  id                 Int         @id @default(autoincrement())
-  nama               String?
-  email              String      @unique
-  password           String
-  resetPasswordToken String?
-  roleId             Int
-  role               Role        @relation("userRole", references: [id], fields: [roleId])
-  telepon            String?
-  createdAt          DateTime    @default(now())
-  updatedAt          DateTime    @updatedAt
-  deletedAt          DateTime?
-  isDeleted          Boolean?    @default(false)
-  updatedId          Int?
-  createdId          Int?
-  updatedBy          User?       @relation("updatedBy", references: [id], fields: [updatedId])
-  createdBy          User?       @relation("createdBy", references: [id], fields: [createdId])
-  createdProduk      Produk[]    @relation("produkcreatedBy")
-  updatedProduk      Produk[]    @relation("produkupdatedBy")
-  createdInventori   Inventori[] @relation("userInventoriCreate")
-  updatedInventori   Inventori[] @relation("userInventoriUpdate")
-  createdLogstok     Logstok[]   @relation("logstokcreatedBy")
-  updatedLogstok     Logstok[]   @relation("logstokupdatedBy")
-  createdSupplier    Supplier[]  @relation("suppliercreatedBy")
-  updatedSupplier    Supplier[]  @relation("supplierupdatedBy")
-  createdGudang      Gudang[]    @relation("gudangcreatedBy")
-  updatedGudang      Gudang[]    @relation("gudangupdatedBy")
-  createdFitur       Fitur[]     @relation("fiturcreatedBy")
-  updatedFitur       Fitur[]     @relation("fiturupdatedBy")
-  createdPaket       Paket[]     @relation("paketcreatedBy")
-  updatedPaket       Paket[]     @relation("paketupdatedBy")
-  updatedUser        User[]      @relation("updatedBy")
-  createdUser        User[]      @relation("createdBy")
-  updatedRole        Role[]      @relation("roleupdatedBy")
-  createdRole        Role[]      @relation("rolecreatedBy")
+  id                     Int               @id @default(autoincrement())
+  nama                   String?
+  email                  String            @unique
+  password               String
+  resetPasswordToken     String?
+  roleId                 Int
+  role                   Role              @relation("userRole", references: [id], fields: [roleId])
+  telepon                String?
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
+  deletedAt              DateTime?
+  isDeleted              Boolean?          @default(false)
+  updatedId              Int?
+  createdId              Int?
+  updatedBy              User?             @relation("updatedBy", references: [id], fields: [updatedId])
+  createdBy              User?             @relation("createdBy", references: [id], fields: [createdId])
+  createdProduk          Produk[]          @relation("produkcreatedBy")
+  updatedProduk          Produk[]          @relation("produkupdatedBy")
+  createdInventori       Inventori[]       @relation("userInventoriCreate")
+  updatedInventori       Inventori[]       @relation("userInventoriUpdate")
+  createdLogstok         Logstok[]         @relation("logstokcreatedBy")
+  updatedLogstok         Logstok[]         @relation("logstokupdatedBy")
+  createdSupplier        Supplier[]        @relation("suppliercreatedBy")
+  updatedSupplier        Supplier[]        @relation("supplierupdatedBy")
+  createdGudang          Gudang[]          @relation("gudangcreatedBy")
+  updatedGudang          Gudang[]          @relation("gudangupdatedBy")
+  createdFitur           Fitur[]           @relation("fiturcreatedBy")
+  updatedFitur           Fitur[]           @relation("fiturupdatedBy")
+  createdPaket           Paket[]           @relation("paketcreatedBy")
+  updatedPaket           Paket[]           @relation("paketupdatedBy")
+  updatedUser            User[]            @relation("updatedBy")
+  createdUser            User[]            @relation("createdBy")
+  createdMkas            Mkas[]            @relation("mkascreatedBy")
+  updatedMkas            Mkas[]            @relation("mkasupdatedBy")
+  createdFakturStokMasuk FakturStokMasuk[] @relation("fakturstokmasukcreatedBy")
+  updatedFakturStokMasuk FakturStokMasuk[] @relation("fakturstokmasukupdatedBy")
+  updatedRole            Role[]            @relation("roleupdatedBy")
+  createdRole            Role[]            @relation("rolecreatedBy")
+}
+
+model FakturStokMasuk {
+  id             Int                   @id @default(autoincrement())
+  faktur         String                @unique
+  nomortransaksi String                @unique
+  tanggalinput   DateTime              @default(now())
+  status         Status                @default(INACTIVE)
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  deletedAt      DateTime?
+  isDeleted      Boolean?              @default(false)
+  updatedBy      User?                 @relation(fields: [updatedId], references: [id], name: "fakturstokmasukupdatedBy")
+  createdBy      User?                 @relation(fields: [createdId], references: [id], name: "fakturstokmasukcreatedBy")
+  updatedId      Int?
+  createdId      Int?
+  items          FakturStokMasukItem[] @relation("fakturstokmasukitems")
+  supplier       Supplier?             @relation(fields: [supplierId], references: [id], name: "supplierstokmasuk")
+  supplierId     Int?
+}
+
+model FakturStokMasukItem {
+  id                Int              @id @default(autoincrement())
+  FakturStokMasuk   FakturStokMasuk? @relation(fields: [fakturStokMasukId], references: [id], name: "fakturstokmasukitems")
+  Inventori         Inventori?       @relation(fields: [inventoriId], references: [id], name: "fakturinventori")
+  inventoriId       Int?
+  Gudang            Gudang?          @relation(fields: [gudangId], references: [id], name: "faturstokmasukgudang")
+  gudangId          Int?
+  fakturStokMasukId Int?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  deletedAt         DateTime?
+  isDeleted         Boolean?         @default(false)
+  updatedId         Int?
+  createdId         Int?
+}
+
+model Mkas {
+  id        Int       @id @default(autoincrement())
+  nama      String    @unique
+  kode      String    @unique
+  status    Status    @default(INACTIVE)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  isDeleted Boolean?  @default(false)
+  updatedBy User?     @relation(fields: [updatedId], references: [id], name: "mkasupdatedBy")
+  createdBy User?     @relation(fields: [createdId], references: [id], name: "mkascreatedBy")
+  updatedId Int?
+  createdId Int?
 }
 
 model Fitur {
@@ -134,42 +188,44 @@ model Produk {
 }
 
 model Gudang {
-  id        Int       @id @default(autoincrement())
-  kode      String
-  nama      String
-  status    Status    @default(INACTIVE)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-  isDeleted Boolean?  @default(false)
-  updatedBy User?     @relation(fields: [updatedId], references: [id], name: "gudangupdatedBy")
-  createdBy User?     @relation(fields: [createdId], references: [id], name: "gudangcreatedBy")
-  updatedId Int?
-  createdId Int?
-  Logstok   Logstok[] @relation("gudang")
+  id                   Int                   @id @default(autoincrement())
+  kode                 String
+  nama                 String
+  status               Status                @default(INACTIVE)
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  deletedAt            DateTime?
+  isDeleted            Boolean?              @default(false)
+  updatedBy            User?                 @relation(fields: [updatedId], references: [id], name: "gudangupdatedBy")
+  createdBy            User?                 @relation(fields: [createdId], references: [id], name: "gudangcreatedBy")
+  updatedId            Int?
+  createdId            Int?
+  Logstok              Logstok[]             @relation("gudang")
+  fakturstokmasukitems FakturStokMasukItem[] @relation("faturstokmasukgudang")
 }
 
 model Supplier {
-  id          Int       @id @default(autoincrement())
-  kode        String
-  nama        String
-  alamat      String    @db.Text
-  whatsapp    String?
-  no_telphone String
-  email       String?
-  status      Status    @default(INACTIVE)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
-  isDeleted   Boolean?  @default(false)
-  updatedBy   User?     @relation(fields: [updatedId], references: [id], name: "supplierupdatedBy")
-  createdBy   User?     @relation(fields: [createdId], references: [id], name: "suppliercreatedBy")
-  updatedId   Int?
-  createdId   Int?
+  id               Int               @id @default(autoincrement())
+  kode             String
+  nama             String
+  alamat           String            @db.Text
+  whatsapp         String?
+  no_telphone      String
+  email            String?
+  status           Status            @default(INACTIVE)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  deletedAt        DateTime?
+  isDeleted        Boolean?          @default(false)
+  updatedBy        User?             @relation(fields: [updatedId], references: [id], name: "supplierupdatedBy")
+  createdBy        User?             @relation(fields: [createdId], references: [id], name: "suppliercreatedBy")
+  updatedId        Int?
+  createdId        Int?
+  fakturStokMasuks FakturStokMasuk[] @relation("supplierstokmasuk")
 }
 
 model Inventori {
-  id         Int       @id @default(autoincrement())
+  id         Int                   @id @default(autoincrement())
   kode       String
   tipe       String
   merek      String
@@ -178,16 +234,17 @@ model Inventori {
   stok_awal  Int?
   stok       Int?
   satuan     String
-  logstok    Logstok[] @relation("inventori")
-  status     Status    @default(INACTIVE)
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime? @updatedAt
+  logstok    Logstok[]             @relation("inventori")
+  status     Status                @default(INACTIVE)
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime?             @updatedAt
   deletedAt  DateTime?
-  isDeleted  Boolean?  @default(false)
-  updatedBy  User?     @relation(fields: [updatedId], references: [id], name: "userInventoriCreate")
-  createdBy  User?     @relation(fields: [createdId], references: [id], name: "userInventoriUpdate")
+  isDeleted  Boolean?              @default(false)
+  updatedBy  User?                 @relation(fields: [updatedId], references: [id], name: "userInventoriCreate")
+  createdBy  User?                 @relation(fields: [createdId], references: [id], name: "userInventoriUpdate")
   updatedId  Int?
   createdId  Int?
+  faktur     FakturStokMasukItem[] @relation("fakturinventori")
 }
 
 model Logstok {
