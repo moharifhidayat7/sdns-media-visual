@@ -50,20 +50,18 @@ export default async (req, res) => {
           updatedBy: true,
           produk: true,
           fiturs: {
-            include: {
-              fitur: true
+            where: {
+             fitur:{
+          status:"ACTIVE"
+             }
             },
+            include: {
+              fitur: true 
+            }
           },
         },
         where: {
           isDeleted: false,
-          fiturs: {
-            none: {
-              fitur: {
-                status: status
-              }
-            }
-          },
           OR: [
             {
               nama: {
