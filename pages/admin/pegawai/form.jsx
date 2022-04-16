@@ -12,6 +12,9 @@ import {
   Notification,
   Alert,
   PasswordInput,
+  Text,
+  Select,
+  ActionIcon,
 } from "@mantine/core";
 import Head from "next/head";
 import Layout from "@components/views/Layout";
@@ -19,31 +22,33 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useForm } from "@mantine/form";
 import { useNotifications } from "@mantine/notifications";
-import { Check, X } from "tabler-icons-react";
-function Form({ user, action }) {
+import { Check, X, Refresh } from "tabler-icons-react";
+import { generateString } from "../../../helpers/functions";
+
+function Form({ user, role, action }) {
   const form = useForm({
     initialValues: {
+      nama: user.nama || "",
       email: user.email || "",
-      username: user.username || "",
-      password: user.password || "",
+      telepon: user.telepon || "",
+      roleId: (user.roleId && user.roleId.toString()) || "1",
     },
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
-      username: (value) => (value == "" ? "Masukkan Username" : null),
-      password: (value) => (value.length < 1 ? "Masukkan password!" : null),
+      roleId: (value) => (value == "" ? "Pilih Role" : null),
     },
   });
   const notifications = useNotifications();
   const [loading, setLoading] = useState(true);
   const [disabled, setDisabled] = useState(false);
+  const [select, setSelect] = useState("");
   const router = useRouter();
 
   const onSubmit = async (values) => {
     setLoading(false);
-    const method = action === "edit" ? "PUT" : "POST";
-    const url = action === "edit" ? `/api/user/${user.id}` : `/api/user`;
+    const url = user.id ? `/api/user/${user.id}` : `/api/user`;
     await fetch(url, {
-      method,
+      method: user.id ? "PUT" : "POST",
       headers: {
         "Content-Type": "application/json",
       },
@@ -80,10 +85,12 @@ function Form({ user, action }) {
         <Loader size="xl" variant="bars" color="orange" />;
       </div>
       <Head>
-        <title>Tambah Pegawai</title>
+        <title>
+          {action == "read" ? "Detail" : user.id ? "Edit" : "Tambah"} Pegawai
+        </title>
       </Head>
       <Title order={2} style={{ marginBottom: "1.5rem" }}>
-        {action == "read" ? "Read" : "Form"} Pegawai
+        {action == "read" ? "Detail" : user.id ? "Edit" : "Tambah"} Pegawai
       </Title>
 
       <Box
@@ -108,18 +115,60 @@ function Form({ user, action }) {
             <Grid.Col sm={12} md={6}>
               <Group direction="column" grow spacing="lg">
                 <TextInput
-                  placeholder="Username"
-                  label="Username"
-                  {...form.getInputProps("username")}
+                  placeholder="Nama"
+                  label="Nama"
+                  disabled={action == "read"}
+                  {...form.getInputProps("nama")}
                 />
                 <TextInput
                   placeholder="Email"
                   label="Email"
+                  disabled={action == "read"}
                   {...form.getInputProps("email")}
                 />
-                <PasswordInput
-                  label="Password"
-                  {...form.getInputProps("password")}
+                {!user.id && (
+                  <PasswordInput
+                    required
+                    label={
+                      <div className="flex space-x-2 items-center">
+                        <Text weight={500} size="sm">
+                          Password
+                        </Text>
+                        <Button
+                          compact
+                          variant="default"
+                          size="xs"
+                          leftIcon={<Refresh size={15} />}
+                          onClick={() => {
+                            const password = generateString(6);
+
+                            form.setFieldValue("password", password);
+                          }}
+                        >
+                          Random
+                        </Button>
+                      </div>
+                    }
+                    {...form.getInputProps("password")}
+                  />
+                )}
+
+                <TextInput
+                  placeholder="No. Telepon"
+                  label="No. Telepon"
+                  disabled={action == "read"}
+                  {...form.getInputProps("telepon")}
+                />
+                <Select
+                  label="Role"
+                  value={select}
+                  onChange={setSelect}
+                  disabled={action == "read"}
+                  data={role.result.map((r) => ({
+                    value: r.id.toString(),
+                    label: r.nama.toUpperCase(),
+                  }))}
+                  {...form.getInputProps("roleId")}
                 />
 
                 <div className="space-x-2">
@@ -130,7 +179,7 @@ function Form({ user, action }) {
                   >
                     Back
                   </Button>
-                  {!disabled && <Button type="submit">Submit</Button>}
+                  {action != "read" && <Button type="submit">Submit</Button>}
                 </div>
               </Group>
             </Grid.Col>
@@ -142,60 +191,43 @@ function Form({ user, action }) {
 }
 export async function getServerSideProps(context) {
   const id = context.query.id;
-  const read = context.query.read;
-  let user = {};
-  let action = "add";
-  if (Array.isArray(id)) {
-    const res = await fetch(`${process.env.API_URL}/api/user`, {
+
+  const role = await fetch(`${process.env.API_URL}/api/role?limit=0`, {
+    headers: {
+      Cookie: context.req.headers.cookie,
+    },
+  }).then((res) => res.json());
+
+  if (id) {
+    const user = await fetch(`${process.env.API_URL}/api/user/${id}`, {
       headers: {
         Cookie: context.req.headers.cookie,
       },
-    });
-    user = await res.json();
-    user = user.filter((item, i) => {
-      for (let i = 0; i < id.length; i++) {
-        if (item.id == id[i]) {
-          return item;
-        }
-      }
-    });
-  } else {
-    if (id) {
-      let res = await fetch(`${process.env.API_URL}/api/user/${id}`, {
-        headers: {
-          Cookie: context.req.headers.cookie,
+    }).then((res) => res.json());
+    if (context.query.readOnly != undefined) {
+      return {
+        props: {
+          user,
+          role,
+          action: "read",
         },
-      });
-      action = "edit";
-      user = await res.json();
-      if (res.status === 403) {
-        let res = await fetch(`${process.env.API_URL}/api/user`, {
-          headers: {
-            Cookie: context.req.headers.cookie,
-          },
-        });
-        const users = await res.json();
-        user = users.result.length > 0 ? users.result[0] : users;
-        action = "add";
-      }
-    } else {
-      let res = await fetch(`${process.env.API_URL}/api/user`, {
-        headers: {
-          Cookie: context.req.headers.cookie,
-        },
-      });
-      const users = await res.json();
-      user = users.result.length > 0 ? users.result[0] : users;
-      action = "add";
+      };
     }
+
+    return {
+      props: {
+        user,
+        role,
+        action: "",
+      },
+    };
   }
-  if (read) {
-    action = "read";
-  }
+
   return {
     props: {
-      action,
-      user,
+      user: {},
+      role,
+      action: "",
     },
   };
 }

@@ -18,6 +18,7 @@ export default async function handler(req, res) {
           skip,
           take: limit,
           include: {
+            role: true,
             createdBy: true,
             updatedBy: true,
           },
@@ -26,11 +27,6 @@ export default async function handler(req, res) {
             OR: [
               {
                 email: {
-                  contains: search,
-                },
-              },
-              {
-                username: {
                   contains: search,
                 },
               },
@@ -46,11 +42,6 @@ export default async function handler(req, res) {
             OR: [
               {
                 email: {
-                  contains: search,
-                },
-              },
-              {
-                username: {
                   contains: search,
                 },
               },
@@ -75,6 +66,7 @@ export default async function handler(req, res) {
         limit,
       });
     } catch (error) {
+      console.log(error);
       res.status(400).json({ err: "Error occured." });
     }
   }
@@ -87,6 +79,7 @@ export default async function handler(req, res) {
         data: {
           ...req.body,
           password: hash,
+          roleId: parseInt(req.body.roleId),
           createdId: session.user ? session.user.id : null,
         },
       });
@@ -100,6 +93,7 @@ export default async function handler(req, res) {
         user,
       });
     } catch (error) {
+      console.log(error);
       res.status(400).json({ err: "Error occured." });
     }
   }

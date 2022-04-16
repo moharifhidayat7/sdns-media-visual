@@ -23,11 +23,12 @@ export default async function handler(req, res) {
     try {
       const user = await prisma.user.update({
         where: {
-          id: req.query.id,
+          id: parseInt(req.query.id),
         },
         data: {
           ...req.body,
-          updatedBy: session.user ? session.user.id : null,
+          roleId: parseInt(req.body.roleId),
+          updatedId: session.user ? session.user.id : null,
         },
       });
 
@@ -39,6 +40,7 @@ export default async function handler(req, res) {
         user,
       });
     } catch (error) {
+      console.log(error);
       res.status(400).json({ err: "Error occured." });
     }
   }

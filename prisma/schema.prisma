@@ -10,9 +10,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Akses {
+  nama   String
+  path   String
+  read   Boolean?
+  write  Boolean?
+  roleId Int
+  role   Role     @relation("roleAkses", references: [id], fields: [roleId], onDelete: Cascade)
+
+  @@unique([roleId, path], name: "uniqueRole")
+}
+
 model Role {
   id        Int       @id @default(autoincrement())
-  nama      String
+  nama      String    @unique
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
@@ -21,17 +32,19 @@ model Role {
   createdId Int?
   updatedBy User?     @relation("roleupdatedBy", references: [id], fields: [updatedId])
   createdBy User?     @relation("rolecreatedBy", references: [id], fields: [createdId])
-  User      User[]    @relation("userRole")
+  user      User[]    @relation("userRole")
+  akses     Akses[]   @relation("roleAkses")
 }
 
 model User {
   id                 Int         @id @default(autoincrement())
+  nama               String?
   email              String      @unique
-  username           String      @unique
   password           String
   resetPasswordToken String?
   roleId             Int
   role               Role        @relation("userRole", references: [id], fields: [roleId])
+  telepon            String?
   createdAt          DateTime    @default(now())
   updatedAt          DateTime    @updatedAt
   deletedAt          DateTime?

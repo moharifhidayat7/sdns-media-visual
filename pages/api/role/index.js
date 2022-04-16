@@ -10,29 +10,37 @@ export default async function handler(req, res) {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
+    const prismaQuery = {
+      skip,
+      take: limit,
+      include: {
+        akses: true,
+        createdBy: true,
+        updatedBy: true,
+      },
+      where: {
+        isDeleted: false,
+        OR: [
+          {
+            nama: {
+              contains: search,
+            },
+          },
+        ],
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
+    };
+
+    if (req.query.limit == 0) {
+      delete prismaQuery.take;
+      delete prismaQuery.skip;
+    }
+
     try {
       const [result, totalResult] = await prisma.$transaction([
-        prisma.role.findMany({
-          skip,
-          take: limit,
-          include: {
-            createdBy: true,
-            updatedBy: true,
-          },
-          where: {
-            isDeleted: false,
-            OR: [
-              {
-                nama: {
-                  contains: search,
-                },
-              },
-            ],
-          },
-          orderBy: {
-            createdAt: "desc",
-          },
-        }),
+        prisma.role.findMany(prismaQuery),
         prisma.role.count({
           where: {
             isDeleted: false,
@@ -66,14 +74,17 @@ export default async function handler(req, res) {
     try {
       const role = await prisma.role.create({
         data: {
-          ...req.body,
+          nama: req.body.nama,
           createdId: session.role ? session.role.id : null,
+          akses: {
+            create: req.body.akses,
+          },
         },
       });
 
       res.statusCode = 200;
       res.json({
-        message: "role created",
+        message: "Role created",
         role,
       });
     } catch (error) {
@@ -95,7 +106,7 @@ export default async function handler(req, res) {
 
       res.statusCode = 200;
       res.json({
-        message: "role deleted",
+        message: "Role deleted",
         role,
       });
     } catch (error) {

@@ -1,23 +1,72 @@
 import Head from "next/head";
 
 import Layout from "@components/views/Layout";
-import { Title, Text, Button } from "@mantine/core";
+import { Title, Text, Button, Table, Checkbox } from "@mantine/core";
+import { useModals } from "@mantine/modals";
 
 import { CustomTable } from "@components/Table/CustomTable";
 import DataTable from "@components/Table/DataTable";
-import { useContext, useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useNotifications } from "@mantine/notifications";
-import dateFormat from "dateformat";
 import { Check, X } from "tabler-icons-react";
 
 export default function Index({ roles }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
+  const [row, setRow] = useState([]);
+  const modals = useModals();
 
-  useEffect(() => {
-    dispatch({ type: "set_data", payload: roles });
-  }, []);
+  const openAksesModal = (row) => {
+    modals.openModal({
+      title: row.nama,
+      overflow: "inside",
+      size: "lg",
+      children: (
+        <Table>
+          <thead>
+            <tr>
+              <th>Nama</th>
+              <th>URL</th>
+              <th>Akses</th>
+            </tr>
+          </thead>
+          <tbody>
+            {row.akses.map((ak) => {
+              if (ak.read == false && ak.write == false) {
+                return;
+              }
+              return (
+                <tr key={`${ak.nama}_${ak.path}`}>
+                  <td>{ak.nama}</td>
+                  <td>{ak.path}</td>
+                  <td>
+                    {ak.read && (
+                      <Checkbox
+                        value="read"
+                        label="READ"
+                        checked={ak.read}
+                        disabled
+                      />
+                    )}
+                    {ak.write && (
+                      <Checkbox
+                        value="write"
+                        label="WRITE"
+                        checked={ak.write}
+                        disabled
+                      />
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </Table>
+      ),
+    });
+  };
+
   const deleteHandler = async (selected, isLoading, type = "delete") => {
     const data = { id: selected };
     const url = type == "delete" ? `/api/role/${selected}` : `/api/role`;
@@ -66,7 +115,15 @@ export default function Index({ roles }) {
       key: "nama",
       label: "Role",
     },
+    {
+      key: "akses",
+      sortable: false,
+      label: "Akses",
+    },
   ];
+  useEffect(() => {
+    dispatch({ type: "set_data", payload: roles });
+  }, []);
   return (
     <Layout>
       <Head>
@@ -81,18 +138,10 @@ export default function Index({ roles }) {
       <DataTable>
         <DataTable.Action
           filterVisibility={false}
-          onDelete={(selected, isLoading) => {
-            deleteHandler(selected, isLoading, "delete_many");
-          }}
           onRefresh={(isLoading) => refreshHandler(isLoading)}
           onSearch={(value, isLoading) => refreshHandler(isLoading, 1, value)}
         />
-        <CustomTable
-          header={header}
-          name="produk"
-          withSelection={true}
-          withAction={true}
-        >
+        <CustomTable header={header} name="produk" withAction={true}>
           {state.data.result &&
             state.data.result.map((row) => {
               return (
@@ -107,6 +156,18 @@ export default function Index({ roles }) {
                 >
                   <CustomTable.Col>
                     <Text>{row.nama}</Text>
+                  </CustomTable.Col>
+                  <CustomTable.Col>
+                    <Text>
+                      <Button
+                        variant="subtle"
+                        onClick={() => {
+                          openAksesModal(row);
+                        }}
+                      >
+                        VIEW
+                      </Button>
+                    </Text>
                   </CustomTable.Col>
                 </CustomTable.Row>
               );

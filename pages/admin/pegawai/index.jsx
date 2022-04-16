@@ -63,12 +63,16 @@ export default function Index({ users }) {
   };
   const header = [
     {
-      key: "username",
-      label: "Username",
+      key: "nama",
+      label: "Nama",
     },
     {
       key: "email",
       label: "Email",
+    },
+    {
+      key: "role",
+      label: "Role",
     },
     {
       key: "createdAt",
@@ -97,7 +101,7 @@ export default function Index({ users }) {
         />
         <CustomTable
           header={header}
-          name="produk"
+          name="Pegawai"
           withSelection={true}
           withAction={true}
         >
@@ -107,7 +111,7 @@ export default function Index({ users }) {
                 <CustomTable.Row
                   key={row.id}
                   id={row.id}
-                  readLink={`user/form?id=${row.id}&read=true`}
+                  readLink={`/form?id=${row.id}&readOnly`}
                   editLink={`/form?id=${row.id}`}
                   deleteField={row.nama}
                   onDelete={(isLoading) => {
@@ -115,10 +119,13 @@ export default function Index({ users }) {
                   }}
                 >
                   <CustomTable.Col>
-                    <Text>{row.username}</Text>
+                    <Text>{row.nama}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text>{row.email}</Text>
+                  </CustomTable.Col>
+                  <CustomTable.Col>
+                    <Text>{row.role.nama}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text className="uppercase">
@@ -140,7 +147,7 @@ export default function Index({ users }) {
     </Layout>
   );
 }
-//function get server side props produk
+
 export async function getServerSideProps(context) {
   const res = await fetch(`${process.env.API_URL}/api/user?page=0`, {
     headers: {

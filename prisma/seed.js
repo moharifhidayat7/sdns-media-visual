@@ -1,19 +1,41 @@
-import { PrismaClient } from "@prisma/client";
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-
 async function main() {
-  const defaultUser = await prisma.user.upsert({
-    where: { email: "admin@localhost" },
+  const administrator = await prisma.role.upsert({
+    where: { nama: "ADMINISTRATOR" },
     update: {},
     create: {
-      email: "admin@localhost",
-      name: "Admin",
-      username: "admin",
-      password: "$2a$10$AXy4OrgOHI1x0yT1QMlDWeexFUNVoSebNEqcYYf47P/KY25vuubCW",
+      nama: "ADMINISTRATOR",
+      user: {
+        create: [
+          {
+            email: "admin@localhost",
+            username: "admin",
+            password:
+              "$2a$10$AXy4OrgOHI1x0yT1QMlDWeexFUNVoSebNEqcYYf47P/KY25vuubCW",
+          },
+        ],
+      },
+      akses: {
+        create: [
+          {
+            nama: "Role",
+            path: "/admin/role",
+            read: true,
+            write: true,
+          },
+          {
+            nama: "Pegawai",
+            path: "/admin/pegawai",
+            read: true,
+            write: true,
+          },
+        ],
+      },
     },
   });
 
-  console.log({ defaultUser });
+  console.log({ administrator });
 }
 
 main()
