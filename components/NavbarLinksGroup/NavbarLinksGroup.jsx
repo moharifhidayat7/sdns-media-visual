@@ -9,6 +9,8 @@ import {
   UnstyledButton,
   createStyles,
 } from "@mantine/core";
+import { useLocalStorage } from "@mantine/hooks";
+
 import { CalendarStats, ChevronLeft, ChevronRight } from "tabler-icons-react";
 const useStyles = createStyles((theme) => ({
   control: {
@@ -69,7 +71,10 @@ export function LinksGroup({
 }) {
   const { classes, theme } = useStyles();
   const hasLinks = Array.isArray(links);
-  const [opened, setOpened] = useState(initiallyOpened || false);
+  const [opened, setOpened] = useLocalStorage({
+    key: `colapse-menu-${label}`,
+    defaultValue: "",
+  });
   const ChevronIcon = theme.dir === "ltr" ? ChevronRight : ChevronLeft;
   const items = (hasLinks ? links : []).map((link) => (
     <Link href={link.link} passHref key={link.label}>
