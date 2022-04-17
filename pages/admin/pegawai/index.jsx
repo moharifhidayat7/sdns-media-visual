@@ -132,7 +132,7 @@ export default function Index({ user }) {
                     <Text>{row.email}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text>{row.role.nama}</Text>
+                    <Text>{row.role && row.role.nama}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text className="uppercase">
