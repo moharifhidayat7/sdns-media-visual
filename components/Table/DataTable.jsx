@@ -24,6 +24,7 @@ import {
 import { useRouter } from "next/router";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useEffect, useCallback, useState } from "react";
+import { useSession, getSession } from "next-auth/react";
 import {
   useDataTableContext,
   DataTableProvider,
@@ -80,12 +81,17 @@ const Action = ({
   onRefresh = () => {},
   onEdit,
   filterVisibility = true,
-  onDelete = () => {},
+  onDelete,
   onSearch = () => {},
 }) => {
   const [state, dispatch] = useDataTableContext();
   const router = useRouter();
   const [debounced] = useDebouncedValue(state.search, 500);
+  const { data: session, status } = useSession();
+
+  const akses = session.user.role.akses.filter(
+    (f) => f.path == router.pathname
+  )[0];
 
   return (
     <div className="mb-4">
@@ -105,7 +111,7 @@ const Action = ({
             onClick={() => {
               router.push(router.asPath + "/form");
             }}
-            disabled={false}
+            disabled={!akses.write}
           >
             Tambah
           </Button>
@@ -120,23 +126,26 @@ const Action = ({
               <Pencil />
             </ActionIcon>
           )}
-          <ActionIcon
-            size={36}
-            color="red"
-            variant="filled"
-            onClick={() => {
-              dispatch({ type: "set", payload: { loading: true } });
-              onDelete(state.selection, (s) => {
-                dispatch({
-                  type: "set",
-                  payload: { loading: s, selection: [] },
+          {onDelete && !akses.write && (
+            <ActionIcon
+              size={36}
+              color="red"
+              variant="filled"
+              onClick={() => {
+                dispatch({ type: "set", payload: { loading: true } });
+                onDelete(state.selection, (s) => {
+                  dispatch({
+                    type: "set",
+                    payload: { loading: s, selection: [] },
+                  });
                 });
-              });
-            }}
-            disabled={state.selection.length == 0}
-          >
-            <Trash />
-          </ActionIcon>
+              }}
+              disabled={state.selection.length == 0}
+            >
+              <Trash />
+            </ActionIcon>
+          )}
+
           <ActionIcon
             size={36}
             variant="filled"

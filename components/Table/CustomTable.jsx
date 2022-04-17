@@ -27,6 +27,7 @@ import {
   Eye,
 } from "tabler-icons-react";
 import { useEffect, useState } from "react";
+import { useSession, getSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useGlobalContext } from "@components/contexts/GlobalContext";
 const useStyles = createStyles((theme) => ({
@@ -112,11 +113,17 @@ const CustomTable = ({
   withSelection,
   name = "",
 }) => {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [state, dispatch] = useDataTableContext();
   const [globalState, globalDispatch] = useGlobalContext();
 
   const [sortBy, setSortBy] = useState(null);
   const [reverseSortDirection, setReverseSortDirection] = useState(false);
+
+  const akses = session.user.role.akses.filter(
+    (f) => f.path == router.pathname
+  )[0];
 
   useEffect(() => {
     dispatch({ type: "set", payload: { withAction, withSelection, name } });
@@ -143,7 +150,7 @@ const CustomTable = ({
       <Table sx={{ minWidth: 800 }} verticalSpacing="sm">
         <thead>
           <tr>
-            {state.withSelection && (
+            {state.withSelection && akses.write && (
               <th style={{ width: 40 }}>
                 <Checkbox
                   onChange={() => {
@@ -191,6 +198,7 @@ const Row = ({
   deleteField,
   readLink = "",
 }) => {
+  const { data: session, status } = useSession();
   const [state, dispatch] = useDataTableContext();
   const [globalState, globalDispatch] = useGlobalContext();
   const { classes, cx } = useStyles();
@@ -221,9 +229,13 @@ const Row = ({
 
   const selected = state.selection.includes(id);
 
+  const akses = session.user.role.akses.filter(
+    (f) => f.path == router.pathname
+  )[0];
+
   return (
     <tr className={cx({ [classes.rowSelected]: selected })}>
-      {state.withSelection && (
+      {state.withSelection && akses.write && (
         <td>
           <Checkbox
             checked={state.selection.includes(id)}
@@ -236,7 +248,7 @@ const Row = ({
       {state.withAction && (
         <td>
           <Group spacing="xs" noWrap className="justify-end">
-            {readLink && (
+            {readLink && akses.read && (
               <ActionIcon
                 color="blue"
                 variant="filled"
@@ -248,24 +260,28 @@ const Row = ({
               </ActionIcon>
             )}
 
-            <ActionIcon
-              color="yellow"
-              variant="filled"
-              onClick={() =>
-                router.push(router.asPath.split("?")[0] + editLink)
-              }
-              disabled={loading}
-            >
-              <Pencil size={16} />
-            </ActionIcon>
-            <ActionIcon
-              color="red"
-              variant="filled"
-              onClick={openDeleteModal}
-              loading={loading}
-            >
-              <Trash size={16} />
-            </ActionIcon>
+            {akses.write && (
+              <>
+                <ActionIcon
+                  color="yellow"
+                  variant="filled"
+                  onClick={() =>
+                    router.push(router.asPath.split("?")[0] + editLink)
+                  }
+                  disabled={loading}
+                >
+                  <Pencil size={16} />
+                </ActionIcon>
+                <ActionIcon
+                  color="red"
+                  variant="filled"
+                  onClick={openDeleteModal}
+                  loading={loading}
+                >
+                  <Trash size={16} />
+                </ActionIcon>
+              </>
+            )}
           </Group>
         </td>
       )}
