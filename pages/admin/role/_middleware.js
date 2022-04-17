@@ -22,7 +22,7 @@ export async function middleware(req) {
   const page = akses.filter((f) => nextUrl.includes(f.path));
 
   if (page.length == 0 || page[0].visible == false) {
-    return NextResponse.redirect(url + "/403");
+    return NextResponse.rewrite(url + "/403");
   }
 
   return NextResponse.next();
