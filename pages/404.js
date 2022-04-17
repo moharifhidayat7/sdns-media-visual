@@ -73,9 +73,9 @@ export default function Custom403() {
           Halaman tidak ditemukan.
         </Text>
         <Group position="center">
-          <Link href="/admin" passHref>
+          <Link href="/" passHref>
             <Button component="a" variant="subtle" size="md">
-              Kembali ke Dashboard
+              Kembali ke Halaman Utama
             </Button>
           </Link>
         </Group>
