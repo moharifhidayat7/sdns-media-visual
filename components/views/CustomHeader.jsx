@@ -110,29 +110,14 @@ export default function CustomHeader({ links, toggler, ...props }) {
     <Header {...props} className={classes.header}>
       <div className={classes.inner}>
         <Group>
-          {/* <MantineLogo /> */}
           <div className="font-medium text-xl">MVB</div>
-          <ThemeToggle />
         </Group>
 
         <Group>
           <Group ml={50} spacing={5} className={classes.links}>
             {items}
           </Group>
-          <Autocomplete
-            className={classes.search}
-            placeholder="Search"
-            icon={<Search size={16} />}
-            data={[
-              "React",
-              "Angular",
-              "Vue",
-              "Next.js",
-              "Riot.js",
-              "Svelte",
-              "Blitz.js",
-            ]}
-          />
+          <ThemeToggle />
 
           <HeaderUserButton user={user} />
           <Burger
