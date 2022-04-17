@@ -4,6 +4,7 @@ import { getToken } from "next-auth/jwt";
 export async function middleware(req) {
   const url = process.env.NEXTAUTH_URL;
   const token = await getToken({ req });
+  const nextUrl = req.nextUrl.pathname;
 
   const akses = token.user.role.akses.map((aks) => {
     if (aks.read == false && aks.write == false) {
@@ -18,7 +19,7 @@ export async function middleware(req) {
     };
   });
 
-  const page = akses.filter((f) => url + f.path == req.nextUrl);
+  const page = akses.filter((f) => nextUrl.includes(f.path));
 
   if (page.length == 0 || page[0].visible == false) {
     return NextResponse.redirect(url + "/403");
