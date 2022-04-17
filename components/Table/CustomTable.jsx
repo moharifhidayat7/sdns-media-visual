@@ -24,9 +24,10 @@ import {
   Search,
   Pencil,
   Trash,
-  EyeCheck,
+  Eye,
 } from "tabler-icons-react";
 import { useEffect, useState } from "react";
+import { useSession, getSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useGlobalContext } from "@components/contexts/GlobalContext";
 const useStyles = createStyles((theme) => ({
@@ -66,7 +67,6 @@ function Th({ children, reversed, sorted, onSort, ...props }) {
     <th className={classes.th} {...props}>
       <UnstyledButton onClick={onSort} className={classes.control}>
         <Group position="apart" noWrap>
-      
           <Text weight={500} size="sm">
             {children}
           </Text>
@@ -113,11 +113,17 @@ const CustomTable = ({
   withSelection,
   name = "",
 }) => {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [state, dispatch] = useDataTableContext();
   const [globalState, globalDispatch] = useGlobalContext();
 
   const [sortBy, setSortBy] = useState(null);
   const [reverseSortDirection, setReverseSortDirection] = useState(false);
+
+  const akses = session.user.role.akses.filter(
+    (f) => f.path == router.pathname
+  )[0];
 
   useEffect(() => {
     dispatch({ type: "set", payload: { withAction, withSelection, name } });
@@ -144,13 +150,15 @@ const CustomTable = ({
       <Table sx={{ minWidth: 800 }} verticalSpacing="sm">
         <thead>
           <tr>
-            {state.withSelection && (
+            {state.withSelection && akses.write && (
               <th style={{ width: 40 }}>
                 <Checkbox
                   onChange={() => {
-                    dispatch({ type: "toggle_all", payload: globalState.data.result })
-                  }
-                  }
+                    dispatch({
+                      type: "toggle_all",
+                      payload: globalState.data.result,
+                    });
+                  }}
                   checked={state.selection.length === globalState.data.length}
                   indeterminate={
                     state.selection.length > 0 &&
@@ -186,10 +194,11 @@ const Row = ({
   children,
   id,
   editLink = "",
-  onDelete = () => { },
+  onDelete = () => {},
   deleteField,
   readLink = "",
 }) => {
+  const { data: session, status } = useSession();
   const [state, dispatch] = useDataTableContext();
   const [globalState, globalDispatch] = useGlobalContext();
   const { classes, cx } = useStyles();
@@ -220,9 +229,13 @@ const Row = ({
 
   const selected = state.selection.includes(id);
 
+  const akses = session.user.role.akses.filter(
+    (f) => f.path == router.pathname
+  )[0];
+
   return (
     <tr className={cx({ [classes.rowSelected]: selected })}>
-      {state.withSelection && (
+      {state.withSelection && akses.write && (
         <td>
           <Checkbox
             checked={state.selection.includes(id)}
@@ -235,30 +248,40 @@ const Row = ({
       {state.withAction && (
         <td>
           <Group spacing="xs" noWrap className="justify-end">
-            {readLink && (
-              <ActionIcon color="blue" variant="filled" onClick={() =>  router.push(router.asPath.split("?")[0] + readLink)}>
-                <EyeCheck size={16} />
-              </ActionIcon>)
-            }
+            {readLink && akses.read && (
+              <ActionIcon
+                color="blue"
+                variant="filled"
+                onClick={() =>
+                  router.push(router.asPath.split("?")[0] + readLink)
+                }
+              >
+                <Eye size={16} />
+              </ActionIcon>
+            )}
 
-            <ActionIcon
-              color="yellow"
-              variant="filled"
-              onClick={() =>
-                router.push(router.asPath.split("?")[0] + editLink)
-              }
-              disabled={loading}
-            >
-              <Pencil size={16} />
-            </ActionIcon>
-            <ActionIcon
-              color="red"
-              variant="filled"
-              onClick={openDeleteModal}
-              loading={loading}
-            >
-              <Trash size={16} />
-            </ActionIcon>
+            {akses.write && (
+              <>
+                <ActionIcon
+                  color="yellow"
+                  variant="filled"
+                  onClick={() =>
+                    router.push(router.asPath.split("?")[0] + editLink)
+                  }
+                  disabled={loading}
+                >
+                  <Pencil size={16} />
+                </ActionIcon>
+                <ActionIcon
+                  color="red"
+                  variant="filled"
+                  onClick={openDeleteModal}
+                  loading={loading}
+                >
+                  <Trash size={16} />
+                </ActionIcon>
+              </>
+            )}
           </Group>
         </td>
       )}

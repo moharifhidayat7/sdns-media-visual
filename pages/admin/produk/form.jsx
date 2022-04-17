@@ -20,6 +20,8 @@ import { useForm } from "@mantine/form";
 import { getTitle } from "helpers/functions";
 import { useNotifications } from "@mantine/notifications";
 import { Check, X } from "tabler-icons-react";
+
+import { useSession, getSession } from "next-auth/react";
 function Form({ produk, action }) {
   const form = useForm({
     initialValues: { kode: "", nama: "", status: "" },
@@ -30,6 +32,8 @@ function Form({ produk, action }) {
   const notifications = useNotifications();
   const [loading, setLoading] = useState(true);
   const [disabled, setDisabled] = useState(false);
+
+  const { data: session, status } = useSession();
   const router = useRouter();
   useEffect(() => {
     if (action != "add") {
@@ -93,7 +97,7 @@ function Form({ produk, action }) {
     });
   };
   return (
-    <Layout>
+    <Layout session={session}>
       <div className="loader" hidden={loading}>
         <Loader size="xl" variant="bars" color="orange" />;
       </div>
@@ -230,6 +234,7 @@ export async function getServerSideProps(context) {
     props: {
       action,
       produk,
+      session: await getSession(context),
     },
   };
 }

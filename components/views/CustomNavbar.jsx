@@ -1,7 +1,7 @@
 import { Navbar, ScrollArea, createStyles } from "@mantine/core";
-import { NavbarUserButton } from "@components/UserButton/NavbarUserButton";
+import NavbarUserButton from "@components/UserButton/NavbarUserButton";
 import { LinksGroup } from "@components/NavbarLinksGroup/NavbarLinksGroup";
-
+import { useSession } from "next-auth/react";
 const useStyles = createStyles((theme) => ({
   navbar: {
     backgroundColor:
@@ -23,22 +23,30 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
+const Links = ({ menu }) => {
+  return (
+    <>
+      {menu.map((item, index) => (
+        <LinksGroup {...item} key={item.label} />
+      ))}
+    </>
+  );
+};
+
 const CustomNavbar = ({ menu, ...props }) => {
   const { classes } = useStyles();
-  const links = menu.map((item) => <LinksGroup {...item} key={item.label} />);
+  const { data: session, status } = useSession();
 
+  const user = session.user;
   return (
     <Navbar {...props} className={classes.navbar}>
       <Navbar.Section grow className={classes.links} component={ScrollArea}>
-        <div className={classes.linksInner}>{links}</div>
+        <div className={classes.linksInner}>
+          <Links menu={menu} />
+        </div>
       </Navbar.Section>
-
       <Navbar.Section className={classes.footer}>
-        <NavbarUserButton
-          image="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=255&q=80"
-          name="Ann Nullpointer"
-          email="anullpointer@yahoo.com"
-        />
+        <NavbarUserButton user={user} />
       </Navbar.Section>
     </Navbar>
   );

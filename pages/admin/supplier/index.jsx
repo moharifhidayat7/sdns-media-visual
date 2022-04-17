@@ -10,9 +10,13 @@ import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useNotifications } from "@mantine/notifications";
 import dateFormat from "dateformat";
 import { Check, H3, X } from "tabler-icons-react";
+
+import { useSession, getSession } from "next-auth/react";
 export default function Index({ supplier }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
+
+  const { data: session, status } = useSession();
   const [modalStokLog, setModalStokLog] = useState({
     opened: false,
     data: [],
@@ -100,7 +104,7 @@ export default function Index({ supplier }) {
   ];
 
   return (
-    <Layout>
+    <Layout session={session}>
       <Head>
         <title style={{ textTransform: "capitalize" }}>Master Supplier </title>
       </Head>
@@ -186,6 +190,7 @@ export async function getServerSideProps(context) {
   return {
     props: {
       supplier,
+      session: await getSession(context),
     },
   };
 }

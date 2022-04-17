@@ -10,12 +10,15 @@ import { useContext, useState, useEffect } from "react";
 import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useNotifications } from "@mantine/notifications";
 import { Check, X } from "tabler-icons-react";
+import { useSession, getSession } from "next-auth/react";
 
 export default function Index({ roles }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
   const [row, setRow] = useState([]);
   const modals = useModals();
+
+  const { data: session, status } = useSession();
 
   const openAksesModal = (row) => {
     modals.openModal({
@@ -125,7 +128,7 @@ export default function Index({ roles }) {
     dispatch({ type: "set_data", payload: roles });
   }, []);
   return (
-    <Layout>
+    <Layout session={session}>
       <Head>
         <title style={{ textTransform: "capitalize" }}>Role</title>
       </Head>
@@ -184,7 +187,7 @@ export default function Index({ roles }) {
     </Layout>
   );
 }
-//function get server side props produk
+
 export async function getServerSideProps(context) {
   const res = await fetch(`${process.env.API_URL}/api/role?page=0`, {
     headers: {
@@ -196,6 +199,7 @@ export async function getServerSideProps(context) {
   return {
     props: {
       roles,
+      session: await getSession(context),
     },
   };
 }

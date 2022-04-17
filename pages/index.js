@@ -1,16 +1,16 @@
 import Head from "next/head";
 import { Title, Box, Button } from "@mantine/core";
-
+import Link from "next/link";
 import Layout from "@components/views/Layout";
 
 export default function Home() {
   return (
-    <Layout>
+    <>
       <Head>
-        <title>Dashboard</title>
+        <title>Homepage</title>
       </Head>
       <Title order={1} style={{ marginBottom: "1.5rem" }}>
-        Dashboard
+        Homepage
       </Title>
       <Box
         sx={(theme) => ({
@@ -25,8 +25,10 @@ export default function Home() {
               : theme.colors.gray[4],
         })}
       >
-        <Button>My compact button</Button>
+        <Link href="/login" passHref>
+          <Button component="a">Login</Button>
+        </Link>
       </Box>
-    </Layout>
+    </>
   );
 }

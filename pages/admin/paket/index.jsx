@@ -8,11 +8,14 @@ import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useNotifications } from "@mantine/notifications";
 import dateFormat from "dateformat";
 import { Check, X, CircleCheck } from "tabler-icons-react";
+import { useSession, getSession } from "next-auth/react";
 const URL = "/api/paket";
 const NAMEPAGE = "paket";
 export default function Index({ paket, fiturs }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
+  
+  const { data: session, status } = useSession();
   const [modal, setModal] = useState({
     opened: false,
     title: "",
@@ -95,7 +98,7 @@ export default function Index({ paket, fiturs }) {
   ];
 
   return (
-    <Layout>
+    <Layout session={session}>
       <Head>
         <title style={{ textTransform: "capitalize" }}>
           Master {NAMEPAGE}{" "}
@@ -248,7 +251,8 @@ export async function getServerSideProps(context) {
   return {
     props: {
       paket,
-      fiturs
+      fiturs,
+      session: await getSession(context)
     },
   };
 }

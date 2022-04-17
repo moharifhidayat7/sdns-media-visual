@@ -13,7 +13,7 @@ import {
   Modal,
 } from "@mantine/core";
 
-import { DatePicker } from '@mantine/dates';
+import { DatePicker } from "@mantine/dates";
 import Head from "next/head";
 import Layout from "@components/views/Layout";
 import { useState, useEffect } from "react";
@@ -25,10 +25,18 @@ import { Check, Trash, X } from "tabler-icons-react";
 
 function Form({ suppliers, gudangs, inventories, stokmasuk }) {
   const form = useForm({
-    initialValues: { faktur: "", supplierId: "", tanggalinput: new Date(), nomortransaksi: 0, keterangan: "" },
+    initialValues: {
+      faktur: "",
+      supplierId: "",
+      tanggalinput: new Date(),
+      nomortransaksi: 0,
+      keterangan: "",
+    },
     validate: {
-      tanggalinput: (value) => (value.length < 1 ? "Plese input tanggal." : null),
-      supplierId: (value) => (value.length < 1 ? "Plese input supplier." : null),
+      tanggalinput: (value) =>
+        value.length < 1 ? "Plese input tanggal." : null,
+      supplierId: (value) =>
+        value.length < 1 ? "Plese input supplier." : null,
     },
   });
   const notifications = useNotifications();
@@ -36,19 +44,21 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
   const [disabled, setDisabled] = useState(false);
   const [dataSupplier, setDataSupplier] = useState([]);
   const router = useRouter();
-  const [modal, setModal] = useState(false)
-  const [items, setItems] = useState([])
+  const [modal, setModal] = useState(false);
+  const [items, setItems] = useState([]);
   useEffect(() => {
     if (suppliers.result) {
-      setDataSupplier(suppliers.result.map((item) => {
-        return { value: `${item.id.toString()}`, label: item.nama }
-      }))
+      setDataSupplier(
+        suppliers.result.map((item) => {
+          return { value: `${item.id.toString()}`, label: item.nama };
+        })
+      );
     }
-    const kode = stokmasuk.result[0] ? stokmasuk.result[0].id : 0
-    form.setFieldValue('nomortransaksi', generateCode("", parseInt(kode) + 1))
+    const kode = stokmasuk.result[0] ? stokmasuk.result[0].id : 0;
+    form.setFieldValue("nomortransaksi", generateCode("", parseInt(kode) + 1));
   }, []);
   const handleItem = (e) => {
-    const newItems = items.filter((x) => x.id === e.id)
+    const newItems = items.filter((x) => x.id === e.id);
     if (newItems.length > 0) {
       notifications.showNotification({
         disallowClose: true,
@@ -59,10 +69,10 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
         icon: <X />,
         loading: false,
       });
-      return false
+      return false;
     }
-    setItems([...items, e])
-  }
+    setItems([...items, e]);
+  };
   const submitHandler = async (e) => {
     e.preventDefault();
     if (form.validate().hasErrors) return false;
@@ -76,12 +86,19 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
         icon: <X />,
         loading: false,
       });
-      return false
+      return false;
     }
 
     //add faktur stok masuk
-    const postStokMasuk = await fetch("/api/stokmasuk", { method: "POST", body: JSON.stringify({ ...form.values, supplierId: parseInt(form.values.supplierId) }), headers: { 'Content-Type': 'application/json' } })
-    console.log(items)
+    const postStokMasuk = await fetch("/api/stokmasuk", {
+      method: "POST",
+      body: JSON.stringify({
+        ...form.values,
+        supplierId: parseInt(form.values.supplierId),
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+    console.log(items);
     if (postStokMasuk.status != 200) {
       notifications.showNotification({
         disallowClose: true,
@@ -92,7 +109,7 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
         icon: <X />,
         loading: false,
       });
-      return false
+      return false;
     }
     //add faktur stok masuk items
 
@@ -159,7 +176,12 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
               : theme.colors.gray[4],
         })}
       >
-        <form autoComplete="off" method="post" onSubmit={submitHandler} noValidate>
+        <form
+          autoComplete="off"
+          method="post"
+          onSubmit={submitHandler}
+          noValidate
+        >
           <Grid>
             <Grid.Col sm={12} md={6}>
               <Group direction="column" grow spacing="lg">
@@ -183,8 +205,9 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
                   value={form.values.supplierId}
                   disabled={disabled}
                 />
-                <Button onClick={() => setModal(true)} type="button">ITEM</Button>
-
+                <Button onClick={() => setModal(true)} type="button">
+                  ITEM
+                </Button>
               </Group>
             </Grid.Col>
             <Grid.Col sm={12} md={6}>
@@ -196,7 +219,14 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
                   onChange={(e) => form.setFieldValue("faktur", e)}
                   value={form.values.faktur}
                 />
-                <DatePicker allowFreeInput placeholder="Pick date" label="Tanggal Input" onChange={(e) => form.setFieldValue("tanggalinput", e)} required value={form.values.tanggalinput} />
+                <DatePicker
+                  allowFreeInput
+                  placeholder="Pick date"
+                  label="Tanggal Input"
+                  onChange={(e) => form.setFieldValue("tanggalinput", e)}
+                  required
+                  value={form.values.tanggalinput}
+                />
               </Group>
             </Grid.Col>
           </Grid>
@@ -205,27 +235,51 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
               <thead className="text-blue-600 uppercase">
                 <tr>
                   <th>INVENTORI</th>
-                  {gudangs.result && gudangs.result.map((item) => {
-                    return <th colSpan={2} key={item.id}>{item.nama}</th>
-                  })}
+                  {gudangs.result &&
+                    gudangs.result.map((item) => {
+                      return (
+                        <th colSpan={2} key={item.id}>
+                          {item.nama}
+                        </th>
+                      );
+                    })}
                   <th>harga beli</th>
                   <th>STOK FINAL</th>
                   <th>hapus</th>
                 </tr>
               </thead>
               <tbody>
-                {items.length > 0 ? items.map((item) => {
-                  return (
-                    <Items key={item.id} items={item} set={{ items, setItems }} gudangs={gudangs} deleteItems={(e) => setItems([...items.filter((x) => x.id != e)])} />)
-                }) :
-                  <tr><td colSpan={4 + (gudangs.total * 2)} className="text-center">Belum ada item yang dipilih.</td></tr>
-                }
+                {items.length > 0 ? (
+                  items.map((item) => {
+                    return (
+                      <Items
+                        key={item.id}
+                        items={item}
+                        set={{ items, setItems }}
+                        gudangs={gudangs}
+                        deleteItems={(e) =>
+                          setItems([...items.filter((x) => x.id != e)])
+                        }
+                      />
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={4 + gudangs.total * 2} className="text-center">
+                      Belum ada item yang dipilih.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
-          <Textarea placeholder="Tuliskan sesuatu untuk stok masuk ini (opsional)." className="mt-4" name="keterangan" onChange={(e) => form.setFieldValue("keterangan", e.target.value)} value={form.values.keterangan}>
-
-          </Textarea>
+          <Textarea
+            placeholder="Tuliskan sesuatu untuk stok masuk ini (opsional)."
+            className="mt-4"
+            name="keterangan"
+            onChange={(e) => form.setFieldValue("keterangan", e.target.value)}
+            value={form.values.keterangan}
+          ></Textarea>
 
           <div className="space-x-2 mt-10">
             <Button type="button" onClick={() => router.back()} color="red">
@@ -235,7 +289,11 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
           </div>
         </form>
       </Box>
-      <ViewModal modal={{ modal, setModal }} inventories={inventories.result ?? inventories.result} handleItem={handleItem} />
+      <ViewModal
+        modal={{ modal, setModal }}
+        inventories={inventories.result ?? inventories.result}
+        handleItem={handleItem}
+      />
     </Layout>
   );
 }
@@ -244,26 +302,26 @@ const ViewModal = ({ modal, inventories, handleItem }) => {
   const form = useForm({
     initialValues: { inventori: "" },
     validate: {
-      inventori: (value) => (value.length < 1 ? "Harus pilih salah satu." : null),
-    }
-  })
+      inventori: (value) =>
+        value.length < 1 ? "Harus pilih salah satu." : null,
+    },
+  });
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (form.validate().hasErrors) return false;
-    const id = form.values.inventori
-    const inventori = inventories.filter((x) => x.id == id)
-    handleItem(inventori[0])
-  }
+    const id = form.values.inventori;
+    const inventori = inventories.filter((x) => x.id == id);
+    handleItem(inventori[0]);
+  };
 
   return (
     <Modal
       opened={modal.modal}
       onClose={() => {
         modal.setModal(false);
-        form.reset()
-      }
-      }
+        form.reset();
+      }}
       size="sm"
       transition="rotate-left"
       title={<div className="uppercase">PILIH INVENTORI</div>}
@@ -273,105 +331,165 @@ const ViewModal = ({ modal, inventories, handleItem }) => {
           onChange={(e) => form.setFieldValue("inventori", e)}
           required
           data={inventories.map((item) => {
-            return { value: `${item.id.toString()}`, label: `${item.kode} - ${item.nama.toUpperCase()}` }
+            return {
+              value: `${item.id.toString()}`,
+              label: `${item.kode} - ${item.nama.toUpperCase()}`,
+            };
           })}
           placeholder="Select items"
           nothingFound="Nothing found"
           searchable
           {...form.getInputProps("inventori")}
         />
-        <Button type="submit" variant="gradient" gradient={{ from: 'indigo', to: 'cyan' }} className="mt-5" >ADD</Button>
+        <Button
+          type="submit"
+          variant="gradient"
+          gradient={{ from: "indigo", to: "cyan" }}
+          className="mt-5"
+        >
+          ADD
+        </Button>
       </form>
     </Modal>
   );
-}
-export const Items = ({ items, gudangs, deleteItems = () => { }, set }) => {
+};
+export const Items = ({ items, gudangs, deleteItems = () => {}, set }) => {
   const handleChange = (e, gudang) => {
-    const value = e.target.value || items.stok
-    const name= e.target.name
-    if(name!="qty"){
-      set.setItems([...set.items.map((x)=>{
-        if(x.id==items.id){
-          return {...x, hargabaru:value}
-        }
-        return x
-      })])
+    const value = e.target.value || items.stok;
+    const name = e.target.name;
+    if (name != "qty") {
+      set.setItems([
+        ...set.items.map((x) => {
+          if (x.id == items.id) {
+            return { ...x, hargabaru: value };
+          }
+          return x;
+        }),
+      ]);
       return false;
     }
     const changeQty = set.items.filter((e) => {
       if (e.id == items.id) {
-        if (!e['gudang']) {
-          e["gudang"]=[{
-            id: gudang,qty:value
-          }]
-          return e
+        if (!e["gudang"]) {
+          e["gudang"] = [
+            {
+              id: gudang,
+              qty: value,
+            },
+          ];
+          return e;
         }
         const hasGudang = e["gudang"].filter((x) => {
           if (x.id == gudang) {
-            return x
+            return x;
           }
         });
         if (hasGudang.length < 1) {
-          name=value
+          name = value;
           e["gudang"].push({
             id: gudang,
-            qty:value
-          })
-       
+            qty: value,
+          });
         } else {
-          hasGudang[0].qty = value
+          hasGudang[0].qty = value;
         }
-        return e
+        return e;
       }
-    })
-    console.log(changeQty)
-  }
-
+    });
+    console.log(changeQty);
+  };
 
   return (
     <tr>
       <td className="capitalize">
-        {items.kode} -  {items.nama.toUpperCase()} {items.tipe.toUpperCase()}
+        {items.kode} - {items.nama.toUpperCase()} {items.tipe.toUpperCase()}
       </td>
 
-      {gudangs.result && gudangs.result.map((item) => {
-
-        return [
-          <td key={item.id} style={{ minWidth: "50px", textAlign: "center" }}>
-            {items.stok}
-          </td>,
-          <td key={`s${item.id}`} className="text-center" style={{ minWidth: "100px" }}>
-            <Input type="text" name="qty" onInput={(e) => inputNumberOnly(e)} placeholder="0" size="xs" rightSection={<div className="text-gray-400 text-right w-full pr-1 overflow-hidden">{items.satuan.toUpperCase()}</div>} onChange={(e) => handleChange(e, item.id)} />
-          </td>
-        ]
-      })}
+      {gudangs.result &&
+        gudangs.result.map((item) => {
+          return [
+            <td key={item.id} style={{ minWidth: "50px", textAlign: "center" }}>
+              {items.stok}
+            </td>,
+            <td
+              key={`s${item.id}`}
+              className="text-center"
+              style={{ minWidth: "100px" }}
+            >
+              <Input
+                type="text"
+                name="qty"
+                onInput={(e) => inputNumberOnly(e)}
+                placeholder="0"
+                size="xs"
+                rightSection={
+                  <div className="text-gray-400 text-right w-full pr-1 overflow-hidden">
+                    {items.satuan.toUpperCase()}
+                  </div>
+                }
+                onChange={(e) => handleChange(e, item.id)}
+              />
+            </td>,
+          ];
+        })}
       <td className="text-center">
-        <Input type="text" name="newharga" onInput={(e) => inputNumberOnly(e)} onChange={(e) => handleChange(e)} size="xs" icon="Rp" rightSectionWidth="60px" placeholder={items.harga_beli} />
+        <Input
+          type="text"
+          name="newharga"
+          onInput={(e) => inputNumberOnly(e)}
+          onChange={(e) => handleChange(e)}
+          size="xs"
+          icon="Rp"
+          rightSectionWidth="60px"
+          placeholder={items.harga_beli}
+        />
       </td>
-      <td className="text-center">
-        {items.stok_final}
-      </td>
+      <td className="text-center">{items.stok_final}</td>
 
       <td>
-        <div className=" flex justify-center"> <ActionIcon variant="filled" color="red" onClick={() => deleteItems(items.id)}> <Trash /> </ActionIcon></div>
+        <div className=" flex justify-center">
+          {" "}
+          <ActionIcon
+            variant="filled"
+            color="red"
+            onClick={() => deleteItems(items.id)}
+          >
+            {" "}
+            <Trash />{" "}
+          </ActionIcon>
+        </div>
       </td>
     </tr>
-  )
-}
+  );
+};
 export const getServerSideProps = async (context) => {
   const header = {
     headers: {
       Cookie: context.req.headers.cookie,
     },
   };
-  const stokmasuk = await fetch(`${process.env.API_URL}/api/stokmasuk`, header).then((res) => res.json());
-  const suppliers = await fetch(`${process.env.API_URL}/api/supplier`, header).then(res => res.json());
-  const gudangs = await fetch(`${process.env.API_URL}/api/gudang`, header).then(res => res.json());
-  const inventories = await fetch(`${process.env.API_URL}/api/inventori`, header).then(res => res.json());
+  const stokmasuk = await fetch(
+    `${process.env.API_URL}/api/stokmasuk`,
+    header
+  ).then((res) => res.json());
+  const suppliers = await fetch(
+    `${process.env.API_URL}/api/supplier`,
+    header
+  ).then((res) => res.json());
+  const gudangs = await fetch(`${process.env.API_URL}/api/gudang`, header).then(
+    (res) => res.json()
+  );
+  const inventories = await fetch(
+    `${process.env.API_URL}/api/inventori`,
+    header
+  ).then((res) => res.json());
   return {
     props: {
-      suppliers, gudangs, inventories, stokmasuk: stokmasuk
-    }
-  }
-}
+      suppliers,
+      gudangs,
+      inventories,
+      stokmasuk: stokmasuk,
+    },
+  };
+};
 export default Form;

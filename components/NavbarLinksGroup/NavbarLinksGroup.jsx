@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Group,
@@ -9,8 +9,9 @@ import {
   UnstyledButton,
   createStyles,
 } from "@mantine/core";
-import { CalendarStats, ChevronLeft, ChevronRight } from "tabler-icons-react";
+import { useLocalStorage } from "@mantine/hooks";
 
+import { CalendarStats, ChevronLeft, ChevronRight } from "tabler-icons-react";
 const useStyles = createStyles((theme) => ({
   control: {
     fontWeight: 500,
@@ -59,6 +60,9 @@ const useStyles = createStyles((theme) => ({
   chevron: {
     transition: "transform 200ms ease",
   },
+  chevronRotate: {
+    transform: `rotate(${theme.dir === "rtl" ? -90 : 90}deg)`,
+  },
 }));
 
 export function LinksGroup({
@@ -68,25 +72,19 @@ export function LinksGroup({
   links,
   link,
 }) {
-  const { classes, theme } = useStyles();
-  const hasLinks = Array.isArray(links);
-  const [opened, setOpened] = useState(initiallyOpened || false);
+  const { classes, theme, cx } = useStyles();
+  const hasLinks = links && links.length > 0;
+
+  const [opened, setOpened] = useLocalStorage({
+    key: `colapse-menu-${label}`,
+  });
+
   const ChevronIcon = theme.dir === "ltr" ? ChevronRight : ChevronLeft;
-  const items = (hasLinks ? links : []).map((link) => (
-    <Link href={link.link} passHref key={link.label}>
-      <Text
-        component="a"
-        className={classes.link}
-      >
-        {link.label}
-      </Text>
-    </Link>
-  ));
 
   if (hasLinks) {
     return (
       <>
-        <Box onClick={() => setOpened((o) => !o)} className={classes.control}>
+        <Box onClick={() => setOpened(!opened)} className={classes.control}>
           <Group position="apart" spacing={0}>
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <ThemeIcon variant="light" size={30}>
@@ -94,38 +92,41 @@ export function LinksGroup({
               </ThemeIcon>
               <Box ml="md">{label}</Box>
             </Box>
-            {hasLinks && (
-              <ChevronIcon
-                className={classes.chevron}
-                size={14}
-                style={{
-                  transform: opened
-                    ? `rotate(${theme.dir === "rtl" ? -90 : 90}deg)`
-                    : "none",
-                }}
-              />
-            )}
+            <div
+              className={cx(classes.chevron, {
+                [classes.chevronRotate]: opened,
+              })}
+            >
+              <ChevronIcon size={14} />
+            </div>
           </Group>
         </Box>
-        {hasLinks ? <Collapse in={opened}>{items}</Collapse> : null}
-      </>
-    );
-  } else {
-    return (
-      <>
-        <Link href={link} passHref>
-          <Box component="a" className={classes.control}>
-            <Group position="apart" spacing={0}>
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <ThemeIcon variant="light" size={30}>
-                  <Icon size={18} />
-                </ThemeIcon>
-                <Box ml="md">{label}</Box>
-              </Box>
-            </Group>
-          </Box>
-        </Link>
+        <Collapse in={opened}>
+          {links.map((link, index) => (
+            <Link href={link.link} passHref key={link.label + "_" + link.link}>
+              <Text component="a" className={classes.link} tabIndex={-1}>
+                {link.label}
+              </Text>
+            </Link>
+          ))}
+        </Collapse>
       </>
     );
   }
+  return (
+    <>
+      <Link href={link} passHref>
+        <Box component="a" className={classes.control}>
+          <Group position="apart" spacing={0}>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <ThemeIcon variant="light" size={30}>
+                <Icon size={18} />
+              </ThemeIcon>
+              <Box ml="md">{label}</Box>
+            </Box>
+          </Group>
+        </Box>
+      </Link>
+    </>
+  );
 }

@@ -6,16 +6,12 @@ import {
   Autocomplete,
   Group,
   Burger,
-  UnstyledButton,
-  Menu,
-  Avatar,
-  Text,
-  Divider,
 } from "@mantine/core";
 import { Search } from "tabler-icons-react";
 import { MantineLogo } from "@components/MantineLogo";
 import ThemeToggle from "@components/ThemeToggle";
-import UserMenu from "@components/UserButton/UserMenu";
+import HeaderUserButton from "@components/UserButton/HeaderUserButton";
+import { useSession, getSession } from "next-auth/react";
 
 import { useGlobalContext } from "@components/contexts/GlobalContext";
 
@@ -97,16 +93,12 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export default function CustomHeader({ links,toggler, ...props }) {
+export default function CustomHeader({ links, toggler, ...props }) {
   const [state, dispatch] = useGlobalContext();
   const { classes, theme, cx } = useStyles();
+  const { data: session, status } = useSession();
 
-  const user = {
-    name: "J",
-    email: "janspoon@fighter.dev",
-    image:
-      "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=255&q=80",
-  };
+  const user = session.user;
 
   const items = links.map((link) => (
     <Link key={link.label} href={link.link}>
@@ -118,31 +110,16 @@ export default function CustomHeader({ links,toggler, ...props }) {
     <Header {...props} className={classes.header}>
       <div className={classes.inner}>
         <Group>
-          {/* <MantineLogo /> */}
-        <div className="font-medium text-xl">MVB</div>
-          <ThemeToggle />
+          <div className="font-medium text-xl">MVB</div>
         </Group>
 
         <Group>
           <Group ml={50} spacing={5} className={classes.links}>
             {items}
           </Group>
-          <Autocomplete
-            className={classes.search}
-            placeholder="Search"
-            icon={<Search size={16} />}
-            data={[
-              "React",
-              "Angular",
-              "Vue",
-              "Next.js",
-              "Riot.js",
-              "Svelte",
-              "Blitz.js",
-            ]}
-          />
+          <ThemeToggle />
 
-          <UserMenu user={user}  />
+          <HeaderUserButton user={user} />
           <Burger
             opened={toggler.toggler}
             onClick={() => toggler.setToggler(!toggler.toggler)}
@@ -151,7 +128,6 @@ export default function CustomHeader({ links,toggler, ...props }) {
           />
         </Group>
       </div>
-      
     </Header>
   );
 }

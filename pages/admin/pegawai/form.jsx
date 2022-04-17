@@ -25,6 +25,7 @@ import { useNotifications } from "@mantine/notifications";
 import { Check, X, Refresh } from "tabler-icons-react";
 import { generateString } from "../../../helpers/functions";
 
+import { useSession, getSession } from "next-auth/react";
 function Form({ user, role, action }) {
   const form = useForm({
     initialValues: {
@@ -36,11 +37,19 @@ function Form({ user, role, action }) {
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
       roleId: (value) => (value == "" ? "Pilih Role" : null),
+      password: (v) =>
+        v == ""
+          ? "Masukkan Password"
+          : v.length < 8
+          ? "Password minimal 8 karakter"
+          : null,
     },
   });
   const notifications = useNotifications();
   const [loading, setLoading] = useState(true);
   const [disabled, setDisabled] = useState(false);
+
+  const { data: session, status } = useSession();
   const [select, setSelect] = useState("");
   const router = useRouter();
 
@@ -80,7 +89,7 @@ function Form({ user, role, action }) {
     });
   };
   return (
-    <Layout>
+    <Layout session={session}>
       <div className="loader" hidden={loading}>
         <Loader size="xl" variant="bars" color="orange" />;
       </div>
@@ -140,7 +149,7 @@ function Form({ user, role, action }) {
                           size="xs"
                           leftIcon={<Refresh size={15} />}
                           onClick={() => {
-                            const password = generateString(6);
+                            const password = generateString(8);
 
                             form.setFieldValue("password", password);
                           }}
@@ -210,6 +219,7 @@ export async function getServerSideProps(context) {
           user,
           role,
           action: "read",
+          session: await getSession(context),
         },
       };
     }
@@ -219,6 +229,7 @@ export async function getServerSideProps(context) {
         user,
         role,
         action: "",
+        session: await getSession(context),
       },
     };
   }
@@ -228,6 +239,7 @@ export async function getServerSideProps(context) {
       user: {},
       role,
       action: "",
+      session: await getSession(context),
     },
   };
 }

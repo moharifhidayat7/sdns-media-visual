@@ -11,9 +11,13 @@ import { useNotifications } from "@mantine/notifications";
 import dateFormat from "dateformat";
 import { Check, X } from "tabler-icons-react";
 
+import { useSession, getSession } from "next-auth/react";
+
 export default function Index({ user }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
+
+  const { data: session, status } = useSession();
   const getuserProp = () => {
     const data = user ? user : [];
     dispatch({ type: "set_data", payload: data });
@@ -83,7 +87,7 @@ export default function Index({ user }) {
     },
   ];
   return (
-    <Layout>
+    <Layout session={session}>
       <Head>
         <title style={{ textTransform: "capitalize" }}>Pegawai</title>
       </Head>
@@ -128,7 +132,7 @@ export default function Index({ user }) {
                     <Text>{row.email}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text>{row.role.nama}</Text>
+                    <Text>{row.role && row.role.nama}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text className="uppercase">
@@ -161,6 +165,7 @@ export async function getServerSideProps(context) {
   return {
     props: {
       user,
+      session: await getSession(context),
     },
   };
 }

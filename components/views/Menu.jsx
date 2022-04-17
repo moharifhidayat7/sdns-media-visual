@@ -12,7 +12,7 @@ import {
 } from "tabler-icons-react";
 
 const menu = [
-  { label: "Dashboard", icon: Gauge, link: "/" },
+  { label: "Dashboard", icon: Gauge, link: "/admin" },
   {
     label: "Master",
     icon: BuildingCottage,

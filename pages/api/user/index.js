@@ -1,4 +1,3 @@
-import { data } from "autoprefixer";
 import bcrypt from "bcrypt";
 import prisma from "lib/prisma";
 import { getSession } from "next-auth/react";
@@ -66,7 +65,6 @@ export default async function handler(req, res) {
         limit,
       });
     } catch (error) {
-      console.log(error);
       res.status(400).json({ err: "Error occured." });
     }
   }
@@ -93,7 +91,6 @@ export default async function handler(req, res) {
         user,
       });
     } catch (error) {
-      console.log(error);
       res.status(400).json({ err: "Error occured." });
     }
   }
