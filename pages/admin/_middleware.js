@@ -19,7 +19,7 @@ export async function middleware(req) {
       };
     });
 
-    const page = akses.filter((f) => url + f.path == req.url);
+    const page = akses.filter((f) => url + f.path == req.nextUrl);
 
     if (page.length == 0 || page[0].visible == false) {
       return NextResponse.redirect(url + "/403");
