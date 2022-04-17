@@ -7,7 +7,7 @@ import {
   Container,
   Group,
 } from "@mantine/core";
-
+import { useRouter } from "next/router";
 import Link from "next/link";
 
 const useStyles = createStyles((theme) => ({
@@ -53,7 +53,7 @@ const useStyles = createStyles((theme) => ({
 
 export default function Custom403() {
   const { classes } = useStyles();
-
+  const router = useRouter();
   return (
     <>
       <Head>
@@ -61,23 +61,24 @@ export default function Custom403() {
       </Head>
       <Container className={classes.root}>
         <div className={classes.label}>404</div>
-        <Title className={classes.title}>
-          Halaman yang anda tuju tidak ditemukan.
-        </Title>
+        <Title className={classes.title}>Halaman Tidak Ditemukan</Title>
         <Text
           color="dimmed"
           size="lg"
           align="center"
           className={classes.description}
         >
-          Halaman tidak ditemukan.
+          Halaman yang dituju tidak tersedia.
         </Text>
         <Group position="center">
-          <Link href="/" passHref>
-            <Button component="a" variant="subtle" size="md">
-              Kembali ke Halaman Utama
-            </Button>
-          </Link>
+          <Button
+            component="a"
+            variant="subtle"
+            size="md"
+            onClick={() => router.back()}
+          >
+            Kembali
+          </Button>
         </Group>
       </Container>
     </>
