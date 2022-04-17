@@ -3,5 +3,8 @@
   "editor.bracketPairColorization.enabled": true,
   "prettier.tabWidth": 2,
   "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  }
 }
