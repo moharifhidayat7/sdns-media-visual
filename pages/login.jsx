@@ -67,7 +67,7 @@ export default function Login() {
   const form = useForm({
     initialValues: {
       email: "admin@localhost",
-      password: "admin",
+      password: "12345678",
     },
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
