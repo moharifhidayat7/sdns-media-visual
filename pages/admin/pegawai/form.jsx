@@ -25,6 +25,7 @@ import { useNotifications } from "@mantine/notifications";
 import { Check, X, Refresh } from "tabler-icons-react";
 import { generateString } from "../../../helpers/functions";
 
+import { useSession, getSession } from "next-auth/react";
 function Form({ user, role, action }) {
   const form = useForm({
     initialValues: {
@@ -41,6 +42,8 @@ function Form({ user, role, action }) {
   const notifications = useNotifications();
   const [loading, setLoading] = useState(true);
   const [disabled, setDisabled] = useState(false);
+
+  const { data: session, status } = useSession();
   const [select, setSelect] = useState("");
   const router = useRouter();
 
@@ -80,7 +83,7 @@ function Form({ user, role, action }) {
     });
   };
   return (
-    <Layout>
+    <Layout session={session}>
       <div className="loader" hidden={loading}>
         <Loader size="xl" variant="bars" color="orange" />;
       </div>
@@ -210,6 +213,7 @@ export async function getServerSideProps(context) {
           user,
           role,
           action: "read",
+          session: await getSession(context),
         },
       };
     }
@@ -219,6 +223,7 @@ export async function getServerSideProps(context) {
         user,
         role,
         action: "",
+        session: await getSession(context),
       },
     };
   }
@@ -228,6 +233,7 @@ export async function getServerSideProps(context) {
       user: {},
       role,
       action: "",
+      session: await getSession(context),
     },
   };
 }

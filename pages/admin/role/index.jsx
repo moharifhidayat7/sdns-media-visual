@@ -18,6 +18,8 @@ export default function Index({ roles }) {
   const [row, setRow] = useState([]);
   const modals = useModals();
 
+  const { data: session, status } = useSession();
+
   const openAksesModal = (row) => {
     modals.openModal({
       title: row.nama,
@@ -126,7 +128,7 @@ export default function Index({ roles }) {
     dispatch({ type: "set_data", payload: roles });
   }, []);
   return (
-    <Layout>
+    <Layout session={session}>
       <Head>
         <title style={{ textTransform: "capitalize" }}>Role</title>
       </Head>

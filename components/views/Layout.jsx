@@ -1,8 +1,6 @@
 import CustomHeader from "./CustomHeader";
 import CustomNavbar from "./CustomNavbar";
 
-import { useSession, getSession } from "next-auth/react";
-
 import { AppShell, Container, Loader } from "@mantine/core";
 
 import {
@@ -22,10 +20,9 @@ import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useState } from "react";
 import { menu } from "./Menu";
 
-const Layout = ({ children }) => {
+const Layout = ({ children, session }) => {
   const [state, dispatch] = useGlobalContext();
   const [toggler, setToggler] = useState(false);
-  const { data: session, status } = useSession();
 
   const akses = session.user.role.akses.map((aks) => {
     if (aks.read == false && aks.write == false) {

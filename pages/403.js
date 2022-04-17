@@ -10,6 +10,7 @@ import {
 
 import Layout from "@components/views/Layout";
 
+import { useSession, getSession } from "next-auth/react";
 import Link from "next/link";
 
 const useStyles = createStyles((theme) => ({
@@ -54,10 +55,11 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export default function Custom403() {
+  const { data: session, status } = useSession();
   const { classes } = useStyles();
 
   return (
-    <Layout>
+    <Layout session={session}>
       <Head>
         <title>403 Forbidden</title>
       </Head>
@@ -85,3 +87,11 @@ export default function Custom403() {
     </Layout>
   );
 }
+
+export const getServerSideProps = async (ctx) => {
+  return {
+    props: {
+      session: await getSession(ctx),
+    },
+  };
+};

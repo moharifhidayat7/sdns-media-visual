@@ -8,7 +8,7 @@ export default function Home() {
   const { data: session } = useSession();
 
   return (
-    <Layout>
+    <Layout session={session}>
       <Head>
         <title>Dashboard</title>
       </Head>
