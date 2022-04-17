@@ -1,4 +1,5 @@
 import { createStyles } from "@mantine/core";
+import { NextLink } from "@mantine/next";
 import {
   Heart,
   Star,
@@ -35,11 +36,17 @@ const navStyles = createStyles((theme) => ({
 
 const menuItems = [
   { group: "Akun" },
-  { label: "Profil", icon: <Id size={15} />, link: "#" },
+  {
+    label: "Profil",
+    icon: <Id size={15} />,
+    component: NextLink,
+    href: "/admin/profil",
+  },
   {
     label: "Ganti Password",
     icon: <Key size={15} />,
-    link: "#",
+    component: NextLink,
+    href: "/admin/ganti-password",
   },
   { divider: true },
   {

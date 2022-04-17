@@ -40,7 +40,6 @@ export default async function handler(req, res) {
         user,
       });
     } catch (error) {
-      console.log(error);
       res.status(400).json({ err: "Error occured." });
     }
   }
@@ -65,7 +64,6 @@ export default async function handler(req, res) {
         user,
       });
     } catch (error) {
-      console.log(error);
       res.status(400).json({ err: "Error occured." });
     }
   }

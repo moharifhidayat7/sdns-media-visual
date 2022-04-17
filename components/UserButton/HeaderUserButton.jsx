@@ -8,6 +8,7 @@ import {
   createStyles,
   Avatar,
 } from "@mantine/core";
+
 import { ChevronDown } from "tabler-icons-react";
 
 import { menuItems } from "./Menu";
