@@ -12,7 +12,7 @@ async function main() {
             nama: "Default User",
             email: "admin@localhost",
             password:
-              "$2a$10$AXy4OrgOHI1x0yT1QMlDWeexFUNVoSebNEqcYYf47P/KY25vuubCW",
+              "$2a$10$Wml07l.ttismE1UOeOMvcuUW.w.K2tFVOVAbNpyWe3u8CgyT7hMzy", // 12345678
           },
         ],
       },
