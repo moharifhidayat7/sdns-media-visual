@@ -6,16 +6,11 @@ import {
   Autocomplete,
   Group,
   Burger,
-  UnstyledButton,
-  Menu,
-  Avatar,
-  Text,
-  Divider,
 } from "@mantine/core";
 import { Search } from "tabler-icons-react";
 import { MantineLogo } from "@components/MantineLogo";
 import ThemeToggle from "@components/ThemeToggle";
-import UserMenu from "@components/UserButton/UserMenu";
+import HeaderUserButton from "@components/UserButton/HeaderUserButton";
 import { useSession, getSession } from "next-auth/react";
 
 import { useGlobalContext } from "@components/contexts/GlobalContext";
@@ -139,7 +134,7 @@ export default function CustomHeader({ links, toggler, ...props }) {
             ]}
           />
 
-          <UserMenu user={user} />
+          <HeaderUserButton user={user} />
           <Burger
             opened={toggler.toggler}
             onClick={() => toggler.setToggler(!toggler.toggler)}

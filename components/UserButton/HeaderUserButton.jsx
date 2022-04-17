@@ -8,19 +8,9 @@ import {
   createStyles,
   Avatar,
 } from "@mantine/core";
-import {
-  ChevronDown,
-  Heart,
-  Star,
-  Message,
-  Settings,
-  SwitchHorizontal,
-  Logout,
-  PlayerPause,
-  Trash,
-} from "tabler-icons-react";
+import { ChevronDown } from "tabler-icons-react";
 
-import { signOut } from "next-auth/react";
+import { menuItems } from "./Menu";
 
 const menuStyles = createStyles((theme) => ({
   userMenu: {
@@ -72,29 +62,9 @@ const MenuControl = forwardRef(({ user, userMenuOpened, ...props }, ref) => {
 
 MenuControl.displayName = "MenuControl";
 
-const UserMenu = ({ user }) => {
+const HeaderUserButton = ({ user }) => {
   const { classes, theme, cx } = menuStyles();
   const [userMenuOpened, setUserMenuOpened] = useState(false);
-
-  const menuItems = [
-    { label: "Liked posts", icon: <Heart size={15} />, link: "#" },
-    { label: "Saved posts", icon: <Star size={15} />, link: "#" },
-    { group: "Settings" },
-    { label: "Account settings", icon: <Settings size={15} />, link: "#" },
-    {
-      label: "Change Account",
-      icon: <SwitchHorizontal size={15} />,
-      link: "#",
-    },
-    { divider: true },
-    {
-      color: "red",
-      label: "Logout",
-      icon: <Logout size={15} />,
-      onClick: () => signOut({ callbackUrl: "/login" }),
-      className: classes.itemLogout,
-    },
-  ];
 
   const menuElements = menuItems.map((item, index) => {
     if (item.divider) {
@@ -128,4 +98,4 @@ const UserMenu = ({ user }) => {
   );
 };
 
-export default UserMenu;
+export default HeaderUserButton;
