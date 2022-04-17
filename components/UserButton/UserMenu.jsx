@@ -20,6 +20,8 @@ import {
   Trash,
 } from "tabler-icons-react";
 
+import { signOut } from "next-auth/react";
+
 const menuStyles = createStyles((theme) => ({
   userMenu: {
     [theme.fn.smallerThan("sm")]: {
@@ -89,7 +91,7 @@ const UserMenu = ({ user }) => {
       color: "red",
       label: "Logout",
       icon: <Logout size={15} />,
-      link: "#",
+      onClick: () => signOut({ callbackUrl: "/login" }),
       className: classes.itemLogout,
     },
   ];
@@ -122,32 +124,6 @@ const UserMenu = ({ user }) => {
       control={<MenuControl user={user} userMenuOpened={userMenuOpened} />}
     >
       {menuElements}
-      {/* <Menu.Item icon={<Heart size={14} color={theme.colors.red[6]} />}>
-          Liked posts
-        </Menu.Item>
-        <Menu.Item icon={<Star size={14} color={theme.colors.yellow[6]} />}>
-          Saved posts
-        </Menu.Item>
-        <Menu.Item icon={<Message size={14} color={theme.colors.blue[6]} />}>
-          Your comments
-        </Menu.Item>
-
-        <Menu.Label>Settings</Menu.Label>
-        <Menu.Item icon={<Settings size={14} />}>Account settings</Menu.Item>
-        <Menu.Item icon={<SwitchHorizontal size={14} />}>
-          Change account
-        </Menu.Item>
-        <Menu.Item icon={<Logout size={14} />}>Logout</Menu.Item>
-
-        <Divider />
-
-        <Menu.Label>Danger zone</Menu.Label>
-        <Menu.Item icon={<PlayerPause size={14} />}>
-          Pause subscription
-        </Menu.Item>
-        <Menu.Item color="red" icon={<Trash size={14} />}>
-          Delete account
-        </Menu.Item> */}
     </Menu>
   );
 };

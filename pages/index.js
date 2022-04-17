@@ -1,18 +1,16 @@
 import Head from "next/head";
 import { Title, Box, Button } from "@mantine/core";
-
+import Link from "next/link";
 import Layout from "@components/views/Layout";
 
-import { useSession, getSession } from "next-auth/react";
 export default function Home() {
-  const { data: session, status } = useSession();
   return (
-    <Layout session={session}>
+    <>
       <Head>
-        <title>Dashboard</title>
+        <title>Homepage</title>
       </Head>
       <Title order={1} style={{ marginBottom: "1.5rem" }}>
-        Dashboard
+        Homepage
       </Title>
       <Box
         sx={(theme) => ({
@@ -27,16 +25,10 @@ export default function Home() {
               : theme.colors.gray[4],
         })}
       >
-        <Button>My compact button</Button>
+        <Link href="/login" passHref>
+          <Button component="a">Login</Button>
+        </Link>
       </Box>
-    </Layout>
+    </>
   );
 }
-
-export const getServerSideProps = async (ctx) => {
-  return {
-    props: {
-      session: await getSession(ctx),
-    },
-  };
-};
