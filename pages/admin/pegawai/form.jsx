@@ -37,6 +37,12 @@ function Form({ user, role, action }) {
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
       roleId: (value) => (value == "" ? "Pilih Role" : null),
+      password: (v) =>
+        v == ""
+          ? "Masukkan Password"
+          : v.length < 8
+          ? "Password minimal 8 karakter"
+          : null,
     },
   });
   const notifications = useNotifications();
@@ -143,7 +149,7 @@ function Form({ user, role, action }) {
                           size="xs"
                           leftIcon={<Refresh size={15} />}
                           onClick={() => {
-                            const password = generateString(6);
+                            const password = generateString(8);
 
                             form.setFieldValue("password", password);
                           }}
