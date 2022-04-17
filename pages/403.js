@@ -65,16 +65,14 @@ export default function Custom403() {
       </Head>
       <Container className={classes.root}>
         <div className={classes.label}>403</div>
-        <Title className={classes.title}>
-          Anda tidak memiliki akses ke halaman ini.
-        </Title>
+        <Title className={classes.title}>Halaman Terproteksi</Title>
         <Text
           color="dimmed"
           size="lg"
           align="center"
           className={classes.description}
         >
-          Halaman terproteksi.
+          Anda tidak memiliki akses ke halaman ini.
         </Text>
         <Group position="center">
           <Link href="/admin" passHref>
