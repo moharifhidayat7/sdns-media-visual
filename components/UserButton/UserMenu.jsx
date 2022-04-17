@@ -58,9 +58,9 @@ const MenuControl = forwardRef(({ user, userMenuOpened, ...props }, ref) => {
       {...props}
     >
       <Group spacing={7}>
-        <Avatar src={user.image} alt={user.name} radius="xl" size={20} />
+        <Avatar alt={user.email} radius="xl" size={20} />
         <Text weight={500} size="sm" sx={{ lineHeight: 1 }} mr={3}>
-          {user.name}
+          {user.nama}
         </Text>
         <ChevronDown size={12} />
       </Group>

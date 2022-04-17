@@ -9,8 +9,8 @@ async function main() {
       user: {
         create: [
           {
+            nama: "Default User",
             email: "admin@localhost",
-            username: "admin",
             password:
               "$2a$10$AXy4OrgOHI1x0yT1QMlDWeexFUNVoSebNEqcYYf47P/KY25vuubCW",
           },
