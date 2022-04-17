@@ -5,6 +5,8 @@ export function inputNumberOnly(e) {
     e.target.value = e.target.value.replace(/[^0-9]/g, "");
   }
 }
+
+
 // generate code with prefix 0000 and params value
 export function generateCode(prefix, value) {
   let code = prefix + "";
