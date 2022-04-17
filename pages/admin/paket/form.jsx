@@ -120,7 +120,6 @@ function Form({ data, action, produk, fitur }) {
   }, []);
   const submitHandler = async (e) => {
     e.preventDefault();
-
     if (form.validate().hasErrors) return false;
     setLoading(false);
     const FORMDATA = form.values;

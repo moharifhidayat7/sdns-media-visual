@@ -79,10 +79,11 @@ model User {
 
 model FakturStokMasuk {
   id             Int                   @id @default(autoincrement())
-  faktur         String                @unique
+  faktur         String?
+  keterangan     String? @db.Text
   nomortransaksi String                @unique
   tanggalinput   DateTime              @default(now())
-  status         Status                @default(INACTIVE)
+  status         Status                @default(ACTIVE)
   createdAt      DateTime              @default(now())
   updatedAt      DateTime              @updatedAt
   deletedAt      DateTime?
@@ -98,6 +99,8 @@ model FakturStokMasuk {
 
 model FakturStokMasukItem {
   id                Int              @id @default(autoincrement())
+  harga String?
+  
   FakturStokMasuk   FakturStokMasuk? @relation(fields: [fakturStokMasukId], references: [id], name: "fakturstokmasukitems")
   Inventori         Inventori?       @relation(fields: [inventoriId], references: [id], name: "fakturinventori")
   inventoriId       Int?

@@ -2,6 +2,7 @@ import {
   Title,
   Box,
   Grid,
+  Input,
   Group,
   Button,
   TextInput,
@@ -11,20 +12,23 @@ import {
   Textarea,
   Modal,
 } from "@mantine/core";
+
 import { DatePicker } from '@mantine/dates';
 import Head from "next/head";
 import Layout from "@components/views/Layout";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useForm } from "@mantine/form";
-import { generateCode, getTitle, inputNumberOnly } from "helpers/functions";
+import { generateCode, inputNumberOnly, ucFirst } from "helpers/functions";
 import { useNotifications } from "@mantine/notifications";
-import { Check, Edit, EditCircle, Trash, X } from "tabler-icons-react";
-function Form({ suppliers, gudangs, inventories }) {
+import { Check, Trash, X } from "tabler-icons-react";
+
+function Form({ suppliers, gudangs, inventories, stokmasuk }) {
   const form = useForm({
-    initialValues: { faktur: "", supplierId: "", tanggalinput: "", nomorinput: "" },
+    initialValues: { faktur: "", supplierId: "", tanggalinput: new Date(), nomortransaksi: 0, keterangan: "" },
     validate: {
-      nama: (value) => (value.length < 1 ? "Plese input nama." : null),
+      tanggalinput: (value) => (value.length < 1 ? "Plese input tanggal." : null),
+      supplierId: (value) => (value.length < 1 ? "Plese input supplier." : null),
     },
   });
   const notifications = useNotifications();
@@ -37,13 +41,11 @@ function Form({ suppliers, gudangs, inventories }) {
   useEffect(() => {
     if (suppliers.result) {
       setDataSupplier(suppliers.result.map((item) => {
-        return { value: item.id, label: item.nama }
+        return { value: `${item.id.toString()}`, label: item.nama }
       }))
     }
-
-    form.setValues({
-      nomorinput: "00001"
-    })
+    const kode = stokmasuk.result[0] ? stokmasuk.result[0].id : 0
+    form.setFieldValue('nomortransaksi', generateCode("", parseInt(kode) + 1))
   }, []);
   const handleItem = (e) => {
     const newItems = items.filter((x) => x.id === e.id)
@@ -59,49 +61,79 @@ function Form({ suppliers, gudangs, inventories }) {
       });
       return false
     }
-    setItems([...items, { ...e }])
+    setItems([...items, e])
   }
   const submitHandler = async (e) => {
     e.preventDefault();
     if (form.validate().hasErrors) return false;
-    setLoading(false);
-    const data = form.values;
-    const method = action === "edit" ? "PUT" : "POST";
-    const url = `/api/fakturin`;
-    const notifTitle = action.charAt(0).toUpperCase() + action.slice(1);
-    await fetch(url, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ ...data, updatedId: 1, createdId: 1 }),
-    }).then((res) => {
-      if (res.status === 200) {
-        notifications.showNotification({
-          disallowClose: true,
-          autoClose: 5000,
-          title: notifTitle,
-          message: `${notifTitle} data berhasil`,
-          color: "green",
-          icon: <Check />,
-          loading: false,
-        });
-        router.push({
-          pathname: "/admin/gudang",
-        });
-      } else {
-        setLoading(true);
-        notifications.showNotification({
-          disallowClose: true,
-          autoClose: 5000,
-          title: notifTitle,
-          message: `${notifTitle} data gagal`,
-          color: "red",
-          icon: <X />,
-          loading: false,
-        });
-      }
-    });
+    if (items.length < 1) {
+      notifications.showNotification({
+        disallowClose: true,
+        autoClose: 5000,
+        title: "Gagal",
+        message: `Item tidak boleh kosong`,
+        color: "red",
+        icon: <X />,
+        loading: false,
+      });
+      return false
+    }
+
+    //add faktur stok masuk
+    const postStokMasuk = await fetch("/api/stokmasuk", { method: "POST", body: JSON.stringify({ ...form.values, supplierId: parseInt(form.values.supplierId) }), headers: { 'Content-Type': 'application/json' } })
+    console.log(items)
+    if (postStokMasuk.status != 200) {
+      notifications.showNotification({
+        disallowClose: true,
+        autoClose: 5000,
+        title: "Gagal",
+        message: `${postStokMasuk.statusText}`,
+        color: "red",
+        icon: <X />,
+        loading: false,
+      });
+      return false
+    }
+    //add faktur stok masuk items
+
+    // setLoading(false);
+    // const data = form.values;
+    // const method = action === "edit" ? "PUT" : "POST";
+    // const url = `/api/fakturin`;
+    // const notifTitle = action.charAt(0).toUpperCase() + action.slice(1);
+    // await fetch(url, {
+    //   method,
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({ ...data, updatedId: 1, createdId: 1 }),
+    // }).then((res) => {
+    //   if (res.status === 200) {
+    //     notifications.showNotification({
+    //       disallowClose: true,
+    //       autoClose: 5000,
+    //       title: notifTitle,
+    //       message: `${notifTitle} data berhasil`,
+    //       color: "green",
+    //       icon: <Check />,
+    //       loading: false,
+    //     });
+    //     router.push({
+    //       pathname: "/admin/gudang",
+    //     });
+    //   } else {
+    //     setLoading(true);
+    //     notifications.showNotification({
+    //       disallowClose: true,
+    //       autoClose: 5000,
+    //       title: notifTitle,
+    //       message: `${notifTitle} data gagal`,
+    //       color: "red",
+    //       icon: <X />,
+    //       loading: false,
+    //     });
+    //   }
+    // });
   };
   return (
     <Layout>
@@ -137,7 +169,7 @@ function Form({ suppliers, gudangs, inventories }) {
                   name="nomortransaksi"
                   readOnly
                   required
-                  value={form.values.nomorinput}
+                  value={form.values.nomortransaksi}
                 />
                 <Select
                   required
@@ -148,48 +180,53 @@ function Form({ suppliers, gudangs, inventories }) {
                   placeholder="Select items"
                   nothingFound="Nothing found"
                   searchable
+                  value={form.values.supplierId}
                   disabled={disabled}
                 />
                 <Button onClick={() => setModal(true)} type="button">ITEM</Button>
-                <div className="overflow-x-auto">
-                  <table className="table-bordered w-full">
-                    <thead className="text-blue-600 uppercase">
-                      <tr>
-                        <th>INVENTORI</th>
-                        {gudangs.result && gudangs.result.map((item) => {
-                          return <th colSpan={2} key={item.id}>{item.nama}</th>
-                        })}
-                        <th>STOK FINAL</th>
-                        <th>hapus</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {items.length > 0 ? items.map((item) => {
-                        return (
-                          <Items key={item.id} items={item} gudangs={gudangs} />)
-                      }) :
-                        <tr><td colSpan={5 + gudangs.total} className="text-center">Belum ada item yang dipilih.</td></tr>
-                      }
-                    </tbody>
-                  </table>
-                </div>
+
               </Group>
             </Grid.Col>
             <Grid.Col sm={12} md={6}>
               <Group direction="column" grow spacing="lg">
                 <TextInput
                   label="Faktur"
-                  disabled={disabled}
+                  {...form.getInputProps("faktur")}
                   name="faktur"
+                  onChange={(e) => form.setFieldValue("faktur", e)}
                   value={form.values.faktur}
                 />
-                <DatePicker allowFreeInput placeholder="Pick date" label="Tanggal Input" required value={new Date()} />
+                <DatePicker allowFreeInput placeholder="Pick date" label="Tanggal Input" onChange={(e) => form.setFieldValue("tanggalinput", e)} required value={form.values.tanggalinput} />
               </Group>
             </Grid.Col>
           </Grid>
-          <Textarea placeholder="Tuliskan sesuatu untuk stok masuk ini (opsional)." className="mt-4">
+          <div className="overflow-x-auto mt-5">
+            <table className="table-bordered w-full">
+              <thead className="text-blue-600 uppercase">
+                <tr>
+                  <th>INVENTORI</th>
+                  {gudangs.result && gudangs.result.map((item) => {
+                    return <th colSpan={2} key={item.id}>{item.nama}</th>
+                  })}
+                  <th>harga beli</th>
+                  <th>STOK FINAL</th>
+                  <th>hapus</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.length > 0 ? items.map((item) => {
+                  return (
+                    <Items key={item.id} items={item} set={{ items, setItems }} gudangs={gudangs} deleteItems={(e) => setItems([...items.filter((x) => x.id != e)])} />)
+                }) :
+                  <tr><td colSpan={4 + (gudangs.total * 2)} className="text-center">Belum ada item yang dipilih.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <Textarea placeholder="Tuliskan sesuatu untuk stok masuk ini (opsional)." className="mt-4" name="keterangan" onChange={(e) => form.setFieldValue("keterangan", e.target.value)} value={form.values.keterangan}>
 
           </Textarea>
+
           <div className="space-x-2 mt-10">
             <Button type="button" onClick={() => router.back()} color="red">
               Back
@@ -236,7 +273,7 @@ const ViewModal = ({ modal, inventories, handleItem }) => {
           onChange={(e) => form.setFieldValue("inventori", e)}
           required
           data={inventories.map((item) => {
-            return { value: `${item.id.toString()}`, label: `${item.kode} - ${item.nama}` }
+            return { value: `${item.id.toString()}`, label: `${item.kode} - ${item.nama.toUpperCase()}` }
           })}
           placeholder="Select items"
           nothingFound="Nothing found"
@@ -248,46 +285,92 @@ const ViewModal = ({ modal, inventories, handleItem }) => {
     </Modal>
   );
 }
-export const Items = ({ items, gudangs }) => {
+export const Items = ({ items, gudangs, deleteItems = () => { }, set }) => {
+  const handleChange = (e, gudang) => {
+    const value = e.target.value || items.stok
+    const name= e.target.name
+    if(name!="qty"){
+      set.setItems([...set.items.map((x)=>{
+        if(x.id==items.id){
+          return {...x, hargabaru:value}
+        }
+        return x
+      })])
+      return false;
+    }
+    const changeQty = set.items.filter((e) => {
+      if (e.id == items.id) {
+        if (!e['gudang']) {
+          e["gudang"]=[{
+            id: gudang,qty:value
+          }]
+          return e
+        }
+        const hasGudang = e["gudang"].filter((x) => {
+          if (x.id == gudang) {
+            return x
+          }
+        });
+        if (hasGudang.length < 1) {
+          name=value
+          e["gudang"].push({
+            id: gudang,
+            qty:value
+          })
+       
+        } else {
+          hasGudang[0].qty = value
+        }
+        return e
+      }
+    })
+    console.log(changeQty)
+  }
+
+
   return (
     <tr>
-      <td >
-        {items.nama}
+      <td className="capitalize">
+        {items.kode} -  {items.nama.toUpperCase()} {items.tipe.toUpperCase()}
       </td>
+
       {gudangs.result && gudangs.result.map((item) => {
-        return (
-          <>
-            <td key={item.id} className="w-12 text-center">
-              {items.stok}
-            </td>
-            <td className="flex justify-center">
-              <input type="text" onInput={(e) => inputNumberOnly(e)} className="input-border-none bg-gray-100 w-20 p-2 rounded-sm" placeholder="qty" />
-            </td>
-          </>)
+
+        return [
+          <td key={item.id} style={{ minWidth: "50px", textAlign: "center" }}>
+            {items.stok}
+          </td>,
+          <td key={`s${item.id}`} className="text-center" style={{ minWidth: "100px" }}>
+            <Input type="text" name="qty" onInput={(e) => inputNumberOnly(e)} placeholder="0" size="xs" rightSection={<div className="text-gray-400 text-right w-full pr-1 overflow-hidden">{items.satuan.toUpperCase()}</div>} onChange={(e) => handleChange(e, item.id)} />
+          </td>
+        ]
       })}
       <td className="text-center">
-        {items.stok}
+        <Input type="text" name="newharga" onInput={(e) => inputNumberOnly(e)} onChange={(e) => handleChange(e)} size="xs" icon="Rp" rightSectionWidth="60px" placeholder={items.harga_beli} />
+      </td>
+      <td className="text-center">
+        {items.stok_final}
       </td>
 
       <td>
-        <div className=" flex justify-center"> <ActionIcon variant="filled" color="red"> <Trash /> </ActionIcon></div>
+        <div className=" flex justify-center"> <ActionIcon variant="filled" color="red" onClick={() => deleteItems(items.id)}> <Trash /> </ActionIcon></div>
       </td>
     </tr>
   )
 }
-export async function getServerSideProps(context) {
+export const getServerSideProps = async (context) => {
   const header = {
     headers: {
       Cookie: context.req.headers.cookie,
     },
   };
-
+  const stokmasuk = await fetch(`${process.env.API_URL}/api/stokmasuk`, header).then((res) => res.json());
   const suppliers = await fetch(`${process.env.API_URL}/api/supplier`, header).then(res => res.json());
   const gudangs = await fetch(`${process.env.API_URL}/api/gudang`, header).then(res => res.json());
   const inventories = await fetch(`${process.env.API_URL}/api/inventori`, header).then(res => res.json());
   return {
     props: {
-      suppliers, gudangs, inventories,
+      suppliers, gudangs, inventories, stokmasuk: stokmasuk
     }
   }
 }
