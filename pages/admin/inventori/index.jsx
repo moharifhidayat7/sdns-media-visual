@@ -10,9 +10,12 @@ import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useNotifications } from "@mantine/notifications";
 import dateFormat from "dateformat";
 import { Check, H3, X } from "tabler-icons-react";
+import { useSession, getSession } from "next-auth/react";
 export default function Index({ inventori }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
+
+  const { data: session, status } = useSession();
   const [modalStokLog, setModalStokLog] = useState({
     opened: false,
     data: [],
@@ -100,7 +103,7 @@ export default function Index({ inventori }) {
   ];
 
   return (
-    <Layout>
+    <Layout session={session}>
       <Head>
         <title style={{ textTransform: "capitalize" }}>Master Inventori </title>
       </Head>
@@ -249,6 +252,7 @@ export async function getServerSideProps(context) {
   return {
     props: {
       inventori,
+      session: await getSession(context),
     },
   };
 }

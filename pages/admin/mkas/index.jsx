@@ -8,12 +8,15 @@ import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useNotifications } from "@mantine/notifications";
 import dateFormat from "dateformat";
 import { Check, X, CircleCheck } from "tabler-icons-react";
-import { getSession } from "next-auth/react";
+import { useSession, getSession } from "next-auth/react";
+
 const URL = "/api/mkas";
 const NAMEPAGE = "Kas";
-export default function Index({ mkas, userSession }) {
+export default function Index({ mkas }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
+
+  const { data: session, status } = useSession();
   useEffect(() => {
     dispatch({ type: "set_data", payload: mkas });
   }, []);
@@ -82,7 +85,7 @@ export default function Index({ mkas, userSession }) {
     },
   ];
   return (
-    <Layout>
+    <Layout session={session}>
       <Head>
         <title style={{ textTransform: "capitalize" }}>
           Master {NAMEPAGE}{" "}
@@ -169,11 +172,10 @@ export async function getServerSideProps(context) {
   const session = await getSession(context);
   const res = await fetch(`${process.env.API_URL}/api/mkas`, OPTION);
   const mkas = await res.json();
-  const userSession = session.user;
   return {
     props: {
       mkas,
-      userSession,
+      session,
     },
   };
 }

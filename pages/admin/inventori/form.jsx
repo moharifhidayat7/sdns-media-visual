@@ -20,6 +20,7 @@ import { useForm } from "@mantine/form";
 import { generateCode, getTitle, inputNumberOnly } from "helpers/functions";
 import { useNotifications } from "@mantine/notifications";
 import { Check, X } from "tabler-icons-react";
+import { useSession, getSession } from "next-auth/react";
 function Form({ inventori, action }) {
   const form = useForm({
     initialValues: {
@@ -44,6 +45,8 @@ function Form({ inventori, action }) {
   const notifications = useNotifications();
   const [loading, setLoading] = useState(true);
   const [disabled, setDisabled] = useState(false);
+
+  const { data: session, status } = useSession();
   const router = useRouter();
   useEffect(() => {
     if (action != "add") {
@@ -118,7 +121,7 @@ function Form({ inventori, action }) {
     });
   };
   return (
-    <Layout>
+    <Layout session={session}>
       <div className="loader" hidden={loading}>
         <Loader size="xl" variant="bars" color="orange" />;
       </div>
@@ -184,7 +187,7 @@ function Form({ inventori, action }) {
                       {...form.getInputProps("satuan")}
                       onChange={(e) => form.setFieldValue("satuan", e)}
                       value={form.values.satuan}
-                      data={["Meter", "Kg", "Litre", "Box", "Pcs","Unit"]}
+                      data={["Meter", "Kg", "Litre", "Box", "Pcs", "Unit"]}
                       placeholder="Select items"
                       nothingFound="Nothing found"
                       searchable
@@ -291,6 +294,7 @@ export async function getServerSideProps(context) {
     props: {
       action,
       inventori,
+      session: await getSession(context),
     },
   };
 }
