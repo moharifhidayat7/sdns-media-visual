@@ -23,14 +23,25 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
+const Links = ({ menu }) => {
+  return (
+    <>
+      {menu.map((item, index) => (
+        <LinksGroup {...item} key={item.label} />
+      ))}
+    </>
+  );
+};
+
 const CustomNavbar = ({ menu, ...props }) => {
   const { classes } = useStyles();
-  const links = menu.map((item) => <LinksGroup {...item} key={item.label} />);
 
   return (
     <Navbar {...props} className={classes.navbar}>
       <Navbar.Section grow className={classes.links} component={ScrollArea}>
-        <div className={classes.linksInner}>{links}</div>
+        <div className={classes.linksInner}>
+          <Links menu={menu} />
+        </div>
       </Navbar.Section>
 
       <Navbar.Section className={classes.footer}>
