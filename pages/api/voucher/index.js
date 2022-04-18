@@ -74,7 +74,7 @@ export default async function handler(req, res) {
         { length: parseInt(req.body.jumlah) },
         () => ({
           kode: nanoid(),
-          expiredAt: req.body.expiredAt,
+          expiredAt: req.body.expiredAt || null,
           perpanjangan: req.body.perpanjangan,
           createdId: session.user ? session.user.id : null,
         })
