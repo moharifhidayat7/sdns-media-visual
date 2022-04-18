@@ -22,7 +22,7 @@ import { useForm } from "@mantine/form";
 import { generateCode, inputNumberOnly, ucFirst } from "helpers/functions";
 import { useNotifications } from "@mantine/notifications";
 import { Check, Trash, X } from "tabler-icons-react";
-import { getSession,useSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 
 function Form({ suppliers, gudangs, inventories, stokmasuk }) {
   const { data: session, status } = useSession();
@@ -73,7 +73,7 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
       });
       return false;
     }
-    setItems([...items, e]);
+    setItems([...items, { ...e, gudang: [] }]);
   };
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -90,7 +90,7 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
       });
       return false;
     }
-
+    console.log(items)
     //add faktur stok masuk
     const postStokMasuk = await fetch("/api/stokmasuk", {
       method: "POST",
@@ -112,8 +112,45 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
       });
       return false;
     }
-    //add faktur stok masuk items
 
+    //add faktur stok masuk items
+    const postStokMasukResult = await postStokMasuk.json();
+    const dataItems = [];
+    items.map((item, k) => {
+      item.gudang.map((gd) => {
+        dataItems.push({
+          fakturStokMasukId: postStokMasukResult.FakturStokMasuk.id,
+          gudangId: gd.id,
+          inventoriId: item.id,
+          stok: gd.qty,
+          harga: item.hargabaru ? item.hargabaru.toString() : item.harga_beli.toString(),
+        })
+      })
+    })
+    const postStokMasukItems = await fetch("/api/stokmasukitem", {
+      method: "POST",
+      body: JSON.stringify(dataItems),
+      headers: { "Content-Type": "application/json" },
+    });
+    if (postStokMasukItems.status != 200) {
+      notifications.showNotification({
+        disallowClose: true,
+        autoClose: 5000,
+        title: "Gagal",
+        message: `${postStokMasuk.statusText}`,
+        color: "red",
+        icon: <X />,
+        loading: false,
+      });
+      return false;
+    }
+    const postLogStok = await fetch("/api/logstok", {
+      method: "POST",
+      body: JSON.stringify(dataItems),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
     // setLoading(false);
     // const data = form.values;
     // const method = action === "edit" ? "PUT" : "POST";
@@ -299,7 +336,7 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
   );
 }
 const ViewModal = ({ modal, inventories, handleItem }) => {
-  
+
   const form = useForm({
     initialValues: { inventori: "" },
     validate: {
@@ -354,7 +391,7 @@ const ViewModal = ({ modal, inventories, handleItem }) => {
     </Modal>
   );
 };
-export const Items = ({ items, gudangs, deleteItems = () => {}, set }) => {
+export const Items = ({ items, gudangs, deleteItems = () => { }, set }) => {
   const handleChange = (e, gudang) => {
     const value = e.target.value || items.stok;
     const name = e.target.name;
@@ -369,7 +406,7 @@ export const Items = ({ items, gudangs, deleteItems = () => {}, set }) => {
       ]);
       return false;
     }
-    const changeQty = set.items.filter((e) => {
+    set.items.filter((e) => {
       if (e.id == items.id) {
         if (!e["gudang"]) {
           e["gudang"] = [
@@ -394,10 +431,22 @@ export const Items = ({ items, gudangs, deleteItems = () => {}, set }) => {
         } else {
           hasGudang[0].qty = value;
         }
+
+        const stokfinal = items.gudang.length > 1 ? items.gudang.reduce((y, x) => {
+          return parseInt(y.qty) + parseInt(x.qty);
+        }) : value;
+        // items.stokfinal=stokfinal
+        set.setItems(set.items.filter((x) => {
+          if (x.id == items.id) {
+            x.stokfinal = stokfinal
+            return x
+          }
+          return x
+        }));
         return e;
       }
     });
-    console.log(changeQty);
+
   };
 
   return (
@@ -445,18 +494,18 @@ export const Items = ({ items, gudangs, deleteItems = () => {}, set }) => {
           placeholder={items.harga_beli}
         />
       </td>
-      <td className="text-center">{items.stok_final}</td>
+      <td className="text-center">{items.stokfinal}</td>
 
       <td>
         <div className=" flex justify-center">
-          {" "}
+
           <ActionIcon
             variant="filled"
             color="red"
             onClick={() => deleteItems(items.id)}
           >
-            {" "}
-            <Trash />{" "}
+
+            <Trash />
           </ActionIcon>
         </div>
       </td>
@@ -480,7 +529,7 @@ export const getServerSideProps = async (context) => {
   const gudangs = await fetch(`${process.env.API_URL}/api/gudang`, header).then(
     (res) => res.json()
   );
-  const session=await getSession(context)
+  const session = await getSession(context)
   const inventories = await fetch(
     `${process.env.API_URL}/api/inventori`,
     header

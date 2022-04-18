@@ -34,3 +34,5 @@ yarn-error.log*
 # vercel
 .vercel
 .env
+.vscode/launch.json
+.vscode/settings.json
