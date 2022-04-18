@@ -78,6 +78,7 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
   const submitHandler = async (e) => {
     e.preventDefault();
     if (form.validate().hasErrors) return false;
+    setLoading(false);
     if (items.length < 1) {
       notifications.showNotification({
         disallowClose: true,
@@ -88,9 +89,9 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
         icon: <X />,
         loading: false,
       });
+      setLoading(true);
       return false;
     }
-    console.log(items)
     //add faktur stok masuk
     const postStokMasuk = await fetch("/api/stokmasuk", {
       method: "POST",
@@ -110,6 +111,7 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
         icon: <X />,
         loading: false,
       });
+      setLoading(true);
       return false;
     }
 
@@ -133,6 +135,13 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
       headers: { "Content-Type": "application/json" },
     });
     if (postStokMasukItems.status != 200) {
+      await fetch("/api/stokmasuk/" + postStokMasukResult.FakturStokMasuk.id, {
+        method: "DELETE",
+        body: JSON.stringify({
+          id: postStokMasukResult.FakturStokMasuk.id,
+        }),
+        headers: { "Content-Type": "application/json" },
+      });
       notifications.showNotification({
         disallowClose: true,
         autoClose: 5000,
@@ -142,6 +151,7 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
         icon: <X />,
         loading: false,
       });
+      setLoading(true);
       return false;
     }
     const postLogStok = await fetch("/api/logstok", {
@@ -151,44 +161,31 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
         "Content-Type": "application/json"
       }
     })
-    // setLoading(false);
-    // const data = form.values;
-    // const method = action === "edit" ? "PUT" : "POST";
-    // const url = `/api/fakturin`;
-    // const notifTitle = action.charAt(0).toUpperCase() + action.slice(1);
-    // await fetch(url, {
-    //   method,
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({ ...data, updatedId: 1, createdId: 1 }),
-    // }).then((res) => {
-    //   if (res.status === 200) {
-    //     notifications.showNotification({
-    //       disallowClose: true,
-    //       autoClose: 5000,
-    //       title: notifTitle,
-    //       message: `${notifTitle} data berhasil`,
-    //       color: "green",
-    //       icon: <Check />,
-    //       loading: false,
-    //     });
-    //     router.push({
-    //       pathname: "/admin/gudang",
-    //     });
-    //   } else {
-    //     setLoading(true);
-    //     notifications.showNotification({
-    //       disallowClose: true,
-    //       autoClose: 5000,
-    //       title: notifTitle,
-    //       message: `${notifTitle} data gagal`,
-    //       color: "red",
-    //       icon: <X />,
-    //       loading: false,
-    //     });
-    //   }
-    // });
+    if (postLogStok.status != 200) {
+      setLoading(true);
+      notifications.showNotification({
+        disallowClose: true,
+        autoClose: 5000,
+        title: "Gagal",
+        message: `${postLogStok.statusText}`,
+        color: "red",
+        icon: <X />,
+        loading: false,
+      });
+      return false
+    }
+    notifications.showNotification({
+      disallowClose: true,
+      autoClose: 5000,
+      title: "Berhasil",
+      message: `Berhasil menambahkan data`,
+      color: "green",
+      icon: <Check />,
+      loading: false,
+    });
+    router.push({
+      pathname: "/admin/faktur-stok-masuk",
+    });
   };
   return (
     <Layout session={session}>
@@ -243,9 +240,7 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
                   value={form.values.supplierId}
                   disabled={disabled}
                 />
-                <Button onClick={() => setModal(true)} type="button">
-                  ITEM
-                </Button>
+
               </Group>
             </Grid.Col>
             <Grid.Col sm={12} md={6}>
@@ -254,7 +249,7 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
                   label="Faktur"
                   {...form.getInputProps("faktur")}
                   name="faktur"
-                  onChange={(e) => form.setFieldValue("faktur", e)}
+                  onChange={(e) => form.setFieldValue("faktur", e.target.value)}
                   value={form.values.faktur}
                 />
                 <DatePicker
@@ -267,7 +262,16 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
                 />
               </Group>
             </Grid.Col>
+            <Grid.Col sm={12} md={6}>
+              <Group direction="column" grow spacing="lg">
+                <Button onClick={() => setModal(true)} type="button">
+                  ITEM
+                </Button>
+              </Group>
+            </Grid.Col>
           </Grid>
+
+
           <div className="overflow-x-auto mt-5">
             <table className="table-bordered w-full">
               <thead className="text-blue-600 uppercase">

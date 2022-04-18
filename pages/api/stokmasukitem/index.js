@@ -4,16 +4,17 @@ import { getSession } from "next-auth/react";
 //prisma create produk
 export default async (req, res) => {
   const data = req.body;
-  const session = getSession({ req });
+  const session =await getSession({ req });
   if (req.method == "POST") {
     try {
       const FakturStokMasukItem = await prisma.FakturStokMasukItem.createMany({
-        data: [...data],
+        data: [...data.map((item) => ({ ...item,    createdId: session.user.id||null,
+          updatedId: session.user.id||null}))],
       });
       res.statusCode = 200;
       res.json({
         message: "Add data success",
-       data: FakturStokMasukItem,
+        data: FakturStokMasukItem,
       });
     } catch (error) {
       res.statusCode = 400;

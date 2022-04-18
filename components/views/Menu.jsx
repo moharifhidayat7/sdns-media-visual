@@ -60,7 +60,7 @@ const menu = [
     label: "Transaksi",
     icon: Receipt2,
     links: [
-      { label: "Inventori Stok Masuk", link: "/admin/fakturin/form" },
+      { label: "Inventori Stok Masuk", link: "/admin/faktur-stok-masuk/form" },
       { label: "Inventori Opname", link: "/opname" },
       { label: "Inventori Pre Order", link: "/preorder" },
       { label: "Inventori Pengembalian", link: "/pengembalian" },
@@ -72,7 +72,7 @@ const menu = [
     label: "Laporan",
     icon: Report,
     links: [
-      { label: "Faktur Stok Masuk", link: "/faktur-stok-masuk" },
+      { label: "Faktur Stok Masuk", link: "/admin/faktur-stok-masuk" },
       { label: "Faktur Stok Keluar", link: "/faktur-stok-keluar" },
       { label: "Faktur Stok Opname", link: "/faktur-stok-opname" },
       { label: "Ringkasan Stok", link: "/ringkasan-stok" },
