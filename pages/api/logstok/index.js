@@ -1,18 +1,27 @@
 import prisma from "lib/prisma";
 import { getSession } from "next-auth/react";
+import dateFormat from "dateformat";
 
 const logstok = async (req, res) => {
   const data = req.body;
   const method = req.method;
   const session = await getSession({ req });
   if (method == "POST") {
+    // createdId: session.user.id,
+    //       updatedId: session.user.id,
     try {
-      const logstok = await prisma.logstok.create({
-        data: {
-          ...data,
-          createdId: session.user.id,
-          updatedId: session.user.id,
-        },
+      const logstok = await prisma.logstok.createMany({
+        data: [...data.map((items) => {
+
+          return {
+            stok:  parseInt(items.stok),
+            datelog: dateFormat(new Date(), "yyyymmdd"),
+            inventoriId: items.inventoriId,
+            gudangId: items.gudangId,
+            createdId: session.user.id,
+            updatedId: session.user.id,
+          }
+        })],
       });
       res.statusCode = 200;
       res.json({

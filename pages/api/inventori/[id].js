@@ -15,8 +15,7 @@ export default async (req, res) => {
         data: {
           ...data,
           updatedId: session.user.id,
-          stok: parseInt(data.stok_awal),
-          stok_awal: parseInt(data.stok_awal),
+          createdId: session.user.id,
           harga_beli: parseInt(data.harga_beli),
         },
       });

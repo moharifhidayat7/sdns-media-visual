@@ -12,7 +12,7 @@ const inventori = async (req, res) => {
         data: {
           ...data,
           harga_beli: parseInt(data.harga_beli),
-          stok: parseInt(data.stok ? data.stok : 0),
+          // stok: parseInt(data.stok ? data.stok : 0),
           createdId: session.user.id,
           updatedId: session.user.id,
         },

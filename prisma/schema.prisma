@@ -101,9 +101,9 @@ model FakturStokMasuk {
 }
 
 model FakturStokMasukItem {
-  id    Int     @id @default(autoincrement())
-  harga String?
-
+  id                Int              @id @default(autoincrement())
+  stok              String?
+  harga             String?
   FakturStokMasuk   FakturStokMasuk? @relation(fields: [fakturStokMasukId], references: [id], name: "fakturstokmasukitems")
   Inventori         Inventori?       @relation(fields: [inventoriId], references: [id], name: "fakturinventori")
   inventoriId       Int?
@@ -237,8 +237,7 @@ model Inventori {
   merek      String
   nama       String
   harga_beli Int
-  stok_awal  Int?
-  stok       Int?
+  stok       Int?                  @default(0)
   satuan     String
   logstok    Logstok[]             @relation("inventori")
   status     Status                @default(INACTIVE)
