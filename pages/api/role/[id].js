@@ -17,28 +17,22 @@ export default async function handler(req, res) {
 
       res.status(200).json(result);
     } catch (error) {
-      console.log(error);
       res.status(400).json({ err: "Error occured." });
     }
   }
   if (req.method === "PUT") {
     try {
-      const role = await prisma.$transaction(
-        async (prisma) => {
-          prisma.role.update({
-            where: {
-              id: parseInt(req.query.id),
-            },
-            data: {
-              nama: req.body.nama,
-              updatedId: session.user ? session.user.id : null,
-            },
-          });
-          req.body.akses.map((ak) =>
-            prisma.akses.upsert({
+      const updatedRole = async (
+        id,
+        body,
+        user = session.user ? session.user.id : null
+      ) => {
+        return await prisma.$transaction(async (prisma) => {
+          await body.akses.map(async (ak) => {
+            await prisma.akses.upsert({
               where: {
                 uniqueRole: {
-                  roleId: parseInt(req.query.id),
+                  roleId: parseInt(id),
                   path: ak.path,
                 },
               },
@@ -49,18 +43,29 @@ export default async function handler(req, res) {
                 write: ak.write,
                 role: {
                   connect: {
-                    id: parseInt(req.query.id),
+                    id: parseInt(id),
                   },
                 },
               },
               update: {
                 ...ak,
               },
-            })
-          );
-        },
-        { timeout: 10000 }
-      );
+            });
+          });
+          const role = await prisma.role.update({
+            where: {
+              id: parseInt(id),
+            },
+            data: {
+              nama: body.nama,
+              updatedId: user,
+            },
+          });
+          return role;
+        });
+      };
+
+      const role = await updatedRole(req.query.id, req.body);
 
       res.status(200).json({
         message: "role updated",

@@ -75,7 +75,7 @@ export default async function handler(req, res) {
       const role = await prisma.role.create({
         data: {
           nama: req.body.nama,
-          createdId: session.role ? session.role.id : null,
+          createdId: session.user ? session.user.id : null,
           akses: {
             create: req.body.akses,
           },
