@@ -64,7 +64,7 @@ export default async function handler(req, res) {
             });
             return role;
           },
-          { timeout: 10000 }
+          { maxWait: 5000, timeout: 10000 }
         );
       };
 
