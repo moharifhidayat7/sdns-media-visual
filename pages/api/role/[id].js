@@ -23,41 +23,44 @@ export default async function handler(req, res) {
   }
   if (req.method === "PUT") {
     try {
-      const role = await prisma.$transaction([
-        prisma.role.update({
-          where: {
-            id: parseInt(req.query.id),
-          },
-          data: {
-            nama: req.body.nama,
-            updatedId: session.user ? session.user.id : null,
-          },
-        }),
-        ...req.body.akses.map((ak) =>
-          prisma.akses.upsert({
+      const role = await prisma.$transaction(
+        async (prisma) => {
+          prisma.role.update({
             where: {
-              uniqueRole: {
-                roleId: parseInt(req.query.id),
-                path: ak.path,
-              },
+              id: parseInt(req.query.id),
             },
-            create: {
-              nama: ak.nama,
-              path: ak.path,
-              read: ak.read,
-              write: ak.write,
-              role: {
-                connect: {
-                  id: parseInt(req.query.id),
+            data: {
+              nama: req.body.nama,
+              updatedId: session.user ? session.user.id : null,
+            },
+          });
+          req.body.akses.map((ak) =>
+            prisma.akses.upsert({
+              where: {
+                uniqueRole: {
+                  roleId: parseInt(req.query.id),
+                  path: ak.path,
                 },
               },
-            },
-            update: {
-              ...ak,
-            },
-          })
-        ),
-      ]);
+              create: {
+                nama: ak.nama,
+                path: ak.path,
+                read: ak.read,
+                write: ak.write,
+                role: {
+                  connect: {
+                    id: parseInt(req.query.id),
+                  },
+                },
+              },
+              update: {
+                ...ak,
+              },
+            })
+          );
+        },
+        { timeout: 10000 }
+      );
 
       res.status(200).json({
         message: "role updated",
