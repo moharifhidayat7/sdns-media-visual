@@ -22,8 +22,10 @@ import { useForm } from "@mantine/form";
 import { generateCode, inputNumberOnly, ucFirst } from "helpers/functions";
 import { useNotifications } from "@mantine/notifications";
 import { Check, Trash, X } from "tabler-icons-react";
+import { getSession,useSession } from "next-auth/react";
 
 function Form({ suppliers, gudangs, inventories, stokmasuk }) {
+  const { data: session, status } = useSession();
   const form = useForm({
     initialValues: {
       faktur: "",
@@ -98,7 +100,6 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
       }),
       headers: { "Content-Type": "application/json" },
     });
-    console.log(items);
     if (postStokMasuk.status != 200) {
       notifications.showNotification({
         disallowClose: true,
@@ -153,7 +154,7 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
     // });
   };
   return (
-    <Layout>
+    <Layout session={session}>
       <div className="loader" hidden={loading}>
         <Loader size="xl" variant="bars" color="orange" />;
       </div>
@@ -298,7 +299,7 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
   );
 }
 const ViewModal = ({ modal, inventories, handleItem }) => {
-  // const [data, setData] = useState([])
+  
   const form = useForm({
     initialValues: { inventori: "" },
     validate: {
@@ -479,6 +480,7 @@ export const getServerSideProps = async (context) => {
   const gudangs = await fetch(`${process.env.API_URL}/api/gudang`, header).then(
     (res) => res.json()
   );
+  const session=await getSession(context)
   const inventories = await fetch(
     `${process.env.API_URL}/api/inventori`,
     header
@@ -488,6 +490,7 @@ export const getServerSideProps = async (context) => {
       suppliers,
       gudangs,
       inventories,
+      session,
       stokmasuk: stokmasuk,
     },
   };
