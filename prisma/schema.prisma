@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
 }
 
 datasource db {
@@ -75,12 +76,14 @@ model User {
   updatedFakturStokMasuk FakturStokMasuk[] @relation("fakturstokmasukupdatedBy")
   updatedRole            Role[]            @relation("roleupdatedBy")
   createdRole            Role[]            @relation("rolecreatedBy")
+  createdVoucher         Voucher[]         @relation("vouchercreatedBy")
+  updatedVoucher         Voucher[]         @relation("voucherupdatedBy")
 }
 
 model FakturStokMasuk {
   id             Int                   @id @default(autoincrement())
   faktur         String?
-  keterangan     String? @db.Text
+  keterangan     String?               @db.Text
   nomortransaksi String                @unique
   tanggalinput   DateTime              @default(now())
   status         Status                @default(ACTIVE)
@@ -98,9 +101,9 @@ model FakturStokMasuk {
 }
 
 model FakturStokMasukItem {
-  id                Int              @id @default(autoincrement())
+  id    Int     @id @default(autoincrement())
   harga String?
-  
+
   FakturStokMasuk   FakturStokMasuk? @relation(fields: [fakturStokMasukId], references: [id], name: "fakturstokmasukitems")
   Inventori         Inventori?       @relation(fields: [inventoriId], references: [id], name: "fakturinventori")
   inventoriId       Int?
@@ -274,4 +277,19 @@ enum Status {
   SELESAI
   ACTIVE
   INACTIVE
+}
+
+model Voucher {
+  id           Int       @id @default(autoincrement())
+  kode         String    @unique
+  expiredAt    DateTime?
+  perpanjangan Int
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+  isDeleted    Boolean?  @default(false)
+  updatedBy    User?     @relation(fields: [updatedId], references: [id], name: "voucherupdatedBy")
+  createdBy    User?     @relation(fields: [createdId], references: [id], name: "vouchercreatedBy")
+  updatedId    Int?
+  createdId    Int?
 }

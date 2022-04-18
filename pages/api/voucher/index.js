@@ -1,5 +1,6 @@
 import prisma from "lib/prisma";
 import { getSession } from "next-auth/react";
+import { customAlphabet } from "nanoid";
 
 export default async function handler(req, res) {
   const session = await getSession({ req });
@@ -14,7 +15,6 @@ export default async function handler(req, res) {
       skip,
       take: limit,
       include: {
-        akses: true,
         createdBy: true,
         updatedBy: true,
       },
@@ -22,31 +22,26 @@ export default async function handler(req, res) {
         isDeleted: false,
         OR: [
           {
-            nama: {
+            kode: {
               contains: search,
             },
           },
         ],
       },
       orderBy: {
-        createdAt: "asc",
+        createdAt: "desc",
       },
     };
 
-    if (req.query.limit == 0) {
-      delete prismaQuery.take;
-      delete prismaQuery.skip;
-    }
-
     try {
       const [result, totalResult] = await prisma.$transaction([
-        prisma.role.findMany(prismaQuery),
-        prisma.role.count({
+        prisma.voucher.findMany(prismaQuery),
+        prisma.voucher.count({
           where: {
             isDeleted: false,
             OR: [
               {
-                nama: {
+                kode: {
                   contains: search,
                 },
               },
@@ -59,7 +54,7 @@ export default async function handler(req, res) {
 
       res.status(200).json({
         status: "success",
-        message: "Berhasil mengambil data role",
+        message: "Berhasil mengambil data voucher",
         result: result,
         total: totalResult,
         pages,
@@ -72,20 +67,28 @@ export default async function handler(req, res) {
   }
   if (req.method === "POST") {
     try {
-      const role = await prisma.role.create({
-        data: {
-          nama: req.body.nama,
+      const alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const nanoid = customAlphabet(alphabet, 12);
+
+      const prepareData = Array.from(
+        { length: parseInt(req.body.jumlah) },
+        () => ({
+          kode: nanoid(),
+          expiredAt: req.body.expiredAt || null,
+          perpanjangan: req.body.perpanjangan,
           createdId: session.user ? session.user.id : null,
-          akses: {
-            create: req.body.akses,
-          },
-        },
+        })
+      );
+
+      const voucher = await prisma.voucher.createMany({
+        data: prepareData,
+        skipDuplicates: false,
       });
 
       res.statusCode = 200;
       res.json({
-        message: "Role created",
-        role,
+        message: "Voucher created",
+        voucher,
       });
     } catch (error) {
       res.status(400).json({ err: "Error occured." });
@@ -93,7 +96,7 @@ export default async function handler(req, res) {
   }
   if (req.method === "DELETE") {
     try {
-      const role = await prisma.role.updateMany({
+      const voucher = await prisma.voucher.updateMany({
         where: {
           id: { in: req.body.id },
         },
@@ -106,8 +109,8 @@ export default async function handler(req, res) {
 
       res.statusCode = 200;
       res.json({
-        message: "Role deleted",
-        role,
+        message: "Voucher deleted",
+        voucher,
       });
     } catch (error) {
       res.status(400).json({ err: "Error occured." });
