@@ -126,7 +126,7 @@ const Action = ({
               <Pencil />
             </ActionIcon>
           )}
-          {onDelete && !akses.write && (
+          {onDelete && akses.write && (
             <ActionIcon
               size={36}
               color="red"
