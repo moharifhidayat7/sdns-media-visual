@@ -7,7 +7,7 @@ export default async (req, res) => {
   const id = req.query.id;
   if (req.method == "GET") {
     try {
-      const result = await prisma.mkas.findFirst({
+      const result = await prisma.FakturStokMasuk.findFirst({
         include: {
           updatedBy: true,
           createdBy: true,
@@ -24,7 +24,7 @@ export default async (req, res) => {
   } else if (req.method == "PUT") {
     try {
       const data = req.body;
-      const result = await prisma.mkas.update({
+      const result = await prisma.FakturStokMasuk.update({
         where: {
           id: parseInt(id),
         },
@@ -42,7 +42,7 @@ export default async (req, res) => {
     }
   } else if (req.method == "DELETE") {
     try {
-      const result = await prisma.mkas.update({
+      const result = await prisma.FakturStokMasuk.update({
         where: {
           id: parseInt(id),
         },
@@ -52,7 +52,7 @@ export default async (req, res) => {
         },
       });
       res.status(200).json({
-        message: "paket deleted",
+        message: "deleted",
         result,
       });
     } catch (err) {

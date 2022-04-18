@@ -84,7 +84,7 @@ model FakturStokMasuk {
   id             Int                   @id @default(autoincrement())
   faktur         String?
   keterangan     String?               @db.Text
-  nomortransaksi String                @unique
+  nomortransaksi String            
   tanggalinput   DateTime              @default(now())
   status         Status                @default(ACTIVE)
   createdAt      DateTime              @default(now())

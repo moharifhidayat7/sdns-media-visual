@@ -7,8 +7,6 @@ const logstok = async (req, res) => {
   const method = req.method;
   const session = await getSession({ req });
   if (method == "POST") {
-    // createdId: session.user.id,
-    //       updatedId: session.user.id,
     try {
       const logstok = await prisma.logstok.createMany({
         data: [...data.map((items) => {
