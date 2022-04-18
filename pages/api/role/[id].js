@@ -27,42 +27,45 @@ export default async function handler(req, res) {
         body,
         user = session.user ? session.user.id : null
       ) => {
-        return await prisma.$transaction(async (prisma) => {
-          await body.akses.map(async (ak) => {
-            await prisma.akses.upsert({
-              where: {
-                uniqueRole: {
-                  roleId: parseInt(id),
-                  path: ak.path,
-                },
-              },
-              create: {
-                nama: ak.nama,
-                path: ak.path,
-                read: ak.read,
-                write: ak.write,
-                role: {
-                  connect: {
-                    id: parseInt(id),
+        return await prisma.$transaction(
+          async (prisma) => {
+            await body.akses.map(async (ak) => {
+              await prisma.akses.upsert({
+                where: {
+                  uniqueRole: {
+                    roleId: parseInt(id),
+                    path: ak.path,
                   },
                 },
+                create: {
+                  nama: ak.nama,
+                  path: ak.path,
+                  read: ak.read,
+                  write: ak.write,
+                  role: {
+                    connect: {
+                      id: parseInt(id),
+                    },
+                  },
+                },
+                update: {
+                  ...ak,
+                },
+              });
+            });
+            const role = await prisma.role.update({
+              where: {
+                id: parseInt(id),
               },
-              update: {
-                ...ak,
+              data: {
+                nama: body.nama,
+                updatedId: user,
               },
             });
-          });
-          const role = await prisma.role.update({
-            where: {
-              id: parseInt(id),
-            },
-            data: {
-              nama: body.nama,
-              updatedId: user,
-            },
-          });
-          return role;
-        });
+            return role;
+          },
+          { timeout: 10000 }
+        );
       };
 
       const role = await updatedRole(req.query.id, req.body);
