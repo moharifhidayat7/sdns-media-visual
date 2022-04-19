@@ -29,30 +29,22 @@ export default async function handler(req, res) {
       ) => {
         return await prisma.$transaction(
           async (prisma) => {
-            await body.akses.map(async (ak) => {
+            for (let i = 0; i < body.akses.length; i++) {
+              const el = body.akses[i];
               await prisma.akses.upsert({
                 where: {
                   uniqueRole: {
-                    roleId: parseInt(id),
-                    path: ak.path,
+                    path: el.path,
+                    roleId: el.roleId,
                   },
                 },
-                create: {
-                  nama: ak.nama,
-                  path: ak.path,
-                  read: ak.read,
-                  write: ak.write,
-                  role: {
-                    connect: {
-                      id: parseInt(id),
-                    },
-                  },
-                },
+                create: el,
                 update: {
-                  ...ak,
+                  read: el.read,
+                  write: el.write,
                 },
               });
-            });
+            }
             const role = await prisma.role.update({
               where: {
                 id: parseInt(id),
@@ -75,6 +67,7 @@ export default async function handler(req, res) {
         role,
       });
     } catch (error) {
+      console.log(error);
       res.status(400).json({ err: "Error occured." });
     }
   }

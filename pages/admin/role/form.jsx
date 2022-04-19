@@ -32,7 +32,7 @@ import { useSession, getSession } from "next-auth/react";
 function Form({ role, action }) {
   const form = useForm({
     initialValues: {
-      nama: role.nama || "",
+      nama: (role && role.nama) || "",
     },
     validate: {
       nama: (value) => (value == "" ? "Masukkan Nama Role" : null),
@@ -41,7 +41,7 @@ function Form({ role, action }) {
   const notifications = useNotifications();
   const [loading, setLoading] = useState(true);
   const [disabled, setDisabled] = useState(false);
-  const [akses, setAkses] = useState(role.akses || []);
+  const [akses, setAkses] = useState([]);
 
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -59,16 +59,20 @@ function Form({ role, action }) {
 
   const onSubmit = async (values) => {
     setLoading(false);
-    const url = role.id ? `/api/role/${role.id}` : `/api/role`;
+    const url = role ? `/api/role/${role.id}` : `/api/role`;
+
+    const newAkses = role
+      ? akses.map((a) => ({ ...a, roleId: role.id }))
+      : akses;
 
     await fetch(url, {
-      method: role.id ? "PUT" : "POST",
+      method: role ? "PUT" : "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         ...values,
-        akses,
+        akses: newAkses,
       }),
     }).then((res) => {
       if (res.status === 200) {
@@ -105,7 +109,7 @@ function Form({ role, action }) {
         <title>Tambah Role</title>
       </Head>
       <Title order={2} style={{ marginBottom: "1.5rem" }}>
-        {role.id ? "Edit" : "Tambah"} Role
+        {role ? "Edit" : "Tambah"} Role
       </Title>
 
       <Box
@@ -159,7 +163,7 @@ function Form({ role, action }) {
                               <Grid.Col>
                                 <CheckboxGroup
                                   defaultValue={
-                                    role.akses && [
+                                    role && [
                                       role.akses.some(
                                         (e) =>
                                           e.path === sub.link && e.read === true
@@ -195,7 +199,7 @@ function Form({ role, action }) {
                     <Text size="xs">{item.link}</Text>
                     <CheckboxGroup
                       defaultValue={
-                        role.akses && [
+                        role && [
                           role.akses.some(
                             (e) => e.path === item.link && e.read === true
                           ) && "read",
@@ -243,7 +247,6 @@ export async function getServerSideProps(context) {
   }
   return {
     props: {
-      role: {},
       session: await getSession(context),
     },
   };
