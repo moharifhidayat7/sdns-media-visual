@@ -9,7 +9,6 @@ import {
   UnstyledButton,
   createStyles,
 } from "@mantine/core";
-import { useLocalStorage } from "@mantine/hooks";
 
 import { CalendarStats, ChevronLeft, ChevronRight } from "tabler-icons-react";
 const useStyles = createStyles((theme) => ({
@@ -71,20 +70,25 @@ export function LinksGroup({
   initiallyOpened,
   links,
   link,
+  setMenuList,
+  collapse,
+  index,
 }) {
   const { classes, theme, cx } = useStyles();
   const hasLinks = links && links.length > 0;
 
-  const [opened, setOpened] = useLocalStorage({
-    key: `colapse-menu-${label}`,
-  });
-
   const ChevronIcon = theme.dir === "ltr" ? ChevronRight : ChevronLeft;
 
   if (hasLinks) {
+    const state = collapse.includes(index);
     return (
       <>
-        <Box onClick={() => setOpened(!opened)} className={classes.control}>
+        <Box
+          onClick={() => {
+            setMenuList(index);
+          }}
+          className={classes.control}
+        >
           <Group position="apart" spacing={0}>
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <ThemeIcon variant="light" size={30}>
@@ -94,14 +98,14 @@ export function LinksGroup({
             </Box>
             <div
               className={cx(classes.chevron, {
-                [classes.chevronRotate]: opened,
+                [classes.chevronRotate]: state,
               })}
             >
               <ChevronIcon size={14} />
             </div>
           </Group>
         </Box>
-        <Collapse in={opened}>
+        <Collapse in={state} animateOpacity={false}>
           {links.map((link, index) => (
             <Link href={link.link} passHref key={link.label + "_" + link.link}>
               <Text component="a" className={classes.link} tabIndex={-1}>
@@ -114,19 +118,17 @@ export function LinksGroup({
     );
   }
   return (
-    <>
-      <Link href={link} passHref>
-        <Box component="a" className={classes.control}>
-          <Group position="apart" spacing={0}>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <ThemeIcon variant="light" size={30}>
-                <Icon size={18} />
-              </ThemeIcon>
-              <Box ml="md">{label}</Box>
-            </Box>
-          </Group>
-        </Box>
-      </Link>
-    </>
+    <Link href={link} passHref>
+      <Box component="a" className={classes.control}>
+        <Group position="apart" spacing={0}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <ThemeIcon variant="light" size={30}>
+              <Icon size={18} />
+            </ThemeIcon>
+            <Box ml="md">{label}</Box>
+          </Box>
+        </Group>
+      </Box>
+    </Link>
   );
 }
