@@ -32,6 +32,7 @@ export default async (req, res) => {
         include: {
           createdBy: true,
           updatedBy: true,
+          supplier:true
         },
         where: {
           isDeleted: false,

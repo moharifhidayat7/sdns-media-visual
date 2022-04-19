@@ -10,10 +10,9 @@ const logstok = async (req, res) => {
     try {
       const logstok = await prisma.logstok.createMany({
         data: [...data.map((items) => {
-
           return {
             stok:  parseInt(items.stok),
-            datelog: dateFormat(new Date(), "yyyymmdd"),
+            datelog: dateFormat(new Date(), "yyyymmddHHMMss"),
             inventoriId: items.inventoriId,
             gudangId: items.gudangId,
             createdId: session.user.id,

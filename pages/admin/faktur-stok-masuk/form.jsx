@@ -73,13 +73,33 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
       });
       return false;
     }
-    setItems([...items, { ...e, gudang: [] }]);
+
+    const stokgudang = gudangs.result.map((x) => {
+      const gudang = e.logstok.reduce((a, b) => {
+        if (b.gudangId == x.id) {
+          return a + b.stok
+        }
+        return a
+      }, 0)
+      return {
+        id: x.id,
+        stok: gudang,
+        qty: 0,
+        satuan: x.satuan,
+      }
+    });
+    const stokfinal = e.logstok.reduce((a, b) => {
+      return a + b.stok
+    }, 0)
+
+    setItems([...items, { ...e, gudang: stokgudang, stokfinalb: stokfinal, stokfinal }]);
   };
   const submitHandler = async (e) => {
     e.preventDefault();
     if (form.validate().hasErrors) return false;
+    const itemnullvalue = items.filter((x) => x.stokfinal == x.stokfinalb);
     setLoading(false);
-    if (items.length < 1) {
+    if (items.length < 1 || itemnullvalue.length > 0) {
       notifications.showNotification({
         disallowClose: true,
         autoClose: 5000,
@@ -114,17 +134,18 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
       setLoading(true);
       return false;
     }
-
-    //add faktur stok masuk items
     const postStokMasukResult = await postStokMasuk.json();
     const dataItems = [];
-    items.map((item, k) => {
+    items.map((item) => {
       item.gudang.map((gd) => {
+        if (gd.qty <= 0) {
+          return false
+        }
         dataItems.push({
           fakturStokMasukId: postStokMasukResult.FakturStokMasuk.id,
           gudangId: gd.id,
           inventoriId: item.id,
-          stok: gd.qty,
+          stok: gd.qty.toString(),
           harga: item.hargabaru ? item.hargabaru.toString() : item.harga_beli.toString(),
         })
       })
@@ -412,37 +433,19 @@ export const Items = ({ items, gudangs, deleteItems = () => { }, set }) => {
     }
     set.items.filter((e) => {
       if (e.id == items.id) {
-        if (!e["gudang"]) {
-          e["gudang"] = [
-            {
-              id: gudang,
-              qty: value,
-            },
-          ];
-          return e;
-        }
-        const hasGudang = e["gudang"].filter((x) => {
+        const hasGudang = e.gudang.filter((x) => {
           if (x.id == gudang) {
             return x;
           }
         });
-        if (hasGudang.length < 1) {
-          name = value;
-          e["gudang"].push({
-            id: gudang,
-            qty: value,
-          });
-        } else {
-          hasGudang[0].qty = value;
-        }
+        hasGudang[0].qty = parseInt(value);
 
-        const stokfinal = items.gudang.length > 1 ? items.gudang.reduce((y, x) => {
-          return parseInt(y.qty) + parseInt(x.qty);
-        }) : value;
-        // items.stokfinal=stokfinal
+        const stokfinal = e.gudang.reduce((y, x) => {
+          return parseInt(y.qty) + parseInt(x.qty)
+        });
         set.setItems(set.items.filter((x) => {
           if (x.id == items.id) {
-            x.stokfinal = stokfinal
+            x.stokfinal = x.stokfinalb + stokfinal
             return x
           }
           return x
@@ -459,33 +462,32 @@ export const Items = ({ items, gudangs, deleteItems = () => { }, set }) => {
         {items.kode} - {items.nama.toUpperCase()} {items.tipe.toUpperCase()}
       </td>
 
-      {gudangs.result &&
-        gudangs.result.map((item) => {
-          return [
-            <td key={item.id} style={{ minWidth: "50px", textAlign: "center" }}>
-              {items.stok}
-            </td>,
-            <td
-              key={`s${item.id}`}
-              className="text-center"
-              style={{ minWidth: "100px" }}
-            >
-              <Input
-                type="text"
-                name="qty"
-                onInput={(e) => inputNumberOnly(e)}
-                placeholder="0"
-                size="xs"
-                rightSection={
-                  <div className="text-gray-400 text-right w-full pr-1 overflow-hidden">
-                    {items.satuan.toUpperCase()}
-                  </div>
-                }
-                onChange={(e) => handleChange(e, item.id)}
-              />
-            </td>,
-          ];
-        })}
+      {items.gudang.map((item) => {
+        return [
+          <td key={item.id} style={{ minWidth: "50px", textAlign: "center" }}>
+            {item.stok}
+          </td>,
+          <td
+            key={`s${item.id}`}
+            className="text-center"
+            style={{ minWidth: "100px" }}
+          >
+            <Input
+              type="text"
+              name="qty"
+              onInput={(e) => inputNumberOnly(e)}
+              placeholder="0"
+              size="xs"
+              rightSection={
+                <div className="text-gray-400 text-right w-full pr-1 overflow-hidden">
+                  {items.satuan.toUpperCase()}
+                </div>
+              }
+              onChange={(e) => handleChange(e, item.id)}
+            />
+          </td>,
+        ];
+      })}
       <td className="text-center">
         <Input
           type="text"

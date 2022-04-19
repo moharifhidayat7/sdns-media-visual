@@ -10,9 +10,8 @@ import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useNotifications } from "@mantine/notifications";
 import dateFormat from "dateformat";
 import { Check, H3, X } from "tabler-icons-react";
-
 import { useSession, getSession } from "next-auth/react";
-export default function Index({ fitur }) {
+export default function Index({ stokmasuk }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
 
@@ -23,11 +22,11 @@ export default function Index({ fitur }) {
   });
 
   useEffect(() => {
-    dispatch({ type: "set_data", payload: fitur });
+    dispatch({ type: "set_data", payload: stokmasuk });
   }, []);
   const deleteHandler = async (selected, isLoading, type = "delete") => {
     const data = { id: selected };
-    const url = type == "delete" ? `/api/fitur/${selected}` : `/api/fitur`;
+    const url = type == "delete" ? `/api/stokmasuk/${selected}` : `/api/stokmasuk`;
     await fetch(url, {
       method: "DELETE",
       headers: {
@@ -61,7 +60,7 @@ export default function Index({ fitur }) {
     });
   };
   const refreshHandler = async (isLoading, page = 1, search = "") => {
-    const url = `/api/fitur?page=${page}&search=${search}`;
+    const url = `/api/stokmasuk?page=${page}&search=${search}`;
     const res = await fetch(url);
     const data = await res.json();
     dispatch({ type: "set_data", payload: { ...data, search, page } });
@@ -69,16 +68,16 @@ export default function Index({ fitur }) {
   };
   const header = [
     {
-      key: "kode",
-      label: "Kode",
+      key: "notransaksi",
+      label: "No Transaksi",
     },
     {
-      key: "nama",
-      label: "Nama",
+      key: "faktur",
+      label: "Faktur",
     },
     {
-      key: "status",
-      label: "Status",
+      key: "supplier",
+      label: "Supplier",
     },
     {
       key: "createdAt",
@@ -89,13 +88,13 @@ export default function Index({ fitur }) {
   return (
     <Layout session={session}>
       <Head>
-        <title style={{ textTransform: "capitalize" }}>Master Fitur </title>
+        <title style={{ textTransform: "capitalize" }}>Transaksi Faktur Stok Masuk </title>
       </Head>
       <Title
         order={2}
         style={{ marginBottom: "1.5rem", textTransform: "capitalize" }}
       >
-        Data Fitur
+        Data Faktur Stok Masuk
       </Title>
       <DataTable>
         <DataTable.Action
@@ -108,7 +107,7 @@ export default function Index({ fitur }) {
         />
         <CustomTable
           header={header}
-          name="fitur"
+          name="fakturstokmasuk"
           withSelection={true}
           withAction={true}
         >
@@ -119,18 +118,17 @@ export default function Index({ fitur }) {
                   key={row.id}
                   id={row.id}
                   readLink={`/form?id=${row.id}&read=true`}
-                  editLink={`/form?id=${row.id}`}
-                  deleteField={row.nama}
+                  deleteField={row.nomortransaksi}
                   onDelete={(isLoading) => deleteHandler(row.id, isLoading)}
                 >
                   <CustomTable.Col>
-                    <Text>{row.kode}</Text>
+                    <Text>{row.nomortransaksi}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase">{row.nama}</Text>
+                    <Text className="uppercase">{row.faktur}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase">{row.status}</Text>
+                    <Text className="uppercase">{row.supplier&&row.supplier.nama}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text className="uppercase">
@@ -152,15 +150,15 @@ export default function Index({ fitur }) {
 }
 
 export async function getServerSideProps(context) {
-  const res = await fetch(`${process.env.API_URL}/api/fitur/`, {
+  const res = await fetch(`${process.env.API_URL}/api/stokmasuk/`, {
     headers: {
       Cookie: context.req.headers.cookie,
     },
   });
-  const fitur = await res.json();
+  const stokmasuk = await res.json();
   return {
     props: {
-      fitur,
+      stokmasuk,
       session: await getSession(context),
     },
   };

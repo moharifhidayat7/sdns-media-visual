@@ -194,7 +194,7 @@ const Row = ({
   children,
   id,
   editLink = "",
-  onDelete = () => {},
+  onDelete = () => { },
   deleteField,
   readLink = "",
 }) => {
@@ -262,7 +262,7 @@ const Row = ({
 
             {akses.write && (
               <>
-                <ActionIcon
+                {editLink && <ActionIcon
                   color="yellow"
                   variant="filled"
                   onClick={() =>
@@ -271,15 +271,15 @@ const Row = ({
                   disabled={loading}
                 >
                   <Pencil size={16} />
-                </ActionIcon>
-                <ActionIcon
+                </ActionIcon>}
+                {deleteField && <ActionIcon
                   color="red"
                   variant="filled"
                   onClick={openDeleteModal}
                   loading={loading}
                 >
                   <Trash size={16} />
-                </ActionIcon>
+                </ActionIcon>}
               </>
             )}
           </Group>
