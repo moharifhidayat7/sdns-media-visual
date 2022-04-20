@@ -85,7 +85,7 @@ export default async (req, res) => {
     }
   } else if (req.method == "DELETE") {
     try {
-      const mkas = await prisma.mkas.updateMany({
+      const FakturStokMasuk = await prisma.FakturStokMasuk.updateMany({
         where: {
           id: { in: data.id },
         },
@@ -96,8 +96,8 @@ export default async (req, res) => {
       });
       res.statusCode = 200;
       res.json({
-        message: "mkas deleted",
-        mkas,
+        message: "Data has deleted",
+        FakturStokMasuk,
       });
     } catch (error) {
       res.status(403).json({ err: err.message });
