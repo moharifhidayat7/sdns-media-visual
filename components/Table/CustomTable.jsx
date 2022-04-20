@@ -194,9 +194,10 @@ const Row = ({
   children,
   id,
   editLink = "",
-  onDelete = () => { },
+  onDelete = () => {},
   deleteField,
   readLink = "",
+  customAction,
 }) => {
   const { data: session, status } = useSession();
   const [state, dispatch] = useDataTableContext();
@@ -259,27 +260,31 @@ const Row = ({
                 <Eye size={16} />
               </ActionIcon>
             )}
-
+            {customAction && customAction}
             {akses.write && (
               <>
-                {editLink && <ActionIcon
-                  color="yellow"
-                  variant="filled"
-                  onClick={() =>
-                    router.push(router.asPath.split("?")[0] + editLink)
-                  }
-                  disabled={loading}
-                >
-                  <Pencil size={16} />
-                </ActionIcon>}
-                {deleteField && <ActionIcon
-                  color="red"
-                  variant="filled"
-                  onClick={openDeleteModal}
-                  loading={loading}
-                >
-                  <Trash size={16} />
-                </ActionIcon>}
+                {editLink && (
+                  <ActionIcon
+                    color="yellow"
+                    variant="filled"
+                    onClick={() =>
+                      router.push(router.asPath.split("?")[0] + editLink)
+                    }
+                    disabled={loading}
+                  >
+                    <Pencil size={16} />
+                  </ActionIcon>
+                )}
+                {deleteField && (
+                  <ActionIcon
+                    color="red"
+                    variant="filled"
+                    onClick={openDeleteModal}
+                    loading={loading}
+                  >
+                    <Trash size={16} />
+                  </ActionIcon>
+                )}
               </>
             )}
           </Group>

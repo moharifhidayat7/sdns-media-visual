@@ -83,6 +83,7 @@ const Action = ({
   filterVisibility = true,
   onDelete,
   onSearch = () => {},
+  addLabel = "Tambah",
 }) => {
   const [state, dispatch] = useDataTableContext();
   const router = useRouter();
@@ -113,7 +114,7 @@ const Action = ({
             }}
             disabled={!akses.write}
           >
-            Tambah
+            {addLabel}
           </Button>
           {onEdit && (
             <ActionIcon
