@@ -74,6 +74,10 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
       return false;
     }
 
+
+    const logstok = gudangs.result.map((x) => {
+      return e.logstok.filter((y) => y.gudangId == x.id)
+    })
     const stokgudang = gudangs.result.map((x) => {
       const gudang = e.logstok.reduce((a, b) => {
         if (b.gudangId == x.id) {
@@ -88,11 +92,10 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
         satuan: x.satuan,
       }
     });
-    const stokfinal = e.logstok.reduce((a, b) => {
+    const stokfinal = stokgudang.reduce((a, b) => {
       return a + b.stok
     }, 0)
-
-    setItems([...items, { ...e, gudang: stokgudang, stokfinalb: stokfinal, stokfinal }]);
+    setItems([...items, { ...e, logstok: logstok, gudang: stokgudang, stokfinalb: stokfinal, stokfinal }]);
   };
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -440,10 +443,11 @@ export const Items = ({ items, gudangs, deleteItems = () => { }, set }) => {
         });
         hasGudang[0].qty = parseInt(value);
 
-        const stokfinal = e.gudang.reduce((y, x) => {
+        const stokfinal =e.gudang.length>1? e.gudang.reduce((y, x) => {
           return parseInt(y.qty) + parseInt(x.qty)
-        });
+        }):parseInt(value);
         set.setItems(set.items.filter((x) => {
+          console.log(e.gudang)
           if (x.id == items.id) {
             x.stokfinal = x.stokfinalb + stokfinal
             return x
