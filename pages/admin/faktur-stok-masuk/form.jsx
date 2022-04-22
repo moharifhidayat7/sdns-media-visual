@@ -56,7 +56,7 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
         })
       );
     }
-    const kode = stokmasuk.result ? stokmasuk.result.id : 0;
+    const kode = stokmasuk ? stokmasuk.id : 0;
     form.setFieldValue("nomortransaksi", generateCode("", parseInt(kode) + 1));
   }, []);
   const handleItem = (e) => {
@@ -419,7 +419,7 @@ const ViewModal = ({ modal, inventories, handleItem }) => {
     </Modal>
   );
 };
-export const Items = ({ items, gudangs, deleteItems = () => { }, set }) => {
+const Items = ({ items, gudangs, deleteItems = () => { }, set }) => {
   const handleChange = (e, gudang) => {
     const value = e.target.value || items.stok;
     const name = e.target.name;
@@ -548,7 +548,7 @@ export const getServerSideProps = async (context) => {
     `${process.env.API_URL}/api/inventori`,
     header
   ).then((res) => res.json());
-  const stokmasuk = stokmasukresult.result.length < 0 ? stokmasukresults[0] : stokmasukresult.result
+  const stokmasuk =stokmasukresult.result.length>0?stokmasukresult.result: stokmasukresults.result[0]
 
   return {
     props: {

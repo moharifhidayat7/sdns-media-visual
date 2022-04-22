@@ -11,6 +11,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Status {
+  MENUNGGU
+  DITERIMA
+  SELESAI
+  ACTIVE
+  INACTIVE
+}
+
+enum TypeGajiKaryawan {
+  ABSENSI
+  PENDAPATAN
+  POTONGAN
+}
+
+// This is enum type definition.
+
 model Akses {
   nama   String
   path   String
@@ -78,13 +94,52 @@ model User {
   createdRole            Role[]            @relation("rolecreatedBy")
   createdVoucher         Voucher[]         @relation("vouchercreatedBy")
   updatedVoucher         Voucher[]         @relation("voucherupdatedBy")
+  createdGajiKaryawan    GajiKaryawan[]    @relation("GajiKaryawancreatedBy")
+  updatedGajiKaryawan    GajiKaryawan[]    @relation("GajiKaryawanupdatedBy")
+  gajiKaryawan           GajiKaryawan[]    @relation("GajiKaryawan")
+}
+
+model GajiKaryawan {
+  id           Int                @id @default(autoincrement())
+  tanggalinput DateTime           @default(now())
+  notransaksi  String
+  periode      String
+  catatan      String?
+  status       Status             @default(ACTIVE)
+  karyawan     User?              @relation(fields: [karyawanId], references: [id], name: "GajiKaryawan")
+  karyawanId   Int?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  deletedAt    DateTime?
+  isDeleted    Boolean?           @default(false)
+  updatedBy    User?              @relation(fields: [updatedId], references: [id], name: "GajiKaryawanupdatedBy")
+  createdBy    User?              @relation(fields: [createdId], references: [id], name: "GajiKaryawancreatedBy")
+  updatedId    Int?
+  createdId    Int?
+  items         GajiKaryawanItem[] @relation("GajiKaryawanItem")
+}
+
+model GajiKaryawanItem {
+  id             Int              @id @default(autoincrement())
+  gajiKaryawan   GajiKaryawan?    @relation(fields: [gajiKaryawanId], references: [id], name: "GajiKaryawanItem")
+  gaji           String
+  tipe           TypeGajiKaryawan
+  nama           String
+  gajiKaryawanId Int?
+  status         Status           @default(ACTIVE)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  deletedAt      DateTime?
+  isDeleted      Boolean?         @default(false)
+  updatedId      Int?
+  createdId      Int?
 }
 
 model FakturStokMasuk {
   id             Int                   @id @default(autoincrement())
   faktur         String?
   keterangan     String?               @db.Text
-  nomortransaksi String            
+  nomortransaksi String
   tanggalinput   DateTime              @default(now())
   status         Status                @default(ACTIVE)
   createdAt      DateTime              @default(now())
@@ -268,14 +323,6 @@ model Logstok {
   updatedId   Int?
   createdId   Int?
   inventoriId Int?
-}
-
-enum Status {
-  MENUNGGU
-  DITERIMA
-  SELESAI
-  ACTIVE
-  INACTIVE
 }
 
 model Voucher {
