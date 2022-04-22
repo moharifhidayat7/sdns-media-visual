@@ -30,48 +30,22 @@ export default async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
     try {
-      const FakturStokMasuk = await prisma.FakturStokMasuk.findMany({
+      const FakturStokMasukItem = await prisma.FakturStokMasukItem.findMany({
         skip,
         take: limit,
         include: {
-          createdBy: true,
-          updatedBy: true,
+Gudang:true
         },
         where: {
           isDeleted: false,
-          OR: [
-            {
-              nomortransaksi: {
-                contains: search,
-              },
-            },
-
-          ],
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-      });
-      const total = await prisma.FakturStokMasuk.count({
-        where: {
-          isDeleted: false,
-          OR: [
-            {
-              nomortransaksi: {
-                contains: search,
-              },
-            },
-
-          ],
-        },
-      });
-      const pages = Math.ceil(total / limit);
+        }
+      })
       res.json({
         status: "success",
-        message: "Berhasil mengambil data FakturStokMasuk",
-        result: FakturStokMasuk,
-        total,
-        pages,
+        message: "Berhasil mengambil data FakturStokMasukItem",
+        result: FakturStokMasukItem,
+        // total,
+        // pages,
         page,
         limit,
       });

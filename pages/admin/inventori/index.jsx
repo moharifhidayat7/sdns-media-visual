@@ -218,6 +218,7 @@ const ViewModalLogStok = ({ logstok, setModalStokLog }) => {
             <th>NO</th>
             <th>Unique Date Log</th>
             <th>Created On</th>
+            <th>Gudang</th>
             <th>Stok</th>
           </tr>
         </thead>
@@ -227,13 +228,14 @@ const ViewModalLogStok = ({ logstok, setModalStokLog }) => {
               <td>{key + 1}</td>
               <td>{element.datelog}</td>
               <td>{dateFormat(element.createdAt, "dd-mm-yyyy")}</td>
+              <td>{element.gudang.nama}</td>
               <td>{element.stok}</td>
             </tr>
           ))}
         </tbody>
         <tfoot>
           <tr>
-            <th colSpan="3">Total</th>
+            <th colSpan="4">Total</th>
             <th>{sumStok}</th>
           </tr>
         </tfoot>

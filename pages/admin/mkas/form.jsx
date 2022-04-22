@@ -17,7 +17,7 @@ import { useForm } from "@mantine/form";
 import { generateCode, getTitle, inputNumberOnly } from "helpers/functions";
 import { useNotifications } from "@mantine/notifications";
 import { Check, X } from "tabler-icons-react";
-import { getSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 const PAGENAME = "mkas";
 export async function getServerSideProps(context) {
   const id = context.query.id;
@@ -55,7 +55,8 @@ export async function getServerSideProps(context) {
     props: {
       action,
       userSession,
-      data: mkas
+      data: mkas,
+      session
     },
   };
 }
@@ -72,9 +73,8 @@ function Form({ data, action, userSession }) {
   const [loading, setLoading] = useState(true);
   const [disabled, setDisabled] = useState(false);
   const router = useRouter();
-
+  const { data: session, status } = useSession()
   useEffect(() => {
-    console.log(action)
     if (action != "add") {
       form.setValues({
         kode: data.kode,
@@ -86,9 +86,9 @@ function Form({ data, action, userSession }) {
       }
     } else {
       const codeInt = data.id ? data.id : 0;
-      const code = generateCode("PKG", parseInt(codeInt) + 1);
+      const code = generateCode("MKS", parseInt(codeInt) + 1);
       form.setValues({
-        kode: "",
+        kode: code,
         nama: "",
         status: "INACTIVE",
       });
@@ -138,7 +138,7 @@ function Form({ data, action, userSession }) {
     });
   };
   return (
-    <Layout>
+    <Layout session={session}>
       <div className="loader" hidden={loading}>
         <Loader size="xl" variant="bars" color="orange" />;
       </div>

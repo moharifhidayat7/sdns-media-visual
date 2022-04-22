@@ -11,15 +11,29 @@ export default async (req, res) => {
         include: {
           updatedBy: true,
           createdBy: true,
+          items: {
+            where:{
+              Gudang:{
+                isDeleted:false
+              },
+              Inventori:{
+                isDeleted:false
+              }
+            },
+           include:{
+             Inventori:true,
+              Gudang:true
+           }
+          }
         },
         where: {
           id: parseInt(id),
           isDeleted: false,
         },
       });
-      res.status(200).json(result);
+      res.status(200).json({result:result});
     } catch (err) {
-      res.status(403).json({ err: err.message });
+      res.status(403).json({ err: err.message, result: [] });
     }
   } else if (req.method == "PUT") {
     try {
