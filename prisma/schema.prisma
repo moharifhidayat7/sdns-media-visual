@@ -205,7 +205,7 @@ model Mkas {
 
 model MkasPerkiraan {
   id        Int       @id @default(autoincrement())
-  nama      String   
+  nama      String
   mkas      Mkas?     @relation(fields: [mkasId], references: [id], name: "mkasperkiraan")
   mkasId    Int?
   status    Status    @default(DEBIT)
@@ -367,4 +367,21 @@ model Voucher {
   createdBy    User?     @relation(fields: [createdId], references: [id], name: "vouchercreatedBy")
   updatedId    Int?
   createdId    Int?
+}
+
+enum TipeAkun {
+  DEBET
+  KREDIT
+}
+
+model Akun {
+  id        Int       @id @default(autoincrement())
+  kode      String    @unique
+  nama      String
+  tipe      TipeAkun
+  parentId  Int?
+  parent    Akun?     @relation(name: "SubAkun", references: [id], fields: [parentId])
+  child     Akun[]    @relation(name: "SubAkun")
+  isDeleted Boolean?  @default(false)
+  deletedAt DateTime?
 }
