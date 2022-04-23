@@ -249,6 +249,7 @@ const Row = ({
       {state.withAction && (
         <td>
           <Group spacing="xs" noWrap className="justify-end">
+            {customAction}
             {readLink && akses.read && (
               <ActionIcon
                 color="blue"
@@ -260,7 +261,6 @@ const Row = ({
                 <Eye size={16} />
               </ActionIcon>
             )}
-            {customAction && customAction}
             {akses.write && (
               <>
                 {editLink && (
