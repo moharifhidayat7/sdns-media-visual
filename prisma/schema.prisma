@@ -17,6 +17,8 @@ enum Status {
   SELESAI
   ACTIVE
   INACTIVE
+  DEBIT
+  KREDIT
 }
 
 enum TypeGajiKaryawan {
@@ -98,6 +100,7 @@ model User {
   updatedGajiKaryawan    GajiKaryawan[]    @relation("GajiKaryawanupdatedBy")
   gajiKaryawan           GajiKaryawan[]    @relation("GajiKaryawan")
 }
+
 // model Kas{
 //     status       Status             @default(MENUNGGU)
 //   createdAt    DateTime           @default(now())
@@ -126,7 +129,7 @@ model GajiKaryawan {
   createdBy    User?              @relation(fields: [createdId], references: [id], name: "GajiKaryawancreatedBy")
   updatedId    Int?
   createdId    Int?
-  items         GajiKaryawanItem[] @relation("GajiKaryawanItem")
+  items        GajiKaryawanItem[] @relation("GajiKaryawanItem")
 }
 
 model GajiKaryawanItem {
@@ -184,16 +187,32 @@ model FakturStokMasukItem {
 }
 
 model Mkas {
+  id        Int             @id @default(autoincrement())
+  nama      String          @unique
+  kode      String
+  prefix    String          @unique
+  status    Status?         @default(INACTIVE)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  deletedAt DateTime?
+  isDeleted Boolean?        @default(false)
+  updatedBy User?           @relation(fields: [updatedId], references: [id], name: "mkasupdatedBy")
+  createdBy User?           @relation(fields: [createdId], references: [id], name: "mkascreatedBy")
+  updatedId Int?
+  createdId Int?
+  perkiraan MkasPerkiraan[] @relation("mkasperkiraan")
+}
+
+model MkasPerkiraan {
   id        Int       @id @default(autoincrement())
-  nama      String    @unique
-  kode      String    @unique
-  status    Status    @default(INACTIVE)
+  nama      String   
+  mkas      Mkas?     @relation(fields: [mkasId], references: [id], name: "mkasperkiraan")
+  mkasId    Int?
+  status    Status    @default(DEBIT)
   createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  updatedAt DateTime? @updatedAt
   deletedAt DateTime?
   isDeleted Boolean?  @default(false)
-  updatedBy User?     @relation(fields: [updatedId], references: [id], name: "mkasupdatedBy")
-  createdBy User?     @relation(fields: [createdId], references: [id], name: "mkascreatedBy")
   updatedId Int?
   createdId Int?
 }

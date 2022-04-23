@@ -66,7 +66,7 @@ const menu = [
       { label: "Inventori Pengembalian", link: "/pengembalian" },
       { label: "Pembayaran Gaji Karyawan", link: "/admin/gaji-karyawan/form" },
       { label: "Tagihan Pelanggan", link: "/tagihan-pelanggan" },
-      { label: "Kas Pengeluaran & Pemasukan", link: "/kas-form" },
+      { label: "Kas", link: "/kas-form" },
     ],
   },
   {

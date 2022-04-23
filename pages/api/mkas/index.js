@@ -1,13 +1,33 @@
 import prisma from "lib/prisma";
+import { getSession } from "next-auth/react";
 
 //prisma create produk
 export default async (req, res) => {
   const data = req.body;
+  const session = await getSession({ req });
   if (req.method == "POST") {
     try {
       const mkas = await prisma.mkas.create({
+        include: {
+          perkiraan: true
+        },
         data: {
-          ...data,
+          nama: data.nama,
+          status: data.status || "INACTIVE",
+          prefix: data.prefix,
+          kode: data.kode,
+          createdId: session.user.id,
+          updatedId: session.user.id,
+          perkiraan: {
+            create: [...data.perkiraan.map(item => {
+              return {
+                nama: item.nama,
+                status: item.status,
+                createdId: session.user.id,
+                updatedId: session.user.id
+              }
+            })]
+          }
         },
       });
       res.statusCode = 200;

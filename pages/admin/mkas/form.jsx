@@ -8,15 +8,18 @@ import {
   Button,
   TextInput,
   Loader,
+  Text,
+  Select,
+  ActionIcon,
 } from "@mantine/core";
 import Head from "next/head";
 import Layout from "@components/views/Layout";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { useForm } from "@mantine/form";
+import { formList, useForm } from "@mantine/form";
 import { generateCode, getTitle, inputNumberOnly } from "helpers/functions";
 import { useNotifications } from "@mantine/notifications";
-import { Check, X } from "tabler-icons-react";
+import { Check, Trash, X } from "tabler-icons-react";
 import { getSession, useSession } from "next-auth/react";
 const PAGENAME = "mkas";
 export async function getServerSideProps(context) {
@@ -63,10 +66,14 @@ export async function getServerSideProps(context) {
 
 function Form({ data, action, userSession }) {
   const form = useForm({
-    initialValues: { kode: "", nama: "", status: "" },
+    initialValues: { kode: "", nama: "", prefix: "", status: "", perkiraan: formList([]),disconnect:[] },
     validate: {
       nama: (value) => (value.length < 1 ? "Plese input nama." : null),
-      kode: (value) => (value.length < 1 ? "Plese input kode." : null),
+      prefix: (value) => (value.length < 1 ? "Plese input value." : null),
+      perkiraan: {
+        nama: (value) => (value.length < 1 ? "Plese input nama." : null),
+        status: (value) => (value.length < 1 ? "Plese input status." : null),
+      },
     },
   });
   const notifications = useNotifications();
@@ -79,7 +86,14 @@ function Form({ data, action, userSession }) {
       form.setValues({
         kode: data.kode,
         nama: data.nama,
+        prefix: data.prefix,
         status: data.status,
+        perkiraan:formList([...data.perkiraan.map((item) => ({
+          nama: item.nama,
+          status: item.status,
+          id: item.id,
+        }))]),
+        disconnect:[]
       });
       if (action == "read") {
         setDisabled(true);
@@ -87,27 +101,37 @@ function Form({ data, action, userSession }) {
     } else {
       const codeInt = data.id ? data.id : 0;
       const code = generateCode("MKS", parseInt(codeInt) + 1);
-      form.setValues({
-        kode: code,
-        nama: "",
-        status: "INACTIVE",
-      });
+      form.setFieldValue("kode", code)
     }
   }, []);
   const submitHandler = async (e) => {
     e.preventDefault();
     if (form.validate().hasErrors) return false;
+    console.log(form.values);
+    if (form.values.perkiraan.length < 1) {
+      notifications.showNotification({
+        disallowClose: true,
+        autoClose: 5000,
+        title: "Validation Error",
+        message: "Plese input perkiraan.",
+        color: "red",
+        icon: <X />,
+        loading: false,
+      });
+      return false;
+    }
     setLoading(false);
     const FORMDATA = form.values;
     const method = action === "edit" ? "PUT" : "POST";
     const url = action === "edit" ? `/api/${PAGENAME}/${data.id}` : `/api/${PAGENAME}`;
+
     const notifTitle = action.charAt(0).toUpperCase() + action.slice(1);
     await fetch(url, {
       method,
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ ...FORMDATA, updatedId: userSession.id, createdId: userSession.id }),
+      body: JSON.stringify({ ...FORMDATA }),
     }).then(async (res) => {
       const result = await res.json();
       if (res.status === 200) {
@@ -137,6 +161,29 @@ function Form({ data, action, userSession }) {
       }
     });
   };
+  const itemPerkiraan = form.values.perkiraan.map((item, index) => (
+    <Group mt="xs" key={index}>
+      <TextInput
+        placeholder="Nama"
+        required
+        sx={{ flex: 1 }}
+        {...form.getListInputProps('perkiraan', index, 'nama')}
+      />
+      <Select required data={["DEBIT", "KREDIT"]} placeholder="Deb/Kre"    {...form.getListInputProps('perkiraan', index, 'status')} />
+      <ActionIcon
+        color="red"
+        variant="hover"
+        onClick={() => {
+          if(item.id!=undefined){
+            form.setFieldValue("disconnect", [...form.values.disconnect, item.id])
+          }
+          form.removeListItem('perkiraan', index)
+        }}
+      >
+        <Trash size={16} />
+      </ActionIcon>
+    </Group>
+  ))
   return (
     <Layout session={session}>
       <div className="loader" hidden={loading}>
@@ -170,9 +217,19 @@ function Form({ data, action, userSession }) {
                   label="Kode"
                   disabled={disabled}
                   name="kode"
+                  readOnly
                   value={form.values.kode}
                   {...form.getInputProps("kode")}
                   onChange={(e) => { form.setFieldValue("kode", e.target.value) }}
+                />
+                <TextInput
+                  label="Prefix"
+                  disabled={disabled}
+                  name="prefix"
+                  onKeyUp={(e) => inputNumberOnly(e)}
+                  value={form.values.prefix}
+                  {...form.getInputProps("prefix")}
+                  onChange={(e) => { form.setFieldValue("prefix", e.target.value) }}
                 />
                 <TextInput
                   label="Nama"
@@ -201,6 +258,17 @@ function Form({ data, action, userSession }) {
                   />
                 </InputWrapper>
               </Group>
+            </Grid.Col>
+            <Grid.Col sm={12} md={6}>
+              <InputWrapper label="Perkiraan" required>
+                {itemPerkiraan.length > 0 ? itemPerkiraan : <Text color="dimmed" align="center">
+                  Perkiraan Masih Kosong
+                </Text>
+                }
+              </InputWrapper>
+
+              <Button
+                type="button" className="mt-3" onClick={() => form.addListItem("perkiraan", { nama: "", status: "" })}>Tambah Perkiraan</Button>
             </Grid.Col>
 
 
