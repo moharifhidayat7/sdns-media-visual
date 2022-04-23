@@ -12,7 +12,7 @@ import { useSession, getSession } from "next-auth/react";
 
 const URL = "/api/gaji-karyawan";
 const NAMEPAGE = "Gaji Karyawan";
-const index=({ result })=> {
+const Index = ({ result }) => {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
   const { data: session, status } = useSession();
@@ -73,7 +73,7 @@ const index=({ result })=> {
       key: "karyawan",
       label: "Karyawan",
     },
-    {key:"jabatan",label:"Jabatan"},
+    { key: "jabatan", label: "Jabatan" },
     {
       key: "status",
       label: "Status",
@@ -86,9 +86,7 @@ const index=({ result })=> {
   return (
     <Layout session={session}>
       <Head>
-        <title style={{ textTransform: "capitalize" }}>
-          Master {NAMEPAGE}
-        </title>
+        <title style={{ textTransform: "capitalize" }}>Master {NAMEPAGE}</title>
       </Head>
       <Title
         order={2}
@@ -125,13 +123,19 @@ const index=({ result })=> {
                     <Text>{row.notransaksi}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase">{dateFormat(new Date(row.periode),"mmmm yyyy")}</Text>
+                    <Text className="uppercase">
+                      {dateFormat(new Date(row.periode), "mmmm yyyy")}
+                    </Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase">{row.karyawan&&row.karyawan.nama.toUpperCase()}</Text>
+                    <Text className="uppercase">
+                      {row.karyawan && row.karyawan.nama.toUpperCase()}
+                    </Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase">{row.karyawan&&row.karyawan.role.nama.toUpperCase()}</Text>
+                    <Text className="uppercase">
+                      {row.karyawan && row.karyawan.role.nama.toUpperCase()}
+                    </Text>
                   </CustomTable.Col>
 
                   <CustomTable.Col>
@@ -154,7 +158,7 @@ const index=({ result })=> {
       </DataTable>
     </Layout>
   );
-}
+};
 export async function getServerSideProps(context) {
   const OPTION = {
     headers: {
@@ -171,4 +175,4 @@ export async function getServerSideProps(context) {
     },
   };
 }
-export default index;
+export default Index;
