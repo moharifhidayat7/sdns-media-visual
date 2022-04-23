@@ -13,6 +13,7 @@ import {
   Textarea,
   ActionIcon,
   Modal,
+  Text,
 } from "@mantine/core";
 import dateFormat from "dateformat";
 import Head from "next/head";
@@ -71,11 +72,11 @@ export async function getServerSideProps(context) {
 
 const Form = ({ data, action, karyawan }) => {
   const form = useForm({
-    initialValues: { tanggalinput: "", karyawanId: 0, notransaksi: "", periode: "", catatan: "", items: formList([{ nama: "", gaji: 0, tipe: "" }]) },
+    initialValues: { tanggalinput: new Date(), karyawanId: "", notransaksi: "", periode: new Date(), catatan: "", items: formList([]) },
     validate: {
-      karyawanId: (value) => (value == 0 ? "Plese input value." : null),
+      karyawanId: (value) => (value.length < 1? "Plese input value." : null),
       periode: (value) => (value.length < 1 ? "Plese input value." : null),
-      tanggalinput: (value) => (value.length < 1 ? "Plese input value." : null),
+      tanggalinput: (value) => (value.length < 1 ? "Plese input value." : null)
     },
   });
   const notifications = useNotifications();
@@ -97,14 +98,24 @@ const Form = ({ data, action, karyawan }) => {
     } else {
       const codeInt = data.id ? data.id : 0;
       const code = generateCode("", parseInt(codeInt) + 1);
-      form.setValues({ tanggalinput: new Date(), karyawanId: 0, notransaksi: code, periode: new Date(), catatan: "", items: formList([{ nama: "", gaji: 0, tipe: "" }]) });
+      form.setFieldValue('notransaksi', code);
     }
   }, []);
   const submitHandler = async (e) => {
     e.preventDefault();
     if (form.validate().hasErrors) return false;
-    console.log(form.values);
-    return false;
+    if (form.values.items.length < 1) {
+      notifications.showNotification({
+        disallowClose: true,
+        autoClose: 5000,
+        title: "Validasi Gagal",
+        message: "Pastikan anda mengisi data item.",
+        color: "red",
+        icon: <X />,
+        loading: false,
+      });
+      return false;
+    }
     setLoading(false);
     const FORMDATA = form.values;
     const method = action === "edit" ? "PUT" : "POST";
@@ -115,7 +126,7 @@ const Form = ({ data, action, karyawan }) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ ...FORMDATA, updatedId: userSession.id, createdId: userSession.id }),
+      body: JSON.stringify({ ...FORMDATA }),
     }).then(async (res) => {
       const result = await res.json();
       if (res.status === 200) {
@@ -145,7 +156,10 @@ const Form = ({ data, action, karyawan }) => {
       }
     });
   };
-
+  const TotalKeseluruhan = form.values.items.reduce((acc, item) => {
+    if (item.tipe == "POTONGAN") return acc - parseInt(item.gaji);
+    return acc + parseInt(item.gaji);
+  }, 0);
   return (
     <Layout session={session}>
       <div className="loader" hidden={loading}>
@@ -202,7 +216,7 @@ const Form = ({ data, action, karyawan }) => {
                 <Select
                   searchable
                   data={[...karyawan.result.map(item => ({
-                    value: item.id,
+                    value: item.id.toString(),
                     label: `${item.nama.toUpperCase()} - ${item.role && item.role.nama.toUpperCase()}`,
                   }))]}
                   {...form.getInputProps("karyawanId")}
@@ -222,7 +236,10 @@ const Form = ({ data, action, karyawan }) => {
                 />
               </Group>
             </Grid.Col>
-            <Grid.Col>    <Button onClick={() => setModal(true)}>Tambah Item</Button></Grid.Col>
+            <Grid.Col sm={6} md={6}>    <Button onClick={() => setModal(true)}>Tambah Item</Button></Grid.Col>
+            <Grid.Col sm={6} md={6} ><Group position="apart">   <Text><b> TOTAL KESELURUHAN :</b></Text> <Text>Rp.{convertToRupiah(TotalKeseluruhan)}</Text></Group></Grid.Col>
+          </Grid>
+          <Grid>
             <Grid.Col sm={12} md={4}>
               <table className="table-bordered w-full">
                 <thead>
@@ -247,17 +264,16 @@ const Form = ({ data, action, karyawan }) => {
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td colSpan={2} className="text-right">
-                      <b>Total</b>
+                    <td >
+                      Total
                     </td>
-                    <td className="text-right">
-                      <b>Rp.{convertToRupiah(form.values.items.filter(e=>e.tipe==="ABSENSI").reduce((acc, item) =>acc + parseInt(item.gaji) , 0))}</b>
+                    <td colSpan={3} className="text-right">
+                      Rp.{convertToRupiah(form.values.items.filter(e => e.tipe === "ABSENSI").reduce((acc, item) => acc + parseInt(item.gaji), 0))}
                     </td>
                   </tr>
                 </tfoot>
               </table>
             </Grid.Col>
-
             <Grid.Col sm={12} md={4}>
               <table className="table-bordered w-full">
                 <thead>
@@ -282,11 +298,11 @@ const Form = ({ data, action, karyawan }) => {
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td colSpan={2} className="text-right">
-                      <b>Total</b>
+                    <td>
+                      Total
                     </td>
-                    <td className="text-right">
-                      <b>Rp.{convertToRupiah(form.values.items.filter(e=>e.tipe==="PENDAPATAN").reduce((acc, item) =>acc + parseInt(item.gaji) , 0))}</b>
+                    <td colSpan={3} className="text-right">
+                      Rp.{convertToRupiah(form.values.items.filter(e => e.tipe === "PENDAPATAN").reduce((acc, item) => acc + parseInt(item.gaji), 0))}
                     </td>
                   </tr>
                 </tfoot>
@@ -316,11 +332,11 @@ const Form = ({ data, action, karyawan }) => {
                 </tbody>
                 <tfoot>
                   <tr>
-                    <td colSpan={2} className="text-right">
-                      <b>Total</b>
+                    <td >
+                      Total
                     </td>
-                    <td className="text-right">
-                      <b>Rp.{convertToRupiah(form.values.items.filter(e=>e.tipe==="POTONGAN").reduce((acc, item) =>acc + parseInt(item.gaji) , 0))}</b>
+                    <td colSpan={3} className="text-right">
+                      Rp.{convertToRupiah(form.values.items.filter(e => e.tipe === "POTONGAN").reduce((acc, item) => acc + parseInt(item.gaji), 0))}
                     </td>
                   </tr>
                 </tfoot>

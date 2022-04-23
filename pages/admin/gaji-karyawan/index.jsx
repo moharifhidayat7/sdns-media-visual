@@ -10,15 +10,14 @@ import dateFormat from "dateformat";
 import { Check, X, CircleCheck } from "tabler-icons-react";
 import { useSession, getSession } from "next-auth/react";
 
-const URL = "/api/mkas";
-const NAMEPAGE = "Kas";
-export default function Index({ mkas }) {
+const URL = "/api/gaji-karyawan";
+const NAMEPAGE = "Gaji Karyawan";
+const index=({ result })=> {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
-
   const { data: session, status } = useSession();
   useEffect(() => {
-    dispatch({ type: "set_data", payload: mkas });
+    dispatch({ type: "set_data", payload: result });
   }, []);
   const deleteHandler = async (selected, isLoading, type = "delete") => {
     const data = { id: selected };
@@ -63,12 +62,16 @@ export default function Index({ mkas }) {
   };
   const header = [
     {
-      key: "kode",
-      label: "Kode",
+      key: "notransaksi",
+      label: "No Transaksi",
     },
     {
-      key: "nama",
-      label: "Nama",
+      key: "periode",
+      label: "Periode",
+    },
+    {
+      key: "karyawan",
+      label: "Karyawan",
     },
     {
       key: "status",
@@ -78,17 +81,12 @@ export default function Index({ mkas }) {
       key: "createdAt",
       label: "Created At",
     },
-    {
-      key: "akses",
-      sortable: false,
-      label: "Akses",
-    },
   ];
   return (
     <Layout session={session}>
       <Head>
         <title style={{ textTransform: "capitalize" }}>
-          Master {NAMEPAGE}{" "}
+          Master {NAMEPAGE}
         </title>
       </Head>
       <Title
@@ -119,15 +117,17 @@ export default function Index({ mkas }) {
                   key={row.id}
                   id={row.id}
                   readLink={`/form?id=${row.id}&read=true`}
-                  editLink={`/form?id=${row.id}`}
-                  deleteField={row.nama}
+                  deleteField={row.notransaksi}
                   onDelete={(isLoading) => deleteHandler(row.id, isLoading)}
                 >
                   <CustomTable.Col>
-                    <Text>{row.kode}</Text>
+                    <Text>{row.notransaksi}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase">{row.nama}</Text>
+                    <Text className="uppercase">{dateFormat(new Date(row.periode),"mmmm yyyy")}</Text>
+                  </CustomTable.Col>
+                  <CustomTable.Col>
+                    <Text className="uppercase">{row.karyawan&&row.karyawan.nama.toUpperCase()}</Text>
                   </CustomTable.Col>
 
                   <CustomTable.Col>
@@ -136,18 +136,6 @@ export default function Index({ mkas }) {
                   <CustomTable.Col>
                     <Text className="uppercase">
                       {dateFormat(row.createdAt, "dd-mm-yyyy")}
-                    </Text>
-                  </CustomTable.Col>
-                  <CustomTable.Col>
-                    <Text>
-                      <Button
-                        variant="subtle"
-                        onClick={() => {
-                          openAksesModal(row);
-                        }}
-                      >
-                        VIEW
-                      </Button>
                     </Text>
                   </CustomTable.Col>
                 </CustomTable.Row>
@@ -170,12 +158,13 @@ export async function getServerSideProps(context) {
     },
   };
   const session = await getSession(context);
-  const res = await fetch(`${process.env.API_URL}/api/mkas`, OPTION);
-  const mkas = await res.json();
+  const res = await fetch(`${process.env.API_URL}/api/gaji-karyawan`, OPTION);
+  const result = await res.json();
   return {
     props: {
-      mkas,
+      result,
       session,
     },
   };
 }
+export default index;

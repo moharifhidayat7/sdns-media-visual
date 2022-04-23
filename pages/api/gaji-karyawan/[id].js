@@ -42,7 +42,7 @@ export default async (req, res) => {
     }
   } else if (req.method == "DELETE") {
     try {
-      const result = await prisma.mkas.update({
+      const result = await prisma.gajiKaryawan.update({
         where: {
           id: parseInt(id),
         },
@@ -52,7 +52,7 @@ export default async (req, res) => {
         },
       });
       res.status(200).json({
-        message: "paket deleted",
+        message: "Data deleted",
         result,
       });
     } catch (err) {

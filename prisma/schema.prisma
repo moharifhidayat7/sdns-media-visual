@@ -105,7 +105,7 @@ model GajiKaryawan {
   notransaksi  String
   periode      String
   catatan      String?
-  status       Status             @default(ACTIVE)
+  status       Status             @default(MENUNGGU)
   karyawan     User?              @relation(fields: [karyawanId], references: [id], name: "GajiKaryawan")
   karyawanId   Int?
   createdAt    DateTime           @default(now())

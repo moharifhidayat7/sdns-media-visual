@@ -6,6 +6,7 @@ table.table-bordered {
 
 table.table-bordered tfoot td {
   border-top: 1px solid #ddd;
+  font-weight: 600;
 }
 
 table.table-bordered th {

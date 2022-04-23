@@ -4,13 +4,35 @@ import { getSession } from "next-auth/react";
 //prisma create produk
 export default async (req, res) => {
   const data = req.body;
-  const session = getSession({ req });
+  const session = await getSession({ req });
   if (req.method == "POST") {
     try {
       const result = await prisma.GajiKaryawan.create({
-        data: {
-          ...data,
+        include: {
+          items: true
         },
+        data: {
+          tanggalinput: data.tanggalinput,
+          karyawanId: parseInt(data.karyawanId),
+          notransaksi: data.notransaksi,
+          catatan: data.catatan,
+          periode: data.periode,
+          createdId: session.user.id || null,
+          updatedId: session.user.id || null,
+          items: {
+            create: [
+              ...data.items.map(e => {
+                return {
+                  gaji: e.gaji,
+                  tipe: e.tipe,
+                  nama: e.nama,
+                  createdId: session.user.id || null,
+                  updatedId: session.user.id || null,
+                }
+              })
+            ]
+          }
+        }
       });
       res.statusCode = 200;
       res.json({
@@ -19,7 +41,7 @@ export default async (req, res) => {
       });
     } catch (error) {
       res.statusCode = 400;
-      res.json({ message: error.message,result:[] });
+      res.json({ message: error.message, result: [] });
     }
   } else if (req.method == "GET") {
     const search = req.query.search || "";
@@ -32,6 +54,7 @@ export default async (req, res) => {
         skip,
         take: limit,
         include: {
+          karyawan:true,
           createdBy: true,
           updatedBy: true,
           items: true

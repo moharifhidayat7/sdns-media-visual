@@ -77,7 +77,7 @@ const menu = [
       { label: "Faktur Stok Keluar", link: "/faktur-stok-keluar" },
       { label: "Faktur Stok Opname", link: "/faktur-stok-opname" },
       { label: "Ringkasan Stok", link: "/ringkasan-stok" },
-      { label: "Slip Gaji Karyawan", link: "/gaji-karyawan" },
+      { label: "Slip Gaji Karyawan", link: "/admin/gaji-karyawan" },
       { label: "Kas", link: "/kas" },
     ],
   },
