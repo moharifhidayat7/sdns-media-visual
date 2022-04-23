@@ -74,7 +74,7 @@ const Form = ({ data, action, karyawan }) => {
   const form = useForm({
     initialValues: { tanggalinput: new Date(), karyawanId: "", notransaksi: "", periode: new Date(), catatan: "", items: formList([]) },
     validate: {
-      karyawanId: (value) => (value.length < 1? "Plese input value." : null),
+      karyawanId: (value) => (value.length < 1 ? "Plese input value." : null),
       periode: (value) => (value.length < 1 ? "Plese input value." : null),
       tanggalinput: (value) => (value.length < 1 ? "Plese input value." : null)
     },
@@ -88,9 +88,7 @@ const Form = ({ data, action, karyawan }) => {
   useEffect(() => {
     if (action != "add") {
       form.setValues({
-        kode: data.kode,
-        nama: data.nama,
-        status: data.status,
+        tanggalinput:data.tanggalinput, karyawanId: data.karyawanId.toString(), notransaksi: data.notransaksi, periode: new Date(), catatan: data.catatan, items: formList([...data.items.map(item=>({nama:item.nama,tipe:item.tipe,gaji:item.gaji}))]) 
       });
       if (action == "read") {
         setDisabled(true);
@@ -222,6 +220,7 @@ const Form = ({ data, action, karyawan }) => {
                   {...form.getInputProps("karyawanId")}
                   onChange={(e) => { form.setFieldValue("karyawanId", e) }}
                   placeholder="Pick one"
+                  disabled={disabled}
                   label="Pegawai/Karyawan"
                   required
                 />
@@ -236,7 +235,7 @@ const Form = ({ data, action, karyawan }) => {
                 />
               </Group>
             </Grid.Col>
-            <Grid.Col sm={6} md={6}>    <Button onClick={() => setModal(true)}>Tambah Item</Button></Grid.Col>
+            <Grid.Col sm={6} md={6}> {action == "read" ? "" : <Button onClick={() => setModal(true)}>Tambah Item</Button>}   </Grid.Col>
             <Grid.Col sm={6} md={6} ><Group position="apart">   <Text><b> TOTAL KESELURUHAN :</b></Text> <Text>Rp.{convertToRupiah(TotalKeseluruhan)}</Text></Group></Grid.Col>
           </Grid>
           <Grid>
@@ -255,7 +254,7 @@ const Form = ({ data, action, karyawan }) => {
                         Rp.{convertToRupiah(item.gaji)}
                       </td>
                       <td className="flex justify-center">
-                        <ActionIcon variant="hover" color="red" onClick={() => form.removeListItem("items", index)}>
+                        <ActionIcon disabled={disabled} variant="hover" color="red" onClick={() => form.removeListItem("items", index)}>
                           <Trash size={16} />
                         </ActionIcon>
                       </td>
@@ -289,7 +288,7 @@ const Form = ({ data, action, karyawan }) => {
                         Rp.{convertToRupiah(item.gaji)}
                       </td>
                       <td className="flex justify-center">
-                        <ActionIcon variant="hover" color="red" onClick={() => form.removeListItem("items", index)}>
+                        <ActionIcon disabled={disabled} variant="hover" color="red" onClick={() => form.removeListItem("items", index)}>
                           <Trash size={16} />
                         </ActionIcon>
                       </td>
@@ -323,7 +322,7 @@ const Form = ({ data, action, karyawan }) => {
                         Rp.{convertToRupiah(item.gaji)}
                       </td>
                       <td className="flex justify-center">
-                        <ActionIcon variant="hover" color="red" onClick={() => form.removeListItem("items", index)}>
+                        <ActionIcon disabled={disabled} variant="hover" color="red" onClick={() => form.removeListItem("items", index)}>
                           <Trash size={16} />
                         </ActionIcon>
                       </td>
@@ -344,7 +343,7 @@ const Form = ({ data, action, karyawan }) => {
             </Grid.Col>
           </Grid>
 
-          <Textarea placeholder="Ketikkan sesuatu (opsional)" label="Catatan" name="catatan" {...form.getInputProps("catatan")} />
+          <Textarea disabled={disabled} placeholder="Ketikkan sesuatu (opsional)" label="Catatan" name="catatan" {...form.getInputProps("catatan")} />
           <div className="space-x-2 mt-10">
             <Button type="button" onClick={() => router.push(`/admin/${PATHNAME}`)} color="red">
               Back

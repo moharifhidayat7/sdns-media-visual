@@ -54,7 +54,11 @@ export default async (req, res) => {
         skip,
         take: limit,
         include: {
-          karyawan:true,
+          karyawan:{
+            include:{
+              role:true
+            }
+          },
           createdBy: true,
           updatedBy: true,
           items: true

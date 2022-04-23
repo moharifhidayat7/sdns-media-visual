@@ -73,6 +73,7 @@ const index=({ result })=> {
       key: "karyawan",
       label: "Karyawan",
     },
+    {key:"jabatan",label:"Jabatan"},
     {
       key: "status",
       label: "Status",
@@ -128,6 +129,9 @@ const index=({ result })=> {
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text className="uppercase">{row.karyawan&&row.karyawan.nama.toUpperCase()}</Text>
+                  </CustomTable.Col>
+                  <CustomTable.Col>
+                    <Text className="uppercase">{row.karyawan&&row.karyawan.role.nama.toUpperCase()}</Text>
                   </CustomTable.Col>
 
                   <CustomTable.Col>
