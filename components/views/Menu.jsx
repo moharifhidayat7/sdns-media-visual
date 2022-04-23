@@ -24,7 +24,7 @@ const menu = [
       { label: "Gudang", link: "/admin/gudang" },
       { label: "Fitur", link: "/admin/fitur" },
       { label: "Paket", link: "/admin/paket" },
-      { label: "Kas", link: "/admin/mkas" },
+      { label: "Akun Kas", link: "/admin/mkas" },
       { label: "Voucher", link: "/admin/voucher" },
     ],
   },

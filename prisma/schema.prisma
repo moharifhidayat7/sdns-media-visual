@@ -98,7 +98,17 @@ model User {
   updatedGajiKaryawan    GajiKaryawan[]    @relation("GajiKaryawanupdatedBy")
   gajiKaryawan           GajiKaryawan[]    @relation("GajiKaryawan")
 }
-
+// model Kas{
+//     status       Status             @default(MENUNGGU)
+//   createdAt    DateTime           @default(now())
+//   updatedAt    DateTime           @updatedAt
+//   deletedAt    DateTime?
+//   isDeleted    Boolean?           @default(false)
+//   updatedBy    User?              @relation(fields: [updatedId], references: [id], name: "GajiKaryawanupdatedBy")
+//   createdBy    User?              @relation(fields: [createdId], references: [id], name: "GajiKaryawancreatedBy")
+//   updatedId    Int?
+//   createdId    Int?
+// }
 model GajiKaryawan {
   id           Int                @id @default(autoincrement())
   tanggalinput DateTime           @default(now())
