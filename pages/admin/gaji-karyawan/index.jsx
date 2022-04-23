@@ -12,7 +12,7 @@ import { useSession, getSession } from "next-auth/react";
 
 const URL = "/api/gaji-karyawan";
 const NAMEPAGE = "Gaji Karyawan";
-const Index = ({ result }) => {
+const index = ({ result }) => {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
   const { data: session, status } = useSession();
