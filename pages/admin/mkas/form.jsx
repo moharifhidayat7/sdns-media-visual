@@ -26,7 +26,6 @@ export async function getServerSideProps(context) {
   const id = context.query.id;
   const read = context.query.read;
   const session = await getSession(context);
-  const userSession = session.user;
   let mkas = [];
   let action = "add";
   const OPTIONFETCH = {
@@ -57,14 +56,13 @@ export async function getServerSideProps(context) {
   return {
     props: {
       action,
-      userSession,
       data: mkas,
       session
     },
   };
 }
 
-function Form({ data, action, userSession }) {
+function Form({ data, action}) {
   const form = useForm({
     initialValues: { kode: "", nama: "", prefix: "", status: "", perkiraan: formList([]),disconnect:[] },
     validate: {
