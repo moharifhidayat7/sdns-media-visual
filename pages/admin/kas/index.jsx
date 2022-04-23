@@ -12,7 +12,7 @@ import { useSession, getSession } from "next-auth/react";
 
 const URL = "/api/gaji-karyawan";
 const NAMEPAGE = "Gaji Karyawan";
-const index=({ result })=> {
+const Index=({ result })=> {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
   const { data: session, status } = useSession();
@@ -171,4 +171,4 @@ export async function getServerSideProps(context) {
     },
   };
 }
-export default index;
+export default Index;
