@@ -188,7 +188,7 @@ model FakturStokMasukItem {
 
 model Mkas {
   id        Int             @id @default(autoincrement())
-  nama      String          @unique
+  nama      String          
   kode      String
   prefix    String          @unique
   status    Status?         @default(INACTIVE)

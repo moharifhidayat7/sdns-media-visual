@@ -37,31 +37,30 @@ export default async (req, res) => {
           prefix: data.prefix,
           kode: data.kode,
           updatedId: session.user.id,
-          perkiraan:{
-            disconnect:[...data.disconnect.map(item => {
+          perkiraan: {
+            disconnect: [...data.disconnect.map(item => {
               return {
-                id: item.id
+                id: parseInt(item)
               }
             })],
-            upsert:[...data.perkiraan.map(item => {
+            upsert: [...data.perkiraan.map(item => {
               return {
-                create:{
+                create: {
                   nama: item.nama,
                   status: item.status,
                   createdId: session.user.id,
                   updatedId: session.user.id
                 },
-                update:{
+                update: {
                   nama: item.nama,
                   status: item.status,
                   updatedId: session.user.id
                 },
-                where:{
-                  id: item.id
+                where: {
+                  id: item.id || 0
                 }
               }
             })]
-
           }
         },
       });

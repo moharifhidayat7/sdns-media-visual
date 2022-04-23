@@ -62,9 +62,9 @@ export async function getServerSideProps(context) {
   };
 }
 
-function Form({ data, action}) {
+function Form({ data, action }) {
   const form = useForm({
-    initialValues: { kode: "", nama: "", prefix: "", status: "", perkiraan: formList([]),disconnect:[] },
+    initialValues: { kode: "", nama: "", prefix: "", status: "", perkiraan: formList([]), disconnect: [] },
     validate: {
       nama: (value) => (value.length < 1 ? "Plese input nama." : null),
       prefix: (value) => (value.length < 1 ? "Plese input value." : null),
@@ -86,12 +86,12 @@ function Form({ data, action}) {
         nama: data.nama,
         prefix: data.prefix,
         status: data.status,
-        perkiraan:formList([...data.perkiraan.map((item) => ({
+        perkiraan: formList([...data.perkiraan.map((item) => ({
           nama: item.nama,
           status: item.status,
           id: item.id,
         }))]),
-        disconnect:[]
+        disconnect: []
       });
       if (action == "read") {
         setDisabled(true);
@@ -99,13 +99,14 @@ function Form({ data, action}) {
     } else {
       const codeInt = data.id ? data.id : 0;
       const code = generateCode("MKS", parseInt(codeInt) + 1);
+      const prefix = data.prefix ? "0" + (parseInt(data.prefix) + 2) : "01";
       form.setFieldValue("kode", code)
+      form.setFieldValue("prefix", prefix)
     }
   }, []);
   const submitHandler = async (e) => {
     e.preventDefault();
     if (form.validate().hasErrors) return false;
-    console.log(form.values);
     if (form.values.perkiraan.length < 1) {
       notifications.showNotification({
         disallowClose: true,
@@ -164,15 +165,17 @@ function Form({ data, action}) {
       <TextInput
         placeholder="Nama"
         required
+        disabled={disabled}
         sx={{ flex: 1 }}
         {...form.getListInputProps('perkiraan', index, 'nama')}
       />
-      <Select required data={["DEBIT", "KREDIT"]} placeholder="Deb/Kre"    {...form.getListInputProps('perkiraan', index, 'status')} />
+      <Select   disabled={disabled} required data={["DEBIT", "KREDIT"]} placeholder="Deb/Kre"    {...form.getListInputProps('perkiraan', index, 'status')} />
       <ActionIcon
         color="red"
         variant="hover"
+        disabled={disabled}
         onClick={() => {
-          if(item.id!=undefined){
+          if (item.id != undefined) {
             form.setFieldValue("disconnect", [...form.values.disconnect, item.id])
           }
           form.removeListItem('perkiraan', index)
@@ -191,7 +194,7 @@ function Form({ data, action}) {
         <title>Master {PAGENAME}</title>
       </Head>
       <Title order={2} style={{ marginBottom: "1.5rem" }}>
-        {action == "read" ? "Read" : "Form"} {PAGENAME}
+        {action == "read" ? "Read" : "Form"} Akun Kas
       </Title>
 
       <Box
@@ -264,9 +267,9 @@ function Form({ data, action}) {
                 </Text>
                 }
               </InputWrapper>
-
-              <Button
-                type="button" className="mt-3" onClick={() => form.addListItem("perkiraan", { nama: "", status: "" })}>Tambah Perkiraan</Button>
+              {action != "read" &&
+                <Button
+                  type="button" className="mt-3" onClick={() => form.addListItem("perkiraan", { nama: "", status: "" })}>Tambah Perkiraan</Button>}
             </Grid.Col>
 
 
