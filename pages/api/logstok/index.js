@@ -39,9 +39,13 @@ const logstok = async (req, res) => {
           updatedBy: true,
           createdBy: true,
           inventori: true,
+          gudang: true,
         },
         where: {
           isDeleted: false,
+          gudang:{
+            isDeleted:false
+          }
         },
         orderBy: {
           id: "desc",

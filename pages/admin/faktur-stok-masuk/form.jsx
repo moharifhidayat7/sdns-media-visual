@@ -56,7 +56,7 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
         })
       );
     }
-    const kode = stokmasuk.result[0] ? stokmasuk.result[0].id : 0;
+    const kode = stokmasuk ? stokmasuk.id : 0;
     form.setFieldValue("nomortransaksi", generateCode("", parseInt(kode) + 1));
   }, []);
   const handleItem = (e) => {
@@ -74,6 +74,10 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
       return false;
     }
 
+
+    const logstok = gudangs.result.map((x) => {
+      return e.logstok.filter((y) => y.gudangId == x.id)
+    })
     const stokgudang = gudangs.result.map((x) => {
       const gudang = e.logstok.reduce((a, b) => {
         if (b.gudangId == x.id) {
@@ -88,11 +92,10 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
         satuan: x.satuan,
       }
     });
-    const stokfinal = e.logstok.reduce((a, b) => {
+    const stokfinal = stokgudang.reduce((a, b) => {
       return a + b.stok
     }, 0)
-
-    setItems([...items, { ...e, gudang: stokgudang, stokfinalb: stokfinal, stokfinal }]);
+    setItems([...items, { ...e, logstok: logstok, gudang: stokgudang, stokfinalb: stokfinal, stokfinal }]);
   };
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -416,7 +419,7 @@ const ViewModal = ({ modal, inventories, handleItem }) => {
     </Modal>
   );
 };
-export const Items = ({ items, gudangs, deleteItems = () => { }, set }) => {
+const Items = ({ items, gudangs, deleteItems = () => { }, set }) => {
   const handleChange = (e, gudang) => {
     const value = e.target.value || items.stok;
     const name = e.target.name;
@@ -440,9 +443,9 @@ export const Items = ({ items, gudangs, deleteItems = () => { }, set }) => {
         });
         hasGudang[0].qty = parseInt(value);
 
-        const stokfinal = e.gudang.reduce((y, x) => {
+        const stokfinal = e.gudang.length > 1 ? e.gudang.reduce((y, x) => {
           return parseInt(y.qty) + parseInt(x.qty)
-        });
+        }) : parseInt(value);
         set.setItems(set.items.filter((x) => {
           if (x.id == items.id) {
             x.stokfinal = x.stokfinalb + stokfinal
@@ -524,10 +527,15 @@ export const getServerSideProps = async (context) => {
       Cookie: context.req.headers.cookie,
     },
   };
-  const stokmasuk = await fetch(
-    `${process.env.API_URL}/api/stokmasuk`,
+  const readOnly = context.query.read
+  const id = context.query.id || null
+  const url = `${process.env.API_URL}/api/stokmasuk`;
+  const stokmasukresults = await fetch(
+    url,
     header
   ).then((res) => res.json());
+  const stokmasukresult = await fetch(`${url}/${id}`, header).then((res) => res.json())
+
   const suppliers = await fetch(
     `${process.env.API_URL}/api/supplier`,
     header
@@ -540,13 +548,16 @@ export const getServerSideProps = async (context) => {
     `${process.env.API_URL}/api/inventori`,
     header
   ).then((res) => res.json());
+  const stokmasuk =stokmasukresult.result.length>0?stokmasukresult.result: stokmasukresults.result[0]
+
   return {
     props: {
       suppliers,
       gudangs,
       inventories,
       session,
-      stokmasuk: stokmasuk,
+      stokmasuk,
+      action: readOnly ? "SHOW" : "ADD",
     },
   };
 };

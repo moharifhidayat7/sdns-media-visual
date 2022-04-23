@@ -1,4 +1,6 @@
-import { useRouter } from "next/router";
+import {
+  useRouter
+} from "next/router";
 
 export function inputNumberOnly(e) {
   if (e.target.value.match(/[^0-9]/g)) {
@@ -15,7 +17,22 @@ export function generateCode(prefix, value) {
   }
   return code + value;
 }
-
+//convert number to rupiah  format
+export function convertToRupiah(angka) {
+  let rupiah = "";
+  let angkarev = angka
+    .toString()
+    .split("")
+    .reverse()
+    .join("");
+  for (let i = 0; i < angkarev.length; i++)
+    if (i % 3 == 0) rupiah += angkarev.substr(i, 3) + ".";
+  let hasil =
+    rupiah.split("", rupiah.length - 1)
+    .reverse()
+    .join("");
+  return hasil + ",-";
+}
 export function generateString(length) {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

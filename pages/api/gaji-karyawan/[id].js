@@ -7,38 +7,24 @@ export default async (req, res) => {
   const id = req.query.id;
   if (req.method == "GET") {
     try {
-      const result = await prisma.FakturStokMasuk.findFirst({
+      const result = await prisma.mkas.findFirst({
         include: {
           updatedBy: true,
           createdBy: true,
-          items: {
-            where:{
-              Gudang:{
-                isDeleted:false
-              },
-              Inventori:{
-                isDeleted:false
-              }
-            },
-           include:{
-             Inventori:true,
-              Gudang:true
-           }
-          }
         },
         where: {
           id: parseInt(id),
           isDeleted: false,
         },
       });
-      res.status(200).json({result:result});
+      res.status(200).json(result);
     } catch (err) {
-      res.status(403).json({ err: err.message, result: [] });
+      res.status(403).json({ err: err.message });
     }
   } else if (req.method == "PUT") {
     try {
       const data = req.body;
-      const result = await prisma.FakturStokMasuk.update({
+      const result = await prisma.mkas.update({
         where: {
           id: parseInt(id),
         },
@@ -56,7 +42,7 @@ export default async (req, res) => {
     }
   } else if (req.method == "DELETE") {
     try {
-      const result = await prisma.FakturStokMasuk.update({
+      const result = await prisma.gajiKaryawan.update({
         where: {
           id: parseInt(id),
         },
@@ -66,7 +52,7 @@ export default async (req, res) => {
         },
       });
       res.status(200).json({
-        message: "deleted",
+        message: "Data deleted",
         result,
       });
     } catch (err) {

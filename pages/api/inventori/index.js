@@ -42,7 +42,16 @@ const inventori = async (req, res) => {
         include: {
           createdBy: true,
           updatedBy: true,
-          logstok: true,
+          logstok: {
+            where:{
+              gudang:{
+                isDeleted:false
+              }
+            },
+            include: {
+              gudang: true,
+            }
+          },
         },
         where: {
           isDeleted: false,
@@ -91,7 +100,7 @@ const inventori = async (req, res) => {
         limit,
       });
     } catch (err) {
-      res.status(403).json({ err: "Error occured." });
+      res.status(403).json({ err: err.message });
     }
   } else if (method == "DELETE") {
     try {

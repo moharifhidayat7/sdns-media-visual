@@ -4,6 +4,11 @@ table.table-bordered {
   border-radius: 5px;
 }
 
+table.table-bordered tfoot td {
+  border-top: 1px solid #ddd;
+  font-weight: 600;
+}
+
 table.table-bordered th {
   border-right: 1px solid #ddd;
   font-weight: 600;

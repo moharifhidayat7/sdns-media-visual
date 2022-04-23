@@ -1,33 +1,27 @@
 import Head from "next/head";
-
 import Layout from "@components/views/Layout";
 import { Title, Text, Button, Modal, Table } from "@mantine/core";
-
 import { CustomTable } from "@components/Table/CustomTable";
 import DataTable from "@components/Table/DataTable";
 import { useContext, useEffect, useState } from "react";
 import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useNotifications } from "@mantine/notifications";
 import dateFormat from "dateformat";
-import { Check, H3, X } from "tabler-icons-react";
+import { Check, X, CircleCheck } from "tabler-icons-react";
 import { useSession, getSession } from "next-auth/react";
-export default function Index({ inventori }) {
+
+const URL = "/api/gaji-karyawan";
+const NAMEPAGE = "Gaji Karyawan";
+const index=({ result })=> {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
-
   const { data: session, status } = useSession();
-  const [modalStokLog, setModalStokLog] = useState({
-    opened: false,
-    data: [],
-  });
-
   useEffect(() => {
-    dispatch({ type: "set_data", payload: inventori });
+    dispatch({ type: "set_data", payload: result });
   }, []);
   const deleteHandler = async (selected, isLoading, type = "delete") => {
     const data = { id: selected };
-    const url =
-      type == "delete" ? `/api/inventori/${selected}` : `/api/inventori`;
+    const url = type == "delete" ? `${URL}/${selected}` : URL;
     await fetch(url, {
       method: "DELETE",
       headers: {
@@ -61,37 +55,25 @@ export default function Index({ inventori }) {
     });
   };
   const refreshHandler = async (isLoading, page = 1, search = "") => {
-    const url = `/api/inventori?page=${page}&search=${search}`;
-    const res = await fetch(url);
+    const res = await fetch(`${URL}?page=${page}&search=${search}`);
     const data = await res.json();
     dispatch({ type: "set_data", payload: { ...data, search, page } });
     isLoading(false);
   };
   const header = [
     {
-      key: "kode",
-      label: "Kode",
+      key: "notransaksi",
+      label: "No Transaksi",
     },
     {
-      key: "nama",
-      label: "Nama",
+      key: "periode",
+      label: "Periode",
     },
     {
-      key: "tipe",
-      label: "Tipe",
+      key: "karyawan",
+      label: "Karyawan",
     },
-    {
-      key: "merek",
-      label: "Merek",
-    },
-    {
-      key: "satuan",
-      label: "Satuan",
-    },
-    {
-      key: "logstok",
-      label: "Log Stok",
-    },
+    {key:"jabatan",label:"Jabatan"},
     {
       key: "status",
       label: "Status",
@@ -101,17 +83,18 @@ export default function Index({ inventori }) {
       label: "Created At",
     },
   ];
-
   return (
     <Layout session={session}>
       <Head>
-        <title style={{ textTransform: "capitalize" }}>Master Inventori </title>
+        <title style={{ textTransform: "capitalize" }}>
+          Master {NAMEPAGE}
+        </title>
       </Head>
       <Title
         order={2}
         style={{ marginBottom: "1.5rem", textTransform: "capitalize" }}
       >
-        Data Inventori
+        Data {NAMEPAGE}
       </Title>
       <DataTable>
         <DataTable.Action
@@ -124,7 +107,7 @@ export default function Index({ inventori }) {
         />
         <CustomTable
           header={header}
-          name="inventori"
+          name={NAMEPAGE}
           withSelection={true}
           withAction={true}
         >
@@ -135,39 +118,22 @@ export default function Index({ inventori }) {
                   key={row.id}
                   id={row.id}
                   readLink={`/form?id=${row.id}&read=true`}
-                  editLink={`/form?id=${row.id}`}
-                  deleteField={row.nama}
+                  deleteField={row.notransaksi}
                   onDelete={(isLoading) => deleteHandler(row.id, isLoading)}
                 >
                   <CustomTable.Col>
-                    <Text>{row.kode}</Text>
+                    <Text>{row.notransaksi}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase">{row.nama}</Text>
+                    <Text className="uppercase">{dateFormat(new Date(row.periode),"mmmm yyyy")}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase">{row.tipe}</Text>
+                    <Text className="uppercase">{row.karyawan&&row.karyawan.nama.toUpperCase()}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase">{row.merek}</Text>
+                    <Text className="uppercase">{row.karyawan&&row.karyawan.role.nama.toUpperCase()}</Text>
                   </CustomTable.Col>
-                  <CustomTable.Col>
-                    <Text className="uppercase">{row.satuan}</Text>
-                  </CustomTable.Col>
-                  <CustomTable.Col>
-                    <Button
-                      variant="subtle"
-                      onClick={() =>
-                        setModalStokLog({
-                          opened: true,
-                          title: `${row.kode} - ${row.nama} ${row.tipe} ${row.merek}`,
-                          data: row.logstok,
-                        })
-                      }
-                    >
-                      VIEW({row.logstok ? row.logstok.length : 0})
-                    </Button>
-                  </CustomTable.Col>
+
                   <CustomTable.Col>
                     <Text className="uppercase">{row.status}</Text>
                   </CustomTable.Col>
@@ -186,75 +152,23 @@ export default function Index({ inventori }) {
           onChange={(page, isLoading) => refreshHandler(isLoading, page)}
         />
       </DataTable>
-      <ViewModalLogStok
-        logstok={modalStokLog}
-        setModalStokLog={setModalStokLog}
-      />
     </Layout>
   );
 }
-const ViewModalLogStok = ({ logstok, setModalStokLog }) => {
-  //sum stok total
-  const sumStok = logstok.data.reduce((acc, cur) => {
-    return acc + cur.stok;
-  }, 0);
-
-  return (
-    <Modal
-      opened={logstok.opened}
-      onClose={() =>
-        setModalStokLog({
-          opened: false,
-          data: [],
-        })
-      }
-      size="lg"
-      transition="rotate-left"
-      title={logstok.title}
-    >
-      <Table verticalSpacing="xs" className="border">
-        <thead>
-          <tr>
-            <th>NO</th>
-            <th>Unique Date Log</th>
-            <th>Created On</th>
-            <th>Gudang</th>
-            <th>Stok</th>
-          </tr>
-        </thead>
-        <tbody>
-          {logstok.data.map((element, key) => (
-            <tr key={element.id}>
-              <td>{key + 1}</td>
-              <td>{element.datelog}</td>
-              <td>{dateFormat(element.createdAt, "dd-mm-yyyy")}</td>
-              <td>{element.gudang.nama}</td>
-              <td>{element.stok}</td>
-            </tr>
-          ))}
-        </tbody>
-        <tfoot>
-          <tr>
-            <th colSpan="4">Total</th>
-            <th>{sumStok}</th>
-          </tr>
-        </tfoot>
-      </Table>
-    </Modal>
-  );
-};
-
 export async function getServerSideProps(context) {
-  const res = await fetch(`${process.env.API_URL}/api/inventori/`, {
+  const OPTION = {
     headers: {
       Cookie: context.req.headers.cookie,
     },
-  });
-  const inventori = await res.json();
+  };
+  const session = await getSession(context);
+  const res = await fetch(`${process.env.API_URL}/api/gaji-karyawan`, OPTION);
+  const result = await res.json();
   return {
     props: {
-      inventori,
-      session: await getSession(context),
+      result,
+      session,
     },
   };
 }
+export default index;
