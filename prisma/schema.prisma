@@ -88,8 +88,6 @@ model User {
   updatedPaket           Paket[]           @relation("paketupdatedBy")
   updatedUser            User[]            @relation("updatedBy")
   createdUser            User[]            @relation("createdBy")
-  createdMkas            Mkas[]            @relation("mkascreatedBy")
-  updatedMkas            Mkas[]            @relation("mkasupdatedBy")
   createdFakturStokMasuk FakturStokMasuk[] @relation("fakturstokmasukcreatedBy")
   updatedFakturStokMasuk FakturStokMasuk[] @relation("fakturstokmasukupdatedBy")
   updatedRole            Role[]            @relation("roleupdatedBy")
@@ -101,17 +99,6 @@ model User {
   gajiKaryawan           GajiKaryawan[]    @relation("GajiKaryawan")
 }
 
-// model Kas{
-//     status       Status             @default(MENUNGGU)
-//   createdAt    DateTime           @default(now())
-//   updatedAt    DateTime           @updatedAt
-//   deletedAt    DateTime?
-//   isDeleted    Boolean?           @default(false)
-//   updatedBy    User?              @relation(fields: [updatedId], references: [id], name: "GajiKaryawanupdatedBy")
-//   createdBy    User?              @relation(fields: [createdId], references: [id], name: "GajiKaryawancreatedBy")
-//   updatedId    Int?
-//   createdId    Int?
-// }
 model GajiKaryawan {
   id           Int                @id @default(autoincrement())
   tanggalinput DateTime           @default(now())
@@ -186,36 +173,36 @@ model FakturStokMasukItem {
   createdId         Int?
 }
 
-model Mkas {
-  id        Int             @id @default(autoincrement())
-  nama      String          
-  kode      String
-  prefix    String          @unique
-  status    Status?         @default(INACTIVE)
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
-  deletedAt DateTime?
-  isDeleted Boolean?        @default(false)
-  updatedBy User?           @relation(fields: [updatedId], references: [id], name: "mkasupdatedBy")
-  createdBy User?           @relation(fields: [createdId], references: [id], name: "mkascreatedBy")
-  updatedId Int?
-  createdId Int?
-  perkiraan MkasPerkiraan[] @relation("mkasperkiraan")
-}
+// model Mkas {
+//   id        Int             @id @default(autoincrement())
+//   nama      String          
+//   kode      String
+//   prefix    String          @unique
+//   status    Status?         @default(INACTIVE)
+//   createdAt DateTime        @default(now())
+//   updatedAt DateTime        @updatedAt
+//   deletedAt DateTime?
+//   isDeleted Boolean?        @default(false)
+//   updatedBy User?           @relation(fields: [updatedId], references: [id], name: "mkasupdatedBy")
+//   createdBy User?           @relation(fields: [createdId], references: [id], name: "mkascreatedBy")
+//   updatedId Int?
+//   createdId Int?
+//   perkiraan MkasPerkiraan[] @relation("mkasperkiraan")
+// }
 
-model MkasPerkiraan {
-  id        Int       @id @default(autoincrement())
-  nama      String
-  mkas      Mkas?     @relation(fields: [mkasId], references: [id], name: "mkasperkiraan")
-  mkasId    Int?
-  status    Status    @default(DEBIT)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  deletedAt DateTime?
-  isDeleted Boolean?  @default(false)
-  updatedId Int?
-  createdId Int?
-}
+// model MkasPerkiraan {
+//   id        Int       @id @default(autoincrement())
+//   nama      String
+//   mkas      Mkas?     @relation(fields: [mkasId], references: [id], name: "mkasperkiraan")
+//   mkasId    Int?
+//   status    Status    @default(DEBIT)
+//   createdAt DateTime  @default(now())
+//   updatedAt DateTime? @updatedAt
+//   deletedAt DateTime?
+//   isDeleted Boolean?  @default(false)
+//   updatedId Int?
+//   createdId Int?
+// }
 
 model Fitur {
   id        Int              @id @default(autoincrement())
@@ -376,12 +363,17 @@ enum TipeAkun {
 
 model Akun {
   id        Int       @id @default(autoincrement())
-  kode      String    @unique
+  kode      String 
   nama      String
   tipe      TipeAkun
   parentId  Int?
   parent    Akun?     @relation(name: "SubAkun", references: [id], fields: [parentId])
   child     Akun[]    @relation(name: "SubAkun")
   isDeleted Boolean?  @default(false)
+  createdAt DateTime?  @default(now())
+  updatedAt DateTime?  @updatedAt
+  createdId Int?
+  updatedId Int?
   deletedAt DateTime?
+  @@unique([kode, parentId], name: "uniqueAkun")
 }

@@ -64,7 +64,7 @@ export async function getServerSideProps(context) {
   const akun = await res.json();
   return {
     props: {
-      akun,
+      akun:akun.result,
       session: await getSession(context),
     },
   };

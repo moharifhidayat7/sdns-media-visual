@@ -1,54 +1,97 @@
 import prisma from "lib/prisma";
 import { getSession } from "next-auth/react";
 
-export default async function handler(req, res) {
+//prisma create produk
+
+const Index = async (req, res) => {
+  const data = req.body;
   const session = await getSession({ req });
-
-  if (req.method === "GET") {
+  if (req.method == "POST") {
     try {
-      const akun = await prisma.akun.findMany();
-
-      res.status(200).json(akun);
-    } catch (error) {
-      res.status(400).json({ err: "Error occured." });
-    }
-  }
-  if (req.method === "POST") {
-    try {
-      const akun = await prisma.akun.create({
+      const result = await prisma.akun.create({
         data: {
-          ...req.body,
-        },
+          ...data,
+          kode:data.kode,
+          parentId:parseInt(data.parentId)||null,
+          createdId: session.user.id,
+          updatedId: session.user.id,
+        }
       });
-
       res.statusCode = 200;
       res.json({
-        message: "Akun created",
-        akun,
+        message: "Data berhasil ditambahkan",
+        result,
       });
     } catch (error) {
-      res.status(400).json({ err: "Error occured." });
+      res.statusCode = 400;
+      res.json({ message: error.message, result: [] });
     }
-  }
-  if (req.method === "DELETE") {
+  } else if (req.method == "GET") {
+    const search = req.query.search || "";
+    const status = req.query.status || undefined;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
     try {
-      const akun = await prisma.akun.updateMany({
+      const result = await prisma.akun.findMany({
+        skip,
+        take: limit,
+        include: {
+          child:true,
+          parent:true,
+        },
         where: {
-          id: { in: req.body.id },
+          isDeleted: false,
+        },
+        orderBy: {
+          kode: "asc",
+        },
+      });
+      const total = await prisma.akun.count({
+        where: {
+          isDeleted: false,
+        },
+      });
+      const pages = Math.ceil(total / limit);
+      res.json({
+        status: "success",
+        message: "Berhasil mengambil data mkas",
+        result,
+        total,
+        pages,
+        page,
+        limit,
+      });
+    } catch (err) {
+      res.status(403).json({
+        status: "error",
+        message: err.message,
+        result: [],
+        total: 0,
+        pages: 0,
+        page: 1,
+        limit: 10,
+      });
+    }
+  } else if (req.method == "DELETE") {
+    try {
+      const result = await prisma.akun.updateMany({
+        where: {
+          id: { in: data.id },
         },
         data: {
           isDeleted: true,
           deletedAt: new Date(),
         },
       });
-
       res.statusCode = 200;
       res.json({
-        message: "Akun deleted",
-        akun,
+        message: "Data deleted",
+        result,
       });
     } catch (error) {
-      res.status(400).json({ err: "Error occured." });
+      res.status(403).json({ err: err.message });
     }
   }
-}
+};
+export default Index;

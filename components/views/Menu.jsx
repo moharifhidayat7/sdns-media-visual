@@ -16,7 +16,7 @@ const menu = [
   {
     label: "Master",
     icon: BuildingCottage,
-    initiallyOpened: true,
+    initiallyOpened: false,
     links: [
       { label: "Produk", link: "/admin/produk" },
       { label: "Inventori", link: "/admin/inventori" },
@@ -24,7 +24,6 @@ const menu = [
       { label: "Gudang", link: "/admin/gudang" },
       { label: "Fitur", link: "/admin/fitur" },
       { label: "Paket", link: "/admin/paket" },
-      { label: "Akun Kas", link: "/admin/mkas" },
       { label: "Akun", link: "/admin/akun" },
       { label: "Voucher", link: "/admin/voucher" },
     ],
@@ -67,7 +66,6 @@ const menu = [
       { label: "Inventori Pengembalian", link: "/pengembalian" },
       { label: "Pembayaran Gaji Karyawan", link: "/admin/gaji-karyawan/form" },
       { label: "Tagihan Pelanggan", link: "/tagihan-pelanggan" },
-      { label: "Kas", link: "/kas-form" },
     ],
   },
   {
@@ -79,7 +77,6 @@ const menu = [
       { label: "Faktur Stok Opname", link: "/faktur-stok-opname" },
       { label: "Ringkasan Stok", link: "/ringkasan-stok" },
       { label: "Slip Gaji Karyawan", link: "/admin/gaji-karyawan" },
-      { label: "Kas", link: "/kas" },
     ],
   },
   { label: "Settings", icon: Adjustments, link: "/settings" },
