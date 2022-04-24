@@ -9,9 +9,10 @@ import { useNotifications } from "@mantine/notifications";
 import dateFormat from "dateformat";
 import { Check, X, CircleCheck } from "tabler-icons-react";
 import { useSession, getSession } from "next-auth/react";
+import { convertToRupiah } from "helpers/functions";
 
-const URL = "/api/gaji-karyawan";
-const NAMEPAGE = "Gaji Karyawan";
+const URL = "/api/kas";
+const NAMEPAGE = "Kas";
 export default function Index({ result }) {
   const [state, dispatch] = useGlobalContext();
   const notifications = useNotifications();
@@ -62,33 +63,24 @@ export default function Index({ result }) {
   };
   const header = [
     {
-      key: "notransaksi",
-      label: "No Transaksi",
+      key: "tanggal",
+      label: "Tanggal",
     },
     {
-      key: "periode",
-      label: "Periode",
+      key: "noakun",
+      label: "Akun",
     },
     {
-      key: "karyawan",
-      label: "Karyawan",
+      key: "keterangan",
+      label: "Keterangan",
     },
-    {key:"jabatan",label:"Jabatan"},
-    {
-      key: "status",
-      label: "Status",
-    },
-    {
-      key: "createdAt",
-      label: "Created At",
-    },
+    { key: "debet", label: "Debet" },
+    { key: "kredit", label: "Kredit" },
   ];
   return (
     <Layout session={session}>
       <Head>
-        <title style={{ textTransform: "capitalize" }}>
-          Master {NAMEPAGE}
-        </title>
+        <title style={{ textTransform: "capitalize" }}>Master {NAMEPAGE}</title>
       </Head>
       <Title
         order={2}
@@ -118,28 +110,32 @@ export default function Index({ result }) {
                   key={row.id}
                   id={row.id}
                   readLink={`/form?id=${row.id}&read=true`}
-                  deleteField={row.notransaksi}
+                  editLink={`/form?id=${row.id}`}
+                  deleteField={row.createdAt}
                   onDelete={(isLoading) => deleteHandler(row.id, isLoading)}
                 >
                   <CustomTable.Col>
-                    <Text>{row.notransaksi}</Text>
-                  </CustomTable.Col>
-                  <CustomTable.Col>
-                    <Text className="uppercase">{dateFormat(new Date(row.periode),"mmmm yyyy")}</Text>
-                  </CustomTable.Col>
-                  <CustomTable.Col>
-                    <Text className="uppercase">{row.karyawan&&row.karyawan.nama.toUpperCase()}</Text>
-                  </CustomTable.Col>
-                  <CustomTable.Col>
-                    <Text className="uppercase">{row.karyawan&&row.karyawan.role.nama.toUpperCase()}</Text>
-                  </CustomTable.Col>
-
-                  <CustomTable.Col>
-                    <Text className="uppercase">{row.status}</Text>
+                    <Text>{dateFormat(row.createdAt, "dd/mm/yy")}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text className="uppercase">
-                      {dateFormat(row.createdAt, "dd-mm-yyyy")}
+                      {row.akun && `${row.akun.kode} - ${row.akun.nama}`}
+                    </Text>
+                  </CustomTable.Col>
+                  <CustomTable.Col>
+                    <Text className="uppercase">
+                      {row.keterangan}
+                    </Text>
+                  </CustomTable.Col>
+                  <CustomTable.Col>
+                    <Text className="">
+                      {row.akun && row.akun.tipe == "DEBET" ?"Rp."+ convertToRupiah(row.saldo) : ""}
+                    </Text>
+                  </CustomTable.Col>
+
+                  <CustomTable.Col>
+                    <Text className=" text-red-500">
+                      {row.akun && row.akun.tipe == "KREDIT" ? "Rp." + convertToRupiah(row.saldo) : ""}
                     </Text>
                   </CustomTable.Col>
                 </CustomTable.Row>
@@ -154,7 +150,7 @@ export default function Index({ result }) {
       </DataTable>
     </Layout>
   );
-}
+};
 export async function getServerSideProps(context) {
   const OPTION = {
     headers: {
@@ -162,7 +158,7 @@ export async function getServerSideProps(context) {
     },
   };
   const session = await getSession(context);
-  const res = await fetch(`${process.env.API_URL}/api/gaji-karyawan`, OPTION);
+  const res = await fetch(`${process.env.API_URL}/api/kas`, OPTION);
   const result = await res.json();
   return {
     props: {

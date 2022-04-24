@@ -376,6 +376,22 @@ model Akun {
   createdId Int?
   updatedId Int?
   deletedAt DateTime?
+  kas       Kas[]     @relation("KasAkun")
 
   @@unique([kode, parentId], name: "uniqueAkun")
+}
+
+model Kas {
+  id         Int       @id @default(autoincrement())
+  kode       String?
+  keterangan String
+  saldo      String
+  akun       Akun?     @relation(name: "KasAkun", references: [id], fields: [akunId])
+  akunId     Int?
+  isDeleted  Boolean?  @default(false)
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
+  createdId  Int?
+  updatedId  Int?
+  deletedAt  DateTime?
 }
