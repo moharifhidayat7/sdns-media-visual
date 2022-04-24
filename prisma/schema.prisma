@@ -175,7 +175,7 @@ model FakturStokMasukItem {
 
 // model Mkas {
 //   id        Int             @id @default(autoincrement())
-//   nama      String          
+//   nama      String
 //   kode      String
 //   prefix    String          @unique
 //   status    Status?         @default(INACTIVE)
@@ -363,17 +363,34 @@ enum TipeAkun {
 
 model Akun {
   id        Int       @id @default(autoincrement())
-  kode      String 
+  kode      String
   nama      String
   tipe      TipeAkun
   parentId  Int?
   parent    Akun?     @relation(name: "SubAkun", references: [id], fields: [parentId])
   child     Akun[]    @relation(name: "SubAkun")
   isDeleted Boolean?  @default(false)
-  createdAt DateTime?  @default(now())
-  updatedAt DateTime?  @updatedAt
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
   createdId Int?
   updatedId Int?
   deletedAt DateTime?
+  kas       Kas[]     @relation("KasAkun")
+
   @@unique([kode, parentId], name: "uniqueAkun")
+}
+
+model Kas {
+  id         Int       @id @default(autoincrement())
+  kode       String?
+  keterangan String
+  saldo      String
+  akun       Akun?     @relation(name: "KasAkun", references: [id], fields: [akunId])
+  akunId     Int?
+  isDeleted  Boolean?  @default(false)
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
+  createdId  Int?
+  updatedId  Int?
+  deletedAt  DateTime?
 }

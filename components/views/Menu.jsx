@@ -3,6 +3,7 @@ import {
   BuildingCottage,
   Receipt2,
   ReportMoney,
+  CreditCard,
   Report,
   Notification,
   Server,
@@ -66,6 +67,13 @@ const menu = [
       { label: "Inventori Pengembalian", link: "/pengembalian" },
       { label: "Pembayaran Gaji Karyawan", link: "/admin/gaji-karyawan/form" },
       { label: "Tagihan Pelanggan", link: "/tagihan-pelanggan" },
+    ],
+  },
+  {
+    label: "Akunting",
+    icon: CreditCard,
+    links: [
+      { label: "Kas", link: "/admin/kas" },
     ],
   },
   {
