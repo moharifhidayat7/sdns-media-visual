@@ -9,6 +9,7 @@ import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useNotifications } from "@mantine/notifications";
 import { useEffect } from "react";
 import { useSession, getSession } from "next-auth/react";
+import _ from "lodash";
 
 export default function Index({ akun }) {
   const [state, dispatch] = useGlobalContext();
@@ -62,9 +63,12 @@ export async function getServerSideProps(context) {
     },
   });
   const akun = await res.json();
+
+  const filterAkun = _.filter(akun.result, { parentId: 0 });
+  const sortAkun = _.filter(filterAkun, "kode");
   return {
     props: {
-      akun:akun.result,
+      akun: sortAkun,
       session: await getSession(context),
     },
   };

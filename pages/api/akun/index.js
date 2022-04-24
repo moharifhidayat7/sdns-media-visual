@@ -11,11 +11,12 @@ const Index = async (req, res) => {
       const result = await prisma.akun.create({
         data: {
           ...data,
-          kode:data.kode,
-          parentId:parseInt(data.parentId)||null,
+          kode: data.kode,
+          parentId: parseInt(data.parentId) || null,
+          akunId: parseInt(data.parentId) || null,
           createdId: session.user.id,
           updatedId: session.user.id,
-        }
+        },
       });
       res.statusCode = 200;
       res.json({
@@ -37,8 +38,12 @@ const Index = async (req, res) => {
         skip,
         take: limit,
         include: {
-          child:true,
-          parent:true,
+          child: {
+            include: {
+              child: true,
+            },
+          },
+          akun: true,
         },
         where: {
           isDeleted: false,
