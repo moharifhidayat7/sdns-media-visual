@@ -366,8 +366,9 @@ model Akun {
   kode      String
   nama      String
   tipe      TipeAkun
-  parentId  Int?
-  parent    Akun?     @relation(name: "SubAkun", references: [id], fields: [parentId])
+  parentId  Int?      @default(0)
+  akunId    Int?
+  akun      Akun?     @relation(name: "SubAkun", references: [id], fields: [akunId])
   child     Akun[]    @relation(name: "SubAkun")
   isDeleted Boolean?  @default(false)
   createdAt DateTime? @default(now())

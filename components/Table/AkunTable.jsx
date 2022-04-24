@@ -46,64 +46,87 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
+const Row = ({ item, parent = "0", children, parentId = 0, level = 0 }) => {
+  return (
+    <>
+      <tr key={item.id}>
+        {level > 0 && (
+          <td
+            style={{
+              width: "5rem",
+              textAlign: "center",
+            }}
+          ></td>
+        )}
+        <td
+          style={{
+            width: "5rem",
+            textAlign: parentId != 0 ? "left" : "center",
+            fontWeight: level == 0 ? 700 : 400,
+          }}
+        >
+          {parentId != 0 ? parent + "." + item.kode : item.kode}
+        </td>
+        <td
+          style={{ fontWeight: level == 0 ? 700 : 400 }}
+          colSpan={parentId == 0 ? 2 : 1}
+        >
+          {item.nama}
+        </td>
+        <td>
+          <Text
+            sx={(theme) => ({
+              color:
+                item.tipe == "DEBET"
+                  ? theme.colors.green[5]
+                  : theme.colors.red[5],
+            })}
+          >
+            {item.tipe}
+          </Text>
+        </td>
+        <td>
+          <Group spacing="xs" noWrap className="justify-end">
+            <ActionIcon color="yellow" variant="filled" onClick={() => {}}>
+              <Pencil size={16} />
+            </ActionIcon>
+            <ActionIcon color="red" variant="filled">
+              <Trash size={16} />
+            </ActionIcon>
+          </Group>
+        </td>
+      </tr>
+      {item.child &&
+        item.child.map((child) => (
+          <>
+            <Row
+              item={child}
+              parent={
+                child.parentId != 0 ? parent + "." + item.kode : item.kode
+              }
+              parentId={item.id}
+              level={level + 1}
+              key={child.id}
+            ></Row>
+          </>
+        ))}
+    </>
+  );
+};
+
 export function AkunTable({ data }) {
   const { classes, cx } = useStyles();
   const [scrolled, setScrolled] = useState(false);
 
-  const rows = data.map((row) => (
-    <tr key={row.id}>
-      <td
-        style={{
-          width: "5rem",
-          fontWeight: row.parentId ? 400 : 700,
-          textAlign: "center",
-        }}
-      >
-        {row.parentId ? "" : row.kode}
-      </td>
-      <td
-        style={{
-          width: "5rem",
-          fontWeight: row.parentId ? 400 : 700,
-          textAlign: row.parentId ? "center" : "left",
-        }}
-        colSpan={row.parentId ? 1 : 2}
-      >
-        {row.parentId ? `${row.parentId}.${row.kode}` : row.nama}
-      </td>
-      {row.parentId && <td>{row.nama}</td>}
-      <td>
-        <Text
-          sx={(theme) => ({
-            color:
-              row.tipe == "DEBET" ? theme.colors.green[5] : theme.colors.red[5],
-          })}
-        >
-          {row.tipe}
-        </Text>
-      </td>
-      <td>
-        <Group spacing="xs" noWrap className="justify-end">
-          <ActionIcon color="yellow" variant="filled" onClick={() => {}}>
-            <Pencil size={16} />
-          </ActionIcon>
-          <ActionIcon color="red" variant="filled">
-            <Trash size={16} />
-          </ActionIcon>
-        </Group>
-      </td>
-    </tr>
-  ));
-
   return (
     <ScrollArea
-      sx={{ height: 300 }}
+      sx={{ height: 500 }}
       onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
     >
       <Table
         sx={{
-          minWidth: 700,
           borderCollapse: "collapse",
+          minWidth: 700,
         }}
       >
         <thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
@@ -116,7 +139,11 @@ export function AkunTable({ data }) {
             <th style={{ textAlign: "right", width: "10rem" }}>Action</th>
           </tr>
         </thead>
-        <tbody className={classes.rows}>{rows}</tbody>
+        <tbody className={classes.rows}>
+          {data.map((item) => (
+            <Row item={item} key={item.id}></Row>
+          ))}
+        </tbody>
       </Table>
     </ScrollArea>
   );

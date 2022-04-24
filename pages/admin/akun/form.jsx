@@ -18,10 +18,15 @@ import {
 import dateFormat from "dateformat";
 import Head from "next/head";
 import Layout from "@components/views/Layout";
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef } from "react";
 import { useRouter } from "next/router";
 import { formList, useForm } from "@mantine/form";
-import { convertToRupiah, generateCode, getTitle, inputNumberOnly } from "helpers/functions";
+import {
+  convertToRupiah,
+  generateCode,
+  getTitle,
+  inputNumberOnly,
+} from "helpers/functions";
 import { useNotifications } from "@mantine/notifications";
 import { Check, Trash, X } from "tabler-icons-react";
 import { getSession, useSession } from "next-auth/react";
@@ -46,36 +51,61 @@ export async function getServerSideProps(context) {
     if (res.status != 200) {
       let res = await fetch(`${process.env.API_URL}/api/akun`, OPTIONFETCH);
       const results = await res.json();
-      result = results.result.length > 0 ? results.result[results.total-1] : results;
+      result =
+        results.result.length > 0 ? results.result[results.total - 1] : results;
       action = "add";
     }
   } else {
     let res = await fetch(`${process.env.API_URL}/api/akun`, OPTIONFETCH);
     const results = await res.json();
-    result = results.result.length > 0 ? results.result[results.total-1] : results;
+    result =
+      results.result.length > 0 ? results.result[results.total - 1] : results;
     action = "add";
   }
   if (read) {
     action = "read";
   }
-  const parentakun = await fetch(`${process.env.API_URL}/api/akun`, OPTIONFETCH).then(res => res.json());
+  const parentakun = await fetch(
+    `${process.env.API_URL}/api/akun`,
+    OPTIONFETCH
+  ).then((res) => res.json());
+
   return {
     props: {
       action,
       session,
       parentakun,
-      data: result,
+      data: result || [],
     },
   };
 }
 
+// const SelectItem = forwardRef(({ ...akun }, ref) => {
+//   return (
+//     <div ref={ref} {...akun}>
+//       <Group noWrap>
+//         <Text size="sm">
+//           {akun.akunId ? akun.parentId + "." : ""}
+//           {akun.kode}
+//         </Text>
+//         -
+//         <div>
+//           <Text size="sm">{akun.nama}</Text>
+//         </div>
+//       </Group>
+//     </div>
+//   );
+// });
+
+// SelectItem.displayName = "SelectItem";
+
 const Form = ({ data, action, parentakun }) => {
   const form = useForm({
-    initialValues: { kode: "", nama: '', tipe: "", parentId: "" },
+    initialValues: { kode: "", nama: "", tipe: "", parentId: "" },
     validate: {
       kode: (value) => (value.length < 1 ? "Plese input value." : null),
       nama: (value) => (value.length < 1 ? "Plese input value." : null),
-      tipe: (value) => (value.length < 1 ? "Plese input value." : null)
+      tipe: (value) => (value.length < 1 ? "Plese input value." : null),
     },
   });
   const notifications = useNotifications();
@@ -83,17 +113,17 @@ const Form = ({ data, action, parentakun }) => {
   const [disabled, setDisabled] = useState(false);
   const [modal, setModal] = useState(false);
   const router = useRouter();
-  const { data: session, status } = useSession()
+  const { data: session, status } = useSession();
   useEffect(() => {
     if (action != "add") {
-      form.setValues({ kode: "", nama: '', tipe: "", parentId: "" });
+      form.setValues({ kode: "", nama: "", tipe: "", parentId: "" });
       if (action == "read") {
         setDisabled(true);
       }
     } else {
-            const codeInt = data.id ? data.id : 0;
+      const codeInt = data.id ? data.id : 0;
       const code = parseInt(codeInt) + 1;
-      form.setFieldValue('kode', code.toString());
+      form.setFieldValue("kode", code.toString());
     }
   }, []);
   const submitHandler = async (e) => {
@@ -103,7 +133,8 @@ const Form = ({ data, action, parentakun }) => {
     setLoading(false);
     const FORMDATA = form.values;
     const method = action === "edit" ? "PUT" : "POST";
-    const url = action === "edit" ? `/api/${PATHNAME}/${data.id}` : `/api/${PATHNAME}`;
+    const url =
+      action === "edit" ? `/api/${PATHNAME}/${data.id}` : `/api/${PATHNAME}`;
     const notifTitle = action.charAt(0).toUpperCase() + action.slice(1);
     await fetch(url, {
       method,
@@ -166,7 +197,12 @@ const Form = ({ data, action, parentakun }) => {
               : theme.colors.gray[4],
         })}
       >
-        <form autoComplete="off" method="post" noValidate onSubmit={submitHandler}>
+        <form
+          autoComplete="off"
+          method="post"
+          noValidate
+          onSubmit={submitHandler}
+        >
           <Grid>
             <Grid.Col sm={12} md={6}>
               <Group direction="column" grow spacing="lg">
@@ -176,7 +212,9 @@ const Form = ({ data, action, parentakun }) => {
                   name="kode"
                   value={form.values.kode}
                   {...form.getInputProps("kode")}
-                  onChange={(e) => { form.setFieldValue("kode", e.target.value) }}
+                  onChange={(e) => {
+                    form.setFieldValue("kode", e.target.value);
+                  }}
                 />
                 <TextInput
                   label="Nama"
@@ -184,14 +222,18 @@ const Form = ({ data, action, parentakun }) => {
                   name="nama"
                   value={form.values.nama}
                   {...form.getInputProps("nama")}
-                  onChange={(e) => { form.setFieldValue("nama", e.target.value) }}
+                  onChange={(e) => {
+                    form.setFieldValue("nama", e.target.value);
+                  }}
                 />
 
                 <Select
                   searchable
                   data={["DEBET", "KREDIT"]}
                   {...form.getInputProps("tipe")}
-                  onChange={(e) => { form.setFieldValue("tipe", e) }}
+                  onChange={(e) => {
+                    form.setFieldValue("tipe", e);
+                  }}
                   placeholder="Pick one"
                   disabled={disabled}
                   label="Tipe Akun"
@@ -199,9 +241,21 @@ const Form = ({ data, action, parentakun }) => {
                 />
                 <Select
                   searchable
-                  data={[...parentakun.result.map(item => ({ label: item.nama, value: item.id.toString() }))]}
+                  // itemComponent={SelectItem}
+                  data={parentakun.result.map((ak) => ({
+                    label: ak.nama,
+                    value: ak.id,
+                  }))}
+                  // filter={(value, item) =>
+                  //   item.kode
+                  //     .toLowerCase()
+                  //     .includes(value.toLowerCase().trim()) ||
+                  //   item.nama.toLowerCase().includes(value.toLowerCase().trim())
+                  // }
                   {...form.getInputProps("parentId")}
-                  onChange={(e) => { form.setFieldValue("parentId", e) }}
+                  onChange={(e) => {
+                    form.setFieldValue("parentId", e);
+                  }}
                   placeholder="Pick one"
                   disabled={disabled}
                   label="Parent Akun"
@@ -209,11 +263,14 @@ const Form = ({ data, action, parentakun }) => {
                 />
               </Group>
             </Grid.Col>
-
           </Grid>
 
           <div className="space-x-2 mt-10">
-            <Button type="button" onClick={() => router.push(`/admin/${PATHNAME}`)} color="red">
+            <Button
+              type="button"
+              onClick={() => router.push(`/admin/${PATHNAME}`)}
+              color="red"
+            >
               Back
             </Button>
             {!disabled && <Button type="submit">Submit</Button>}
@@ -223,7 +280,7 @@ const Form = ({ data, action, parentakun }) => {
       <ModalView handler={{ modal, setModal }} form={form} />
     </Layout>
   );
-}
+};
 const ModalView = ({ handler, form }) => {
   const { modal, setModal } = handler;
   const modalForm = useForm({
@@ -231,45 +288,64 @@ const ModalView = ({ handler, form }) => {
       nama: "",
       tipe: "",
       gaji: "",
-    }
-    , validate: {
-      nama: (value) => value.length > 0 ? undefined : "Nama harus diisi",
-      gaji: (value) => value > 0 ? undefined : "Gaji harus diisi",
-      tipe: (value) => value.length > 0 ? undefined : "Tipe harus diisi",
-    }
-  })
+    },
+    validate: {
+      nama: (value) => (value.length > 0 ? undefined : "Nama harus diisi"),
+      gaji: (value) => (value > 0 ? undefined : "Gaji harus diisi"),
+      tipe: (value) => (value.length > 0 ? undefined : "Tipe harus diisi"),
+    },
+  });
 
   const submitHandler = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (modalForm.validate().hasErrors) return false;
     const nama = e.target.nama.value;
     const gaji = e.target.gaji.value;
     const tipe = e.target.tipe.value;
     await form.addListItem("items", { nama: nama, gaji: gaji, tipe: tipe });
     modalForm.reset();
-    setModal(false)
-  }
+    setModal(false);
+  };
   return (
-    <Modal opened={modal} size="xs" onClose={() => setModal(false)} title="FORM INPUT ITEMS">
+    <Modal
+      opened={modal}
+      size="xs"
+      onClose={() => setModal(false)}
+      title="FORM INPUT ITEMS"
+    >
       <form noValidate autoComplete="off" onSubmit={submitHandler}>
-        <TextInput label="Nama" name="nama" {...modalForm.getInputProps('nama')} required value={modalForm.values.nama} onChange={(e) => modalForm.setFieldValue("nama", e.target.value)} />
-        <TextInput label="Saldo" name="gaji" required onKeyUp={(e) => inputNumberOnly(e)} value={modalForm.values.gaji} onChange={(e) => modalForm.setFieldValue("gaji", e.target.value)} {...modalForm.getInputProps("gaji")} />
+        <TextInput
+          label="Nama"
+          name="nama"
+          {...modalForm.getInputProps("nama")}
+          required
+          value={modalForm.values.nama}
+          onChange={(e) => modalForm.setFieldValue("nama", e.target.value)}
+        />
+        <TextInput
+          label="Saldo"
+          name="gaji"
+          required
+          onKeyUp={(e) => inputNumberOnly(e)}
+          value={modalForm.values.gaji}
+          onChange={(e) => modalForm.setFieldValue("gaji", e.target.value)}
+          {...modalForm.getInputProps("gaji")}
+        />
         <Select
           name="tipe"
-          label="Tipe" required placeholder="Pick one"
+          label="Tipe"
+          required
+          placeholder="Pick one"
           data={["ABSENSI", "PENDAPATAN", "POTONGAN"]}
           value={modalForm.values.tipe}
           onChange={(e) => modalForm.setFieldValue("tipe", e)}
           {...modalForm.getInputProps("tipe")}
         />
         <div className="flex justify-end mt-3">
-
-          <Button type="submit" >
-            Submit
-          </Button>
+          <Button type="submit">Submit</Button>
         </div>
       </form>
     </Modal>
-  )
-}
+  );
+};
 export default Form;
