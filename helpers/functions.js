@@ -10,12 +10,14 @@ export function inputNumberOnly(e) {
 
 
 // generate code with prefix 0000 and params value
-export function generateCode(prefix, value) {
+export function generateCode(prefix, value, length=5,) {
+  //random number 1-100
+  const random =Math.floor(Math.random() * 100) + 1;
   let code = prefix + "";
-  for (let i = 0; i < 5 - value.toString().length; i++) {
+  for (let i = 0; i < length - value.toString().length; i++) {
     code += "0";
   }
-  return code + value;
+  return code + value+random;
 }
 //convert number to rupiah  format
 export function convertToRupiah(angka) {

@@ -28,6 +28,24 @@ enum TypeGajiKaryawan {
 }
 
 // This is enum type definition.
+model Pelanggan {
+  id                 Int       @id @default(autoincrement())
+  no_pelanggan    String    @unique
+  nama               String
+  email              String    @unique
+  no_telp            String
+  kecamatan          String?
+  kelurahan          String?
+  alamat             String
+  password           String
+  resetPasswordToken String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  deletedAt          DateTime?
+  isDeleted          Boolean?  @default(false)
+  updatedId          Int?
+  createdId          Int?
+}
 
 model Akses {
   nama   String

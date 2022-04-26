@@ -2,21 +2,17 @@ import prisma from "lib/prisma";
 import { getSession } from "next-auth/react";
 
 //prisma create produk
-
-const Index = async (req, res) => {
+export default async (req, res) => {
   const data = req.body;
   const session = await getSession({ req });
   if (req.method == "POST") {
     try {
-      const result = await prisma.akun.create({
+      const result = await prisma.pelanggan.create({
         data: {
           ...data,
-          kode: data.kode,
-          parentId: parseInt(data.parentId) || 0,
-          akunId: parseInt(data.parentId) || null,
-          createdId: session.user.id,
-          updatedId: session.user.id,
-        },
+          createdId: session.user.id || null,
+          updatedId: session.user.id || null,
+        }
       });
       res.statusCode = 200;
       res.json({
@@ -34,26 +30,17 @@ const Index = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
     try {
-      const result = await prisma.akun.findMany({
+      const result = await prisma.pelanggan.findMany({
         skip,
         take: limit,
-        include: {
-          child: {
-            include: {
-              child: true,
-            },
-          },
-          akun: true,
-        },
         where: {
           isDeleted: false,
-          
         },
         orderBy: {
-          kode: "asc",
+          createdAt: "desc",
         },
       });
-      const total = await prisma.akun.count({
+      const total = await prisma.pelanggan.count({
         where: {
           isDeleted: false,
         },
@@ -61,7 +48,7 @@ const Index = async (req, res) => {
       const pages = Math.ceil(total / limit);
       res.json({
         status: "success",
-        message: "Berhasil mengambil data mkas",
+        message: "Berhasil mengambil data",
         result,
         total,
         pages,
@@ -81,7 +68,7 @@ const Index = async (req, res) => {
     }
   } else if (req.method == "DELETE") {
     try {
-      const result = await prisma.akun.updateMany({
+      const result = await prisma.pelanggan.updateMany({
         where: {
           id: { in: data.id },
         },
@@ -100,4 +87,3 @@ const Index = async (req, res) => {
     }
   }
 };
-export default Index;

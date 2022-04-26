@@ -244,14 +244,8 @@ const Form = ({ data, action, parentakun }) => {
                   // itemComponent={SelectItem}
                   data={parentakun.result.map((ak) => ({
                     label: ak.nama,
-                    value: ak.id,
+                    value: ak.id.toString(),
                   }))}
-                  // filter={(value, item) =>
-                  //   item.kode
-                  //     .toLowerCase()
-                  //     .includes(value.toLowerCase().trim()) ||
-                  //   item.nama.toLowerCase().includes(value.toLowerCase().trim())
-                  // }
                   {...form.getInputProps("parentId")}
                   onChange={(e) => {
                     form.setFieldValue("parentId", e);

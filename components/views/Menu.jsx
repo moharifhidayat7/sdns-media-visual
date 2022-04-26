@@ -27,6 +27,7 @@ const menu = [
       { label: "Paket", link: "/admin/paket" },
       { label: "Akun", link: "/admin/akun" },
       { label: "Voucher", link: "/admin/voucher" },
+      { label: "Pelanggan", link: "/admin/pelanggan" },
     ],
   },
   {

@@ -14,6 +14,7 @@ import {
   ActionIcon,
   Modal,
   Text,
+  PasswordInput,
 } from "@mantine/core";
 import dateFormat from "dateformat";
 import Head from "next/head";
@@ -26,8 +27,8 @@ import { useNotifications } from "@mantine/notifications";
 import { Check, Trash, X } from "tabler-icons-react";
 import { getSession, useSession } from "next-auth/react";
 import { DatePicker, Month } from "@mantine/dates";
-const PATHNAME = "kas";
-const PAGENAME = "Kas";
+const PATHNAME = "pelanggan";
+const PAGENAME = "Pelanggan";
 export async function getServerSideProps(context) {
   const id = context.query.id;
   const read = context.query.read;
@@ -40,42 +41,59 @@ export async function getServerSideProps(context) {
     },
   };
   if (id) {
-    let res = await fetch(`${process.env.API_URL}/api/kas/${id}`, OPTIONFETCH);
+    let res = await fetch(`${process.env.API_URL}/api/pelanggan/${id}`, OPTIONFETCH);
     action = "edit";
     result = await res.json();
     if (res.status != 200) {
-      let res = await fetch(`${process.env.API_URL}/api/kas`, OPTIONFETCH);
+      let res = await fetch(`${process.env.API_URL}/api/pelanggan`, OPTIONFETCH);
       const results = await res.json();
       result = results.result.length > 0 ? results.result[0] : results;
       action = "add";
     }
   } else {
-    let res = await fetch(`${process.env.API_URL}/api/kas`, OPTIONFETCH);
+    let res = await fetch(`${process.env.API_URL}/api/pelanggan`, OPTIONFETCH);
     const results = await res.json();
     result = results.result.length > 0 ? results.result[0] : results;
     action = "add";
   }
-  const akun = await fetch(`${process.env.API_URL}/api/akun`, OPTIONFETCH).then(res => res.json());
+  const kecamatan = await fetch(`https://dev.farizdotid.com/api/daerahindonesia/kecamatan?id_kota=3510`).then(async (res) => {
+    const data = await res.json();
+    return data.kecamatan;
+  });
   if (read) {
     action = "read";
   }
+  const id_kecamatan = result.kecamatan.split("-")[0];
+  const kelurahan = await fetch(`https://dev.farizdotid.com/api/daerahindonesia/kelurahan?id_kecamatan=${id_kecamatan}`).then(res => res.json());
 
   return {
     props: {
       action,
       session,
-      akun,
+      kecamatan,
+      desa: kelurahan,
       data: result,
     },
   };
 }
 
-const Form = ({ data, action, akun }) => {
+const Form = ({ data, action, kecamatan, desa }) => {
   const form = useForm({
-    initialValues: { saldo: "", keterangan: "", akunId: "" },
+    initialValues: { no_pelanggan: "", no_telp: "", nama: "", alamat: "", kecamatan: "", kelurahan: "", email: "", password: "" },
     validate: {
-      akunId: (value) => (value.length < 1 ? "Plese input value." : null),
-      saldo: (value) => (value.length < 1 ? "Plese input value." : null),
+      password: (value) => (value.length < 1 && action=="add" ? "Plese input value." : null),
+      no_telp: (value) => (value.length < 1 ? "Plese input value." : null),
+      alamat: (value) => (value.length < 1 ? "Plese input value." : null),
+      nama: (value) => (value.length < 1 ? "Plese input value." : null),
+      email: (value) => {
+        if (value.length < 1) {
+          return "Plese input value.";
+        }
+        if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value)) {
+          return "Invalid email address";
+        }
+        return null;
+      }
     },
   });
   const notifications = useNotifications();
@@ -86,19 +104,22 @@ const Form = ({ data, action, akun }) => {
   const { data: session, status } = useSession()
   useEffect(() => {
     if (action != "add") {
-      form.setValues({ saldo: data.saldo, keterangan: data.keterangan, akunId: data.akunId&&data.akunId.toString(), });
+      form.setValues({ no_pelanggan: data.no_pelanggan, no_telp: data.no_telp, nama: data.nama, alamat: data.alamat, kecamatan: data.kecamatan, kelurahan: data.kelurahan, email: data.email, password:''});
+      setKelurahan(desa.kelurahan)
       if (action == "read") {
         setDisabled(true);
       }
     } else {
-      const codeInt = data.id ? data.id : 0;
-      const code = generateCode("", parseInt(codeInt) + 1);
+      // const codeInt = data.id ? data.id : 0;
+      const kodeDate=dateFormat(new Date(), "ddmmyy")  
+      console.log(kodeDate)    
+      const code = generateCode(`CUST${kodeDate}`, 0,1 );
+      form.setFieldValue('no_pelanggan', code);
     }
   }, []);
   const submitHandler = async (e) => {
     e.preventDefault();
     if (form.validate().hasErrors) return false;
-
     setLoading(false);
     const FORMDATA = form.values;
     const method = action === "edit" ? "PUT" : "POST";
@@ -139,6 +160,14 @@ const Form = ({ data, action, akun }) => {
       }
     });
   };
+  const [kelurahan, setKelurahan] = useState([]);
+  const kelurahanHandler = async (e) => {
+    const kode = e.split("-")[0];
+    const kel = await fetch(`https://dev.farizdotid.com/api/daerahindonesia/kelurahan?id_kecamatan=${kode}`).then(res => res.json());
+    setKelurahan(kel.kelurahan);
+    form.setFieldValue("kecamatan", e)
+    form.setFieldValue("kelurahan", "")
+  }
   return (
     <Layout session={session}>
       <div className="loader" hidden={loading}>
@@ -169,30 +198,78 @@ const Form = ({ data, action, akun }) => {
             <Grid.Col sm={12} md={6}>
               <Group direction="column" grow spacing="lg">
                 <TextInput
-                  label="Saldo"
-                  disabled={disabled}
-                  required
-                  name="saldo"
-                  onKeyUp={(e) => inputNumberOnly(e)}
-                  value={form.values.saldo}
-                  {...form.getInputProps("saldo")}
-                  onChange={(e) => { form.setFieldValue("saldo", e.target.value) }}
+                  label="No Pelanggan"
+                                 name="no_pelanggan"
+                  readOnly
+                  value={form.values.no_pelanggan}
+                  {...form.getInputProps("no_pelanggan")}
+                  onChange={(e) => { form.setFieldValue("no_pelanggan", e.target.value) }}
                 />
-                <Select data={[...akun.result.map((e) => ({
-                  label: `${e.kode} - ${e.nama} - ${e.tipe}`,
-                  value: e.id.toString()
-                }))]}
-                disabled={disabled}
-                  onChange={(e) => { form.setFieldValue("akunId", e.value) }}
-                  value={form.values.akunId}
-                  required label="Akun" placeholder="Pick one" {...form.getInputProps("akunId")} />
-                <Textarea disabled={disabled} placeholder="Ketikkan sesuatu (opsional)" label="Keterangan" name="keterangan" {...form.getInputProps("keterangan")} value={form.values.keterangan} />
+                <TextInput
+                  label="Nama"
+                  readOnly={disabled} required
+                  name="nama"
+                  value={form.values.nama}
+                  {...form.getInputProps("nama")}
+                  onChange={(e) => { form.setFieldValue("nama", e.target.value) }}
+                />
+                <TextInput
+                  label="Email"
+                  readOnly={disabled}
+                  name="email"
+                  value={form.values.email}
+                  {...form.getInputProps("email")}
+                  required
+                  onChange={(e) => { form.setFieldValue("email", e.target.value) }}
+                />
+                <TextInput
+                  label="No Telp"
+                  readOnly={disabled}
+                  name="no_telp"
+                  onKeyUp={(e) => inputNumberOnly(e)}
+                  value={form.values.no_telp}
+                  required
+                  {...form.getInputProps("no_telp")}
+                  onChange={(e) => { form.setFieldValue("no_telp", e.target.value) }}
+                />
+                <Select label="Kecamatan" data={[...kecamatan.map((e) => {
+                  return {
+                    value: `${e.id} - ${e.nama}`,
+                    name: e.nama,
+                    label: e.nama.toUpperCase()
+                  }
+                })
+                ]} placeholder="Pick one" value={form.values.kecamatan}
+                  searchable readOnly={disabled}
+                  onChange={(e) => kelurahanHandler(e)}
+                />
+                <Select label="Kelurahan"
+                  data={[...kelurahan.map((e) => {
+                    return {
+                      value: `${e.id} - ${e.nama}`,
+                      name: e.nama,
+                      label: e.nama.toUpperCase()
+                    }
+                  })
+                  ]} readOnly={disabled} value={form.values.kelurahan}
+                  onChange={(e) => { form.setFieldValue("kelurahan", e) }}
+                  placeholder="Pick one"
+                  description="Pilih kecamatan terlebih dahulu"
+                  searchable
+                />
+                <TextInput
+                  label="Alamat"
+                  readOnly={disabled}
+                  name="alamat"
+                  value={form.values.alamat}
+                  required
+                  {...form.getInputProps("alamat")}
+                  onChange={(e) => { form.setFieldValue("alamat", e.target.value) }}
+                />
+                <PasswordInput label="Password" description={action=="edit"?"Kosongkan jika tidak ingin merubah password":''} readOnly={disabled} required onChange={(e) => form.setFieldValue("password", e.target.value)} {...form.getInputProps("password")} id="pwplg" name="password" />
               </Group>
             </Grid.Col>
           </Grid>
-
-
-
           <div className="space-x-2 mt-10">
             <Button type="button" onClick={() => router.push(`/admin/${PATHNAME}`)} color="red">
               Back
@@ -201,7 +278,7 @@ const Form = ({ data, action, akun }) => {
           </div>
         </form>
       </Box>
-      <ModalView handler={{ modal, setModal }} form={form} />
+      {/* <ModalView handler={{ modal, setModal }} form={form} /> */}
     </Layout>
   );
 }
