@@ -62,7 +62,7 @@ export async function getServerSideProps(context) {
     const data = await res.json();
     return data.kecamatan;
   });
-  const id_kecamatan = action=="add">1?result[0].kecamatan.split("-")[0]:result.kecamatan.split("-")[0];
+  const id_kecamatan = action=="add"?result[0].kecamatan.split("-")[0]:result.kecamatan.split("-")[0];
   const kelurahan = await fetch(`https://dev.farizdotid.com/api/daerahindonesia/kelurahan?id_kecamatan=${id_kecamatan}`).then(res => res.json());
 
   return {
