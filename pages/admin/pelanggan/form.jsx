@@ -52,7 +52,7 @@ export async function getServerSideProps(context) {
   } else {
     let res = await fetch(`${process.env.API_URL}/api/pelanggan`, OPTIONFETCH);
     const results = await res.json();
-    result = results.result.length > 0 ? results.result[0] : results;
+    result = results.result.length > 0 ? results.result[0] : results.result;
     action = "add";
   }
   if (read) {
@@ -62,15 +62,26 @@ export async function getServerSideProps(context) {
     const data = await res.json();
     return data.kecamatan;
   });
-  const id_kecamatan = result?result.kecamatan.split("-")[0]:""
-  const kelurahan = await fetch(`https://dev.farizdotid.com/api/daerahindonesia/kelurahan?id_kecamatan=${id_kecamatan}`).then(res => res.json());
-  // console.log(result?result.kelurahan:"")
+
+  if(action!="add"){
+    const id_kecamatan = result? result.kecamatan.split("-")[0] : ""
+    const kelurahan = await fetch(`https://dev.farizdotid.com/api/daerahindonesia/kelurahan?id_kecamatan=${id_kecamatan}`).then(res => res.json());
+    return {
+      props: {
+        action,
+        session,
+        kecamatan,
+        desa: kelurahan,
+        data: result,
+      },
+    };
+  }
   return {
     props: {
       action,
       session,
       kecamatan,
-      desa: kelurahan,
+      // desa: kelurahan,
       data: result,
     },
   };
@@ -81,7 +92,7 @@ const Form = ({ data, action, kecamatan, desa }) => {
   const form = useForm({
     initialValues: { no_pelanggan: "", no_telp: "", nama: "", alamat: "", kecamatan: "", kelurahan: "", email: "", password: "" },
     validate: {
-      password: (value) => (value.length < 1 && action=="add" ? "Plese input value." : null),
+      password: (value) => (value.length < 1 && action == "add" ? "Plese input value." : null),
       no_telp: (value) => (value.length < 1 ? "Plese input value." : null),
       alamat: (value) => (value.length < 1 ? "Plese input value." : null),
       nama: (value) => (value.length < 1 ? "Plese input value." : null),
@@ -104,17 +115,17 @@ const Form = ({ data, action, kecamatan, desa }) => {
   const { data: session, status } = useSession()
   useEffect(() => {
     if (action != "add") {
-      form.setValues({ no_pelanggan: data.no_pelanggan, no_telp: data.no_telp, nama: data.nama, alamat: data.alamat, kecamatan: data.kecamatan, kelurahan: data.kelurahan, email: data.email, password:''});
+      form.setValues({ no_pelanggan: data.no_pelanggan, no_telp: data.no_telp, nama: data.nama, alamat: data.alamat, kecamatan: data.kecamatan, kelurahan: data.kelurahan, email: data.email, password: '' });
+      console.log(desa)
       setKelurahan(desa.kelurahan)
       if (action == "read") {
         setDisabled(true);
       }
     } else {
-      // const codeInt = data.id ? data.id : 0;
-      const kodeDate=dateFormat(new Date(), "ddmmyy")  
-      console.log(kodeDate)    
-      const code = generateCode(`CUST${kodeDate}`, 0,1 );
-      form.setFieldValue('no_pelanggan', code);
+      const codeInt = data.id ? data.id : 0;
+      const kodeDate = dateFormat(new Date(), "ddmmyy")
+      const code = generateCode(`CUST${kodeDate}`, 0, 1);
+      form.setFieldValue('no_pelanggan', code+codeInt);
     }
   }, []);
   const submitHandler = async (e) => {
@@ -199,7 +210,7 @@ const Form = ({ data, action, kecamatan, desa }) => {
               <Group direction="column" grow spacing="lg">
                 <TextInput
                   label="No Pelanggan"
-                                 name="no_pelanggan"
+                  name="no_pelanggan"
                   readOnly
                   value={form.values.no_pelanggan}
                   {...form.getInputProps("no_pelanggan")}
@@ -266,7 +277,7 @@ const Form = ({ data, action, kecamatan, desa }) => {
                   {...form.getInputProps("alamat")}
                   onChange={(e) => { form.setFieldValue("alamat", e.target.value) }}
                 />
-                <PasswordInput label="Password" description={action=="edit"?"Kosongkan jika tidak ingin merubah password":''} readOnly={disabled} required onChange={(e) => form.setFieldValue("password", e.target.value)} {...form.getInputProps("password")} id="pwplg" name="password" />
+                <PasswordInput label="Password" description={action == "edit" ? "Kosongkan jika tidak ingin merubah password" : ''} readOnly={disabled} required onChange={(e) => form.setFieldValue("password", e.target.value)} {...form.getInputProps("password")} id="pwplg" name="password" />
               </Group>
             </Grid.Col>
           </Grid>
