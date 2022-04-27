@@ -27,8 +27,7 @@ import { useNotifications } from "@mantine/notifications";
 import { Check, Trash, X } from "tabler-icons-react";
 import { getSession, useSession } from "next-auth/react";
 import { DatePicker, Month } from "@mantine/dates";
-const PATHNAME = "pelanggan";
-const PAGENAME = "Pelanggan";
+
 export async function getServerSideProps(context) {
   const id = context.query.id;
   const read = context.query.read;
@@ -76,7 +75,8 @@ export async function getServerSideProps(context) {
     },
   };
 }
-
+const PATHNAME = "pelanggan";
+const PAGENAME = "Pelanggan";
 const Form = ({ data, action, kecamatan, desa }) => {
   const form = useForm({
     initialValues: { no_pelanggan: "", no_telp: "", nama: "", alamat: "", kecamatan: "", kelurahan: "", email: "", password: "" },
