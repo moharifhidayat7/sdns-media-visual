@@ -282,52 +282,52 @@ const Form = ({ data, action, kecamatan, desa }) => {
     </Layout>
   );
 }
-const ModalView = ({ handler, form }) => {
-  const { modal, setModal } = handler;
-  const modalForm = useForm({
-    initialValues: {
-      nama: "",
-      tipe: "",
-      gaji: "",
-    }
-    , validate: {
-      nama: (value) => value.length > 0 ? undefined : "Nama harus diisi",
-      gaji: (value) => value > 0 ? undefined : "Gaji harus diisi",
-      tipe: (value) => value.length > 0 ? undefined : "Tipe harus diisi",
-    }
-  })
+// const ModalView = ({ handler, form }) => {
+//   const { modal, setModal } = handler;
+//   const modalForm = useForm({
+//     initialValues: {
+//       nama: "",
+//       tipe: "",
+//       gaji: "",
+//     }
+//     , validate: {
+//       nama: (value) => value.length > 0 ? undefined : "Nama harus diisi",
+//       gaji: (value) => value > 0 ? undefined : "Gaji harus diisi",
+//       tipe: (value) => value.length > 0 ? undefined : "Tipe harus diisi",
+//     }
+//   })
 
-  const submitHandler = async (e) => {
-    e.preventDefault()
-    if (modalForm.validate().hasErrors) return false;
-    const nama = e.target.nama.value;
-    const gaji = e.target.gaji.value;
-    const tipe = e.target.tipe.value;
-    await form.addListItem("items", { nama: nama, gaji: gaji, tipe: tipe });
-    modalForm.reset();
-    setModal(false)
-  }
-  return (
-    <Modal opened={modal} size="xs" onClose={() => setModal(false)} title="FORM INPUT ITEMS">
-      <form noValidate autoComplete="off" onSubmit={submitHandler}>
-        <TextInput label="Nama" name="nama" {...modalForm.getInputProps('nama')} required value={modalForm.values.nama} onChange={(e) => modalForm.setFieldValue("nama", e.target.value)} />
-        <TextInput label="Saldo" name="gaji" required onKeyUp={(e) => inputNumberOnly(e)} value={modalForm.values.gaji} onChange={(e) => modalForm.setFieldValue("gaji", e.target.value)} {...modalForm.getInputProps("gaji")} />
-        <Select
-          name="tipe"
-          label="Tipe" required placeholder="Pick one"
-          data={["ABSENSI", "PENDAPATAN", "POTONGAN"]}
-          value={modalForm.values.tipe}
-          onChange={(e) => modalForm.setFieldValue("tipe", e)}
-          {...modalForm.getInputProps("tipe")}
-        />
-        <div className="flex justify-end mt-3">
+//   const submitHandler = async (e) => {
+//     e.preventDefault()
+//     if (modalForm.validate().hasErrors) return false;
+//     const nama = e.target.nama.value;
+//     const gaji = e.target.gaji.value;
+//     const tipe = e.target.tipe.value;
+//     await form.addListItem("items", { nama: nama, gaji: gaji, tipe: tipe });
+//     modalForm.reset();
+//     setModal(false)
+//   }
+//   return (
+//     <Modal opened={modal} size="xs" onClose={() => setModal(false)} title="FORM INPUT ITEMS">
+//       <form noValidate autoComplete="off" onSubmit={submitHandler}>
+//         <TextInput label="Nama" name="nama" {...modalForm.getInputProps('nama')} required value={modalForm.values.nama} onChange={(e) => modalForm.setFieldValue("nama", e.target.value)} />
+//         <TextInput label="Saldo" name="gaji" required onKeyUp={(e) => inputNumberOnly(e)} value={modalForm.values.gaji} onChange={(e) => modalForm.setFieldValue("gaji", e.target.value)} {...modalForm.getInputProps("gaji")} />
+//         <Select
+//           name="tipe"
+//           label="Tipe" required placeholder="Pick one"
+//           data={["ABSENSI", "PENDAPATAN", "POTONGAN"]}
+//           value={modalForm.values.tipe}
+//           onChange={(e) => modalForm.setFieldValue("tipe", e)}
+//           {...modalForm.getInputProps("tipe")}
+//         />
+//         <div className="flex justify-end mt-3">
 
-          <Button type="submit" >
-            Submit
-          </Button>
-        </div>
-      </form>
-    </Modal>
-  )
-}
+//           <Button type="submit" >
+//             Submit
+//           </Button>
+//         </div>
+//       </form>
+//     </Modal>
+//   )
+// }
 export default Form;
