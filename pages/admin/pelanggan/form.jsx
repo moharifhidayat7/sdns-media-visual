@@ -65,7 +65,7 @@ export async function getServerSideProps(context) {
   // let id_kecamatan = result.kecamatan.split("-")[0];
   // const kelurahan = await fetch(`https://dev.farizdotid.com/api/daerahindonesia/kelurahan`).then(res => res.json());
 
-console.log(result.kecamatan.split("-"))
+console.log(result?result.kecamatan.split("-")[0]:"")
   return {
     props: {
       action,
