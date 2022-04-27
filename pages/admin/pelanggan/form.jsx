@@ -55,15 +55,12 @@ export async function getServerSideProps(context) {
     result = results.result.length > 0 ? results.result[0] : results;
     action = "add";
   }
-  const kecamatan = await fetch(`https://dev.farizdotid.com/api/daerahindonesia/kecamatan?id_kota=3510`).then(async (res) => {
-    const data = await res.json();
-    return data.kecamatan;
-  });
   if (read) {
     action = "read";
   }
+  const kecamatan = []
   const id_kecamatan = result.kecamatan.split("-")[0];
-  const kelurahan = await fetch(`https://dev.farizdotid.com/api/daerahindonesia/kelurahan?id_kecamatan=${id_kecamatan}`).then(res => res.json());
+  const kelurahan =[]
 
   return {
     props: {
