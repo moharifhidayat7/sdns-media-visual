@@ -58,9 +58,12 @@ export async function getServerSideProps(context) {
   if (read) {
     action = "read";
   }
-  const kecamatan = []
+  const kecamatan = await fetch(`https://dev.farizdotid.com/api/daerahindonesia/kecamatan?id_kota=3510`).then(async (res) => {
+    const data = await res.json();
+    return data.kecamatan;
+  });
   const id_kecamatan = result.kecamatan.split("-")[0];
-  const kelurahan =[]
+  const kelurahan = await fetch(`https://dev.farizdotid.com/api/daerahindonesia/kelurahan?id_kecamatan=${id_kecamatan}`).then(res => res.json());
 
   return {
     props: {
@@ -177,7 +180,7 @@ const Form = ({ data, action, kecamatan, desa }) => {
         {action == "read" ? "Read" : "Form"} {PAGENAME}
       </Title>
 
-      <Box
+      {/* <Box
         sx={(theme) => ({
           border: "1px solid",
           borderRadius: theme.radius.sm,
@@ -274,7 +277,7 @@ const Form = ({ data, action, kecamatan, desa }) => {
             {!disabled && <Button type="submit">Submit</Button>}
           </div>
         </form>
-      </Box>
+      </Box> */}
       {/* <ModalView handler={{ modal, setModal }} form={form} /> */}
     </Layout>
   );
