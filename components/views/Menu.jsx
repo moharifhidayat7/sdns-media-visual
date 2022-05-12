@@ -67,15 +67,13 @@ const menu = [
       { label: "Inventori Pre Order", link: "/preorder" },
       { label: "Inventori Pengembalian", link: "/pengembalian" },
       { label: "Pembayaran Gaji Karyawan", link: "/admin/gaji-karyawan/form" },
-      { label: "Tagihan Pelanggan", link: "/tagihan-pelanggan" },
+      { label: "Pembayaran Tagihan", link: "/admin/bayar-tagihan" },
     ],
   },
   {
     label: "Akunting",
     icon: CreditCard,
-    links: [
-      { label: "Kas", link: "/admin/kas" },
-    ],
+    links: [{ label: "Kas", link: "/admin/kas" }],
   },
   {
     label: "Laporan",

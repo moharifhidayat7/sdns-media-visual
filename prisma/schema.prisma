@@ -30,7 +30,7 @@ enum TypeGajiKaryawan {
 // This is enum type definition.
 model Pelanggan {
   id                 Int       @id @default(autoincrement())
-  no_pelanggan    String    @unique
+  no_pelanggan       String    @unique
   nama               String
   email              String    @unique
   no_telp            String
@@ -45,6 +45,7 @@ model Pelanggan {
   isDeleted          Boolean?  @default(false)
   updatedId          Int?
   createdId          Int?
+  Tagihan            Tagihan[]
 }
 
 model Akses {
@@ -115,6 +116,8 @@ model User {
   createdGajiKaryawan    GajiKaryawan[]    @relation("GajiKaryawancreatedBy")
   updatedGajiKaryawan    GajiKaryawan[]    @relation("GajiKaryawanupdatedBy")
   gajiKaryawan           GajiKaryawan[]    @relation("GajiKaryawan")
+  createdTagihan         Tagihan[]         @relation("tagihancreatedBy")
+  updatedTagihan         Tagihan[]         @relation("tagihanupdatedBy")
 }
 
 model GajiKaryawan {
@@ -412,4 +415,22 @@ model Kas {
   createdId  Int?
   updatedId  Int?
   deletedAt  DateTime?
+}
+
+model Tagihan {
+  id          Int        @id @default(autoincrement())
+  kode        String
+  nama        String
+  keterangan  String
+  total       Int
+  pelangganId Int?
+  pelanggan   Pelanggan? @relation(references: [id], fields: [pelangganId])
+  isDeleted   Boolean?   @default(false)
+  createdAt   DateTime?  @default(now())
+  updatedAt   DateTime?  @updatedAt
+  deletedAt   DateTime?
+  updatedBy   User?      @relation(fields: [updatedId], references: [id], name: "tagihanupdatedBy")
+  createdBy   User?      @relation(fields: [createdId], references: [id], name: "tagihancreatedBy")
+  updatedId   Int?
+  createdId   Int?
 }
