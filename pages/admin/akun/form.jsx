@@ -243,7 +243,7 @@ const Form = ({ data, action, parentakun }) => {
                   searchable
                   // itemComponent={SelectItem}
                   data={parentakun.result.map((ak) => ({
-                    label: ak.nama,
+                    label:`${ak.kode} - ${ak.nama}`,
                     value: ak.id.toString(),
                   }))}
                   {...form.getInputProps("parentId")}

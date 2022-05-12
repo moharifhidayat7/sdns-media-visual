@@ -87,7 +87,7 @@ const Row = ({ item, parent = "0", children, parentId = 0, level = 0 }) => {
         </td>
         <td>
           <Group spacing="xs" noWrap className="justify-end">
-            <ActionIcon color="yellow" variant="filled" onClick={() => {}}>
+            <ActionIcon color="yellow" variant="filled" onClick={() => {console.log(1)}}>
               <Pencil size={16} />
             </ActionIcon>
             <ActionIcon color="red" variant="filled">

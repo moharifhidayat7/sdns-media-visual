@@ -56,7 +56,7 @@ function Form({ suppliers, gudangs, inventories, stokmasuk }) {
         })
       );
     }
-    const kode = stokmasuk ? stokmasuk.id : 0;
+    const kode = stokmasuk.id ? stokmasuk.id : 0;
     form.setFieldValue("nomortransaksi", generateCode("", parseInt(kode) + 1));
   }, []);
   const handleItem = (e) => {
@@ -528,14 +528,11 @@ export const getServerSideProps = async (context) => {
     },
   };
   const readOnly = context.query.read
-  const id = context.query.id || null
   const url = `${process.env.API_URL}/api/stokmasuk`;
-  const stokmasukresults = await fetch(
+  const stokmasuk = await fetch(
     url,
     header
   ).then((res) => res.json());
-  const stokmasukresult = await fetch(`${url}/${id}`, header).then((res) => res.json())
-
   const suppliers = await fetch(
     `${process.env.API_URL}/api/supplier`,
     header
@@ -548,7 +545,6 @@ export const getServerSideProps = async (context) => {
     `${process.env.API_URL}/api/inventori`,
     header
   ).then((res) => res.json());
-  const stokmasuk =stokmasukresult.result.length>0?stokmasukresult.result: stokmasukresults.result[0]
 
   return {
     props: {
@@ -556,7 +552,7 @@ export const getServerSideProps = async (context) => {
       gudangs,
       inventories,
       session,
-      stokmasuk,
+      stokmasuk: stokmasuk.result,
       action: readOnly ? "SHOW" : "ADD",
     },
   };
