@@ -9,7 +9,7 @@ export default async (req, res) => {
     try {
       const result = await prisma.kas.findFirst({
         include: {
-        akun:true
+          akun: true,
         },
         where: {
           id: parseInt(id),
@@ -23,13 +23,16 @@ export default async (req, res) => {
   } else if (req.method == "PUT") {
     try {
       const data = req.body;
+      let newData = data;
+      if (data.akunId) {
+        newData.akunId == parseInt(data.akunId);
+      }
       const result = await prisma.kas.update({
         where: {
           id: parseInt(id),
         },
         data: {
-          ...data,
-          akunId:parseInt(data.akunId),
+          ...newData,
         },
       });
       res.status(200).json({
