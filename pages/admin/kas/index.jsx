@@ -58,7 +58,9 @@ export default function Index({ result }) {
   const refreshHandler = async (isLoading, page = 1, search = "") => {
     const res = await fetch(`${URL}?page=${page}&search=${search}`);
     const data = await res.json();
-    dispatch({ type: "set_data", payload: { ...data, search, page } });
+    let nData = data;
+    nData.result = data.result.filter((e) => e.status == "SUKSES");
+    dispatch({ type: "set_data", payload: { ...nData, search, page } });
     isLoading(false);
   };
   const header = [
@@ -123,19 +125,21 @@ export default function Index({ result }) {
                     </Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase">
-                      {row.keterangan}
-                    </Text>
+                    <Text className="uppercase">{row.keterangan}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text className="">
-                      {row.akun && row.akun.tipe == "DEBET" ?"Rp."+ convertToRupiah(row.saldo) : ""}
+                      {row.akun && row.akun.tipe == "DEBET"
+                        ? "Rp." + convertToRupiah(row.saldo)
+                        : ""}
                     </Text>
                   </CustomTable.Col>
 
                   <CustomTable.Col>
                     <Text className=" text-red-500">
-                      {row.akun && row.akun.tipe == "KREDIT" ? "Rp." + convertToRupiah(row.saldo) : ""}
+                      {row.akun && row.akun.tipe == "KREDIT"
+                        ? "Rp." + convertToRupiah(row.saldo)
+                        : ""}
                     </Text>
                   </CustomTable.Col>
                 </CustomTable.Row>
@@ -150,7 +154,7 @@ export default function Index({ result }) {
       </DataTable>
     </Layout>
   );
-};
+}
 export async function getServerSideProps(context) {
   const OPTION = {
     headers: {
@@ -160,11 +164,13 @@ export async function getServerSideProps(context) {
   const session = await getSession(context);
   const res = await fetch(`${process.env.API_URL}/api/kas`, OPTION);
   const result = await res.json();
+
+  let nData = result;
+  nData.result = result.result.filter((e) => e.status == "SUKSES");
   return {
     props: {
-      result,
+      result: nData,
       session,
     },
   };
 }
-
