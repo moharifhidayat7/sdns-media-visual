@@ -7,11 +7,7 @@ export default async (req, res) => {
   const id = req.query.id;
   if (req.method == "GET") {
     try {
-      const result = await prisma.mkas.findFirst({
-        include: {
-          updatedBy: true,
-          createdBy: true,
-        },
+      const result = await prisma.akun.findFirst({
         where: {
           id: parseInt(id),
           isDeleted: false,
@@ -24,7 +20,7 @@ export default async (req, res) => {
   } else if (req.method == "PUT") {
     try {
       const data = req.body;
-      const result = await prisma.mkas.update({
+      const result = await prisma.akun.update({
         where: {
           id: parseInt(id),
         },
@@ -37,18 +33,18 @@ export default async (req, res) => {
         result,
       });
     } catch (err) {
-      console.log(err);
       res.status(403).json({ message: err.message });
     }
   } else if (req.method == "DELETE") {
     try {
-      const result = await prisma.gajiKaryawan.update({
+      const result = await prisma.akun.delete({
         where: {
           id: parseInt(id),
         },
-        data: {
-          isDeleted: true,
-          deletedAt: new Date(),
+      });
+      await prisma.akun.deleteMany({
+        where: {
+          parentId: parseInt(id),
         },
       });
       res.status(200).json({

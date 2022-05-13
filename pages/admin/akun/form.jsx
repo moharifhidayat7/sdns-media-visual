@@ -58,14 +58,13 @@ export async function getServerSideProps(context) {
   } else {
     let res = await fetch(`${process.env.API_URL}/api/akun`, OPTIONFETCH);
     const results = await res.json();
-    result =
-      results.result.length > 0 ? results.result[results.total - 1] : results;
+    result = results.result.length > 0 ? results.result[results.total - 1] : results;
     action = "add";
   }
   if (read) {
     action = "read";
   }
-  const parentakun = await fetch(
+  let parentakun = await fetch(
     `${process.env.API_URL}/api/akun`,
     OPTIONFETCH
   ).then((res) => res.json());
@@ -79,25 +78,6 @@ export async function getServerSideProps(context) {
     },
   };
 }
-
-// const SelectItem = forwardRef(({ ...akun }, ref) => {
-//   return (
-//     <div ref={ref} {...akun}>
-//       <Group noWrap>
-//         <Text size="sm">
-//           {akun.akunId ? akun.parentId + "." : ""}
-//           {akun.kode}
-//         </Text>
-//         -
-//         <div>
-//           <Text size="sm">{akun.nama}</Text>
-//         </div>
-//       </Group>
-//     </div>
-//   );
-// });
-
-// SelectItem.displayName = "SelectItem";
 
 const Form = ({ data, action, parentakun }) => {
   const form = useForm({
@@ -114,9 +94,15 @@ const Form = ({ data, action, parentakun }) => {
   const [modal, setModal] = useState(false);
   const router = useRouter();
   const { data: session, status } = useSession();
+  const [parent, setParent] = useState([])
   useEffect(() => {
     if (action != "add") {
-      form.setValues({ kode: "", nama: "", tipe: "", parentId: "" });
+
+      const coba = parentakun && parentakun.result.filter((x) => {
+        return x.id != data.id
+      })
+      setParent(coba)
+      form.setValues({ kode: data.kode, nama: data.nama, tipe: data.tipe, parentId: data.parentId });
       if (action == "read") {
         setDisabled(true);
       }
@@ -241,9 +227,8 @@ const Form = ({ data, action, parentakun }) => {
                 />
                 <Select
                   searchable
-                  // itemComponent={SelectItem}
-                  data={parentakun.result.map((ak) => ({
-                    label:`${ak.kode} - ${ak.nama}`,
+                  data={parent&&parent.map((ak) => ({
+                    label: `${ak.kode} - ${ak.nama}`,
                     value: ak.id.toString(),
                   }))}
                   {...form.getInputProps("parentId")}

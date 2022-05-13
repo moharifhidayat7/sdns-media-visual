@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   createStyles,
   Table,
@@ -8,6 +8,9 @@ import {
   Group,
 } from "@mantine/core";
 import { Pencil, Trash } from "tabler-icons-react";
+import { useModals } from "@mantine/modals";
+import { useRouter } from "next/router";
+import { route } from "next/dist/server/router";
 const useStyles = createStyles((theme) => ({
   header: {
     position: "sticky",
@@ -22,22 +25,20 @@ const useStyles = createStyles((theme) => ({
       left: 0,
       right: 0,
       bottom: 0,
-      borderBottom: `1px solid ${
-        theme.colorScheme === "dark"
-          ? theme.colors.dark[3]
-          : theme.colors.gray[2]
-      }`,
+      borderBottom: `1px solid ${theme.colorScheme === "dark"
+        ? theme.colors.dark[3]
+        : theme.colors.gray[2]
+        }`,
     },
   },
 
   rows: {
     td: {
       borderLeft: "none",
-      borderRight: `1px solid ${
-        theme.colorScheme === "dark"
-          ? theme.colors.dark[3]
-          : theme.colors.gray[2]
-      }`,
+      borderRight: `1px solid ${theme.colorScheme === "dark"
+        ? theme.colors.dark[3]
+        : theme.colors.gray[2]
+        }`,
     },
   },
 
@@ -46,7 +47,36 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const Row = ({ item, parent = "0", children, parentId = 0, level = 0 }) => {
+const Row = ({ item, parent = "0", children, parentId = 0, level = 0, manageItem }) => {
+  const modals = useModals();
+  const router = useRouter()
+  const openDeleteModal = (name, id, childDeleted = false) => {
+    return modals.openConfirmModal({
+      title: `Delete akunting`,
+      centered: true,
+      children: (
+        <Text size="sm">
+          Anda yakin ingin menghapus
+          <strong> {name}</strong>?
+          Data akun tidak dapat dipulihkan ketika dihapus!
+        </Text>
+      ),
+      labels: { confirm: "Delete", cancel: "Batalkan" },
+      confirmProps: { color: "red" },
+      onConfirm: async () => {
+        const url = `/api/akun/${id}`;
+        await fetch(url, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(id),
+        }).then((res) => {
+          router.reload()
+        });
+      },
+    });
+  };
   return (
     <>
       <tr key={item.id}>
@@ -87,10 +117,10 @@ const Row = ({ item, parent = "0", children, parentId = 0, level = 0 }) => {
         </td>
         <td>
           <Group spacing="xs" noWrap className="justify-end">
-            <ActionIcon color="yellow" variant="filled" onClick={() => {console.log(1)}}>
+            <ActionIcon color="yellow" variant="filled" onClick={() => { router.push("/admin/akun/form?id="+item.id) }}>
               <Pencil size={16} />
             </ActionIcon>
-            <ActionIcon color="red" variant="filled">
+            <ActionIcon color="red" variant="filled" onClick={() => openDeleteModal(item.nama, item.id)}>
               <Trash size={16} />
             </ActionIcon>
           </Group>
@@ -104,6 +134,7 @@ const Row = ({ item, parent = "0", children, parentId = 0, level = 0 }) => {
               parent={
                 child.parentId != 0 ? parent + "." + item.kode : item.kode
               }
+              manageItem={{ ...manageItem }}
               parentId={item.id}
               level={level + 1}
               key={child.id}
@@ -117,7 +148,10 @@ const Row = ({ item, parent = "0", children, parentId = 0, level = 0 }) => {
 export function AkunTable({ data }) {
   const { classes, cx } = useStyles();
   const [scrolled, setScrolled] = useState(false);
-
+  const [newData, setNewData] = useState([]);
+  useEffect(() => {
+    setNewData(data);
+  }, [])
   return (
     <ScrollArea
       sx={{ height: 500 }}
@@ -141,7 +175,7 @@ export function AkunTable({ data }) {
         </thead>
         <tbody className={classes.rows}>
           {data.map((item) => (
-            <Row item={item} key={item.id}></Row>
+            <Row item={item} key={item.id} manageItem={{ newData, setNewData }}></Row>
           ))}
         </tbody>
       </Table>

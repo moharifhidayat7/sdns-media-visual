@@ -46,9 +46,9 @@ export default function Index({ akun }) {
       </Title>
       <DataTable>
         <DataTable.Action
+        refreshVisibility={false}
           filterVisibility={false}
-          onRefresh={(isLoading) => {}}
-          onSearch={(value, isLoading) => {}}
+          searchVisibility={false}
         />
         <AkunTable data={akun} />
       </DataTable>
@@ -66,6 +66,7 @@ export async function getServerSideProps(context) {
 
   const filterAkun = _.filter(akun.result, { parentId: 0 });
   const sortAkun = _.filter(filterAkun, "kode");
+  // console.log(sortAkun)
   return {
     props: {
       akun: sortAkun,

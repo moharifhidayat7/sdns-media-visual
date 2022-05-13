@@ -52,7 +52,7 @@ const DataTable = ({ children }) => {
   );
 };
 
-const Footer = ({ total, pages, onChange = () => {} }) => {
+const Footer = ({ total, pages, onChange = () => { } }) => {
   const [activePage, setActivePage] = useState(1);
   const [state, dispatch] = useDataTableContext();
   return (
@@ -78,11 +78,15 @@ const Footer = ({ total, pages, onChange = () => {} }) => {
 DataTable.Footer = Footer;
 
 const Action = ({
-  onRefresh = () => {},
+  onRefresh = () => { },
   onEdit,
   filterVisibility = true,
   onDelete,
-  onSearch = () => {},
+  searchVisibility=true,
+  importVisibility = false,
+  exportVisibility = false,
+  refreshVisibility = true,
+  onSearch = () => { },
   addLabel = "Tambah",
 }) => {
   const [state, dispatch] = useDataTableContext();
@@ -146,8 +150,7 @@ const Action = ({
               <Trash />
             </ActionIcon>
           )}
-
-          <ActionIcon
+          {refreshVisibility && <ActionIcon
             size={36}
             variant="filled"
             onClick={() => {
@@ -158,23 +161,24 @@ const Action = ({
             }}
           >
             <Refresh />
-          </ActionIcon>
-          <Button
+          </ActionIcon>}
+
+          {exportVisibility && <Button
             leftIcon={<TableExport size={16} />}
             variant="default"
-            onClick={() => {}}
+            onClick={() => { }}
             disabled={false}
           >
             Export
-          </Button>
-          <Button
+          </Button>}
+          {importVisibility&&<Button
             leftIcon={<TableImport size={16} />}
             variant="default"
-            onClick={() => {}}
+            onClick={() => { }}
             disabled={false}
           >
             Import
-          </Button>
+          </Button>}
         </Group>
         <Group
           spacing="xs"
@@ -184,7 +188,8 @@ const Action = ({
             },
           })}
         >
-          <Input
+
+          {searchVisibility&&<Input
             icon={<Search size={18} />}
             placeholder="Search"
             type="search"
@@ -199,7 +204,7 @@ const Action = ({
                 dispatch({ type: "set", payload: { loading: isLoading } });
               });
             }}
-          />
+          />}
           {filterVisibility && (
             <ActionIcon
               size={36}
@@ -218,7 +223,7 @@ const Action = ({
 
 DataTable.Action = Action;
 
-const Filter = ({ children, form, onFilter = () => {} }) => {
+const Filter = ({ children, form, onFilter = () => { } }) => {
   const [state, dispatch] = useDataTableContext();
 
   const cols = () => {

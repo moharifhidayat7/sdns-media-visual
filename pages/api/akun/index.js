@@ -39,6 +39,9 @@ const Index = async (req, res) => {
         take: limit,
         include: {
           child: {
+            where:{
+              isDeleted:false,
+            },
             include: {
               child: true,
             },
@@ -47,7 +50,6 @@ const Index = async (req, res) => {
         },
         where: {
           isDeleted: false,
-          
         },
         orderBy: {
           kode: "asc",
