@@ -83,7 +83,7 @@ const Form = ({ data, action, akun }) => {
       saldo: "",
       keterangan: "",
       akunId: "",
-      createdAt: data ? new Date(data.createdAt) : new Date(),
+      createdAt: action != "add" && new Date(data.createdAt),
     },
     validate: {
       akunId: (value) => (value.length < 1 ? "Plese input value." : null),
@@ -103,7 +103,7 @@ const Form = ({ data, action, akun }) => {
         saldo: data.saldo,
         keterangan: data.keterangan,
         akunId: data.akunId && data.akunId.toString(),
-        createdAt: data && data.createdAt,
+        createdAt: new Date(data.createdAt),
       });
       if (action == "read") {
         setDisabled(true);

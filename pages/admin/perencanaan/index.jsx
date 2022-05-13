@@ -32,6 +32,7 @@ import dateFormat from "dateformat";
 import { convertToRupiah } from "helpers/functions";
 import { useRouter } from "next/router";
 import { useNotifications } from "@mantine/notifications";
+import { useModals } from "@mantine/modals";
 
 const useStyles = createStyles((theme) => ({
   tipe: {},
@@ -44,6 +45,7 @@ const Perencanaan = ({ result }) => {
   const [refresh, setRefresh] = useState(false);
   const { classes, theme } = useStyles();
   const notifications = useNotifications();
+  const modals = useModals();
 
   useEffect(() => {
     dispatch({ type: "set_data", payload: result });
@@ -203,7 +205,20 @@ const Perencanaan = ({ result }) => {
                   <Button
                     color="green"
                     compact
-                    onClick={() => konfirmasi(row.id)}
+                    onClick={() =>
+                      modals.openConfirmModal({
+                        title: `Konfirmasi Perencanaan Kas`,
+                        centered: true,
+                        children: (
+                          <Text size="sm">Konfirmasi Perencanaan Kas?</Text>
+                        ),
+                        labels: { confirm: "Konfirmasi", cancel: "Batalkan" },
+                        confirmProps: { color: "green" },
+                        onConfirm: () => {
+                          konfirmasi(row.id);
+                        },
+                      })
+                    }
                   >
                     Konfirmasi
                   </Button>
@@ -221,7 +236,24 @@ const Perencanaan = ({ result }) => {
                 <ActionIcon
                   color="red"
                   variant="filled"
-                  onClick={() => deleteHandler(row.id)}
+                  onClick={() =>
+                    modals.openConfirmModal({
+                      title: `Delete Perencanaan Kas`,
+                      centered: true,
+                      children: (
+                        <Text size="sm">
+                          Anda yakin ingin menghapus
+                          {row.keterangan}? Anda harus menghubungi administrator
+                          untuk memulihkan data Anda.
+                        </Text>
+                      ),
+                      labels: { confirm: "Delete", cancel: "Batalkan" },
+                      confirmProps: { color: "red" },
+                      onConfirm: () => {
+                        deleteHandler(row.id);
+                      },
+                    })
+                  }
                 >
                   <Trash size={16} />
                 </ActionIcon>
