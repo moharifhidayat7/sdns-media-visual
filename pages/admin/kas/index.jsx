@@ -120,12 +120,12 @@ export default function Index({ result }) {
                     <Text>{dateFormat(row.createdAt, "dd/mm/yy")}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase">
+                    <Text>
                       {row.akun && `${row.akun.kode} - ${row.akun.nama}`}
                     </Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
-                    <Text className="uppercase">{row.keterangan}</Text>
+                    <Text>{row.keterangan}</Text>
                   </CustomTable.Col>
                   <CustomTable.Col>
                     <Text className="">
