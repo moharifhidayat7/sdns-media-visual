@@ -31,8 +31,8 @@ import { useNotifications } from "@mantine/notifications";
 import { Check, Trash, X } from "tabler-icons-react";
 import { getSession, useSession } from "next-auth/react";
 import { DatePicker, Month } from "@mantine/dates";
-const PATHNAME = "kas";
-const PAGENAME = "Kas";
+const PATHNAME = "perencanaan";
+const PAGENAME = "Perencanaan";
 export async function getServerSideProps(context) {
   const id = context.query.id;
   const read = context.query.read;
@@ -79,10 +79,16 @@ export async function getServerSideProps(context) {
 
 const Form = ({ data, action, akun }) => {
   const form = useForm({
-    initialValues: { saldo: "", keterangan: "", akunId: "", status: "SUKSES" },
+    initialValues: {
+      saldo: "",
+      keterangan: "",
+      akunId: "",
+      createdAt: data ? new Date(data.createdAt) : new Date(),
+    },
     validate: {
       akunId: (value) => (value.length < 1 ? "Plese input value." : null),
       saldo: (value) => (value.length < 1 ? "Plese input value." : null),
+      createdAt: (v) => (v == "" ? "Pilih tanggal" : null),
     },
   });
   const notifications = useNotifications();
@@ -97,6 +103,7 @@ const Form = ({ data, action, akun }) => {
         saldo: data.saldo,
         keterangan: data.keterangan,
         akunId: data.akunId && data.akunId.toString(),
+        createdAt: data && data.createdAt,
       });
       if (action == "read") {
         setDisabled(true);
@@ -113,8 +120,7 @@ const Form = ({ data, action, akun }) => {
     setLoading(false);
     const FORMDATA = form.values;
     const method = action === "edit" ? "PUT" : "POST";
-    const url =
-      action === "edit" ? `/api/${PATHNAME}/${data.id}` : `/api/${PATHNAME}`;
+    const url = action === "edit" ? `/api/kas/${data.id}` : `/api/kas`;
     const notifTitle = action.charAt(0).toUpperCase() + action.slice(1);
     await fetch(url, {
       method,
@@ -185,6 +191,14 @@ const Form = ({ data, action, akun }) => {
           <Grid>
             <Grid.Col sm={12} md={6}>
               <Group direction="column" grow spacing="lg">
+                <DatePicker
+                  placeholder="Pick date"
+                  label="Tanggal"
+                  disabled={disabled}
+                  excludeDate={(date) => date < new Date()}
+                  required
+                  {...form.getInputProps("createdAt")}
+                />
                 <TextInput
                   label="Saldo"
                   disabled={disabled}

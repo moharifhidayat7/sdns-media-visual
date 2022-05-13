@@ -75,6 +75,7 @@ const menu = [
     icon: CreditCard,
     links: [
       { label: "Kas", link: "/admin/kas" },
+      { label: "Perencanaan Kas", link: "/admin/perencanaan" },
     ],
   },
   {

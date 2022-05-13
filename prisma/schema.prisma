@@ -30,7 +30,7 @@ enum TypeGajiKaryawan {
 // This is enum type definition.
 model Pelanggan {
   id                 Int       @id @default(autoincrement())
-  no_pelanggan    String    @unique
+  no_pelanggan       String    @unique
   nama               String
   email              String    @unique
   no_telp            String
@@ -406,10 +406,19 @@ model Kas {
   saldo      String
   akun       Akun?     @relation(name: "KasAkun", references: [id], fields: [akunId])
   akunId     Int?
+  noBukti    String?
+  status     StatusKas @default(PENDING)
+  validated  Boolean?  @default(false)
   isDeleted  Boolean?  @default(false)
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @updatedAt
   createdId  Int?
   updatedId  Int?
   deletedAt  DateTime?
+}
+
+enum StatusKas {
+  PENDING
+  SUKSES
+  DIBATALKAN
 }
