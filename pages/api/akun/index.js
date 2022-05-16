@@ -37,17 +37,6 @@ const Index = async (req, res) => {
       const result = await prisma.akun.findMany({
         skip,
         take: limit,
-        include: {
-          child: {
-            where:{
-              isDeleted:false,
-            },
-            include: {
-              child: true,
-            },
-          },
-          akun: true,
-        },
         where: {
           isDeleted: false,
         },
