@@ -44,7 +44,6 @@ const Index = async (req, res) => {
           isDeleted: false,
         },
       });
-      const pages = Math.ceil(total / limit);
       res.json({
         status: "success",
         message: "Berhasil mengambil data mkas",
