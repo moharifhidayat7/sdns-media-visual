@@ -27,15 +27,8 @@ const Index = async (req, res) => {
       res.json({ message: error.message, result: [] });
     }
   } else if (req.method == "GET") {
-    const search = req.query.search || "";
-    const status = req.query.status || undefined;
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
     try {
       const result = await prisma.akun.findMany({
-        skip,
-        take: limit,
         include: {
           parent: true,
         },
@@ -56,20 +49,12 @@ const Index = async (req, res) => {
         status: "success",
         message: "Berhasil mengambil data mkas",
         result,
-        total,
-        pages,
-        page,
-        limit,
       });
     } catch (err) {
       res.status(403).json({
         status: "error",
         message: err.message,
         result: [],
-        total: 0,
-        pages: 0,
-        page: 1,
-        limit: 10,
       });
     }
   } else if (req.method == "DELETE") {
