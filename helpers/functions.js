@@ -1,6 +1,4 @@
-import {
-  useRouter
-} from "next/router";
+import { useRouter } from "next/router";
 
 export function inputNumberOnly(e) {
   if (e.target.value.match(/[^0-9]/g)) {
@@ -8,32 +6,36 @@ export function inputNumberOnly(e) {
   }
 }
 
-
 // generate code with prefix 0000 and params value
-export function generateCode(prefix, value, length=5,) {
+export function generateCode(prefix, value, length = 5) {
   //random number 1-100
-  const random =Math.floor(Math.random() * 100) + 1;
+  const random = Math.floor(Math.random() * 100) + 1;
   let code = prefix + "";
   for (let i = 0; i < length - value.toString().length; i++) {
     code += "0";
   }
-  return code + value+random;
+  return code + value + random;
 }
 //convert number to rupiah  format
 export function convertToRupiah(angka) {
-  let rupiah = "";
-  let angkarev = angka
-    .toString()
-    .split("")
-    .reverse()
-    .join("");
-  for (let i = 0; i < angkarev.length; i++)
-    if (i % 3 == 0) rupiah += angkarev.substr(i, 3) + ".";
-  let hasil =
-    rupiah.split("", rupiah.length - 1)
-    .reverse()
-    .join("");
-  return hasil + ",-";
+  // let rupiah = "";
+  // let angkarev = angka
+  //   .toString()
+  //   .split("")
+  //   .reverse()
+  //   .join("");
+  // for (let i = 0; i < angkarev.length; i++)
+  //   if (i % 3 == 0) rupiah += angkarev.substr(i, 3) + ".";
+  // let hasil =
+  //   rupiah.split("", rupiah.length - 1)
+  //   .reverse()
+  //   .join("");
+  // return hasil + ",-";
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+  }).format(angka);
 }
 export function generateString(length) {
   const characters =
