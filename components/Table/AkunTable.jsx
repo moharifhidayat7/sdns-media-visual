@@ -50,6 +50,35 @@ const useStyles = createStyles((theme) => ({
 }));
 
 const Tree = ({ data, level = 0, parentKode = "" }) => {
+  const modals = useModals();
+  const router = useRouter();
+  const openDeleteModal = (name, id, childDeleted = false) => {
+    return modals.openConfirmModal({
+      title: `Delete akun`,
+      centered: true,
+      children: (
+        <Text size="sm">
+          Anda yakin ingin menghapus
+          <strong> {name}</strong>? Data akun tidak dapat dipulihkan ketika
+          dihapus!
+        </Text>
+      ),
+      labels: { confirm: "Delete", cancel: "Batalkan" },
+      confirmProps: { color: "red" },
+      onConfirm: async () => {
+        const url = `/api/akun/${id}`;
+        await fetch(url, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(id),
+        }).then((res) => {
+          router.reload();
+        });
+      },
+    });
+  };
   return (
     <>
       <tr>
@@ -93,7 +122,26 @@ const Tree = ({ data, level = 0, parentKode = "" }) => {
             {data.tipe}
           </Text>
         </td>
-        <td></td>
+        <td>
+          <Group spacing="xs" noWrap className="justify-end">
+            <ActionIcon
+              color="yellow"
+              variant="filled"
+              onClick={() => {
+                router.push("/admin/akun/form?id=" + data.id);
+              }}
+            >
+              <Pencil size={16} />
+            </ActionIcon>
+            <ActionIcon
+              color="red"
+              variant="filled"
+              onClick={() => openDeleteModal(data.nama, data.id)}
+            >
+              <Trash size={16} />
+            </ActionIcon>
+          </Group>
+        </td>
       </tr>
       {data.children &&
         data.children.map((child) => {
@@ -122,32 +170,27 @@ export function AkunTable({ data }) {
     setNewData(tree);
   }, []);
   return (
-    <ScrollArea
-      sx={{ height: 500 }}
-      onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
+    <Table
+      sx={{
+        borderCollapse: "collapse",
+        minWidth: 700,
+      }}
     >
-      <Table
-        sx={{
-          borderCollapse: "collapse",
-          minWidth: 700,
-        }}
-      >
-        <thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
-          <tr>
-            <th style={{ width: "5rem" }}>Kode</th>
-            <th style={{ width: "5rem" }} colSpan={2}>
-              Nama
-            </th>
-            <th style={{ width: "5rem" }}>Tipe</th>
-            <th style={{ textAlign: "right", width: "5rem" }}>Action</th>
-          </tr>
-        </thead>
-        <tbody className={classes.rows}>
-          {newData.map((row) => (
-            <Tree data={row} key={row.id} />
-          ))}
-        </tbody>
-      </Table>
-    </ScrollArea>
+      <thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
+        <tr>
+          <th style={{ width: "5rem" }}>Kode</th>
+          <th style={{ width: "5rem" }} colSpan={2}>
+            Nama
+          </th>
+          <th style={{ width: "5rem" }}>Tipe</th>
+          <th style={{ textAlign: "right", width: "5rem" }}>Action</th>
+        </tr>
+      </thead>
+      <tbody className={classes.rows}>
+        {newData.map((row) => (
+          <Tree data={row} key={row.id} />
+        ))}
+      </tbody>
+    </Table>
   );
 }
