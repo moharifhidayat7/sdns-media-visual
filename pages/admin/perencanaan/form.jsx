@@ -31,6 +31,8 @@ import { useNotifications } from "@mantine/notifications";
 import { Check, Trash, X } from "tabler-icons-react";
 import { getSession, useSession } from "next-auth/react";
 import { DatePicker, Month } from "@mantine/dates";
+import ArrayToTree from "array-to-tree";
+
 const PATHNAME = "perencanaan";
 const PAGENAME = "Perencanaan";
 export async function getServerSideProps(context) {
@@ -71,7 +73,9 @@ export async function getServerSideProps(context) {
     props: {
       action,
       session,
-      akun,
+      akun: ArrayToTree(akun.result, {
+        parentProperty: "parentId",
+      }),
       data: result,
     },
   };
@@ -95,9 +99,37 @@ const Form = ({ data, action, akun }) => {
   const [loading, setLoading] = useState(true);
   const [disabled, setDisabled] = useState(false);
   const [modal, setModal] = useState(false);
+  const [options, setOptions] = useState([]);
   const router = useRouter();
   const { data: session, status } = useSession();
   useEffect(() => {
+    const rec = (par, res, parentKode = "", level = 0) => {
+      if (par.parentId == null) {
+        res.push({
+          label: par.kode + " - " + par.nama,
+          value: par.id.toString(),
+          disabled: true,
+        });
+      }
+      if (par.children) {
+        for (let i = 0; i < par.children.length; i++) {
+          const element = par.children[i];
+          res.push({
+            label: parentKode + element.kode + " - " + element.nama,
+            value: element.id.toString(),
+          });
+          rec(element, res, parentKode + element.kode + ".", level + 1);
+        }
+      }
+    };
+    const a = akun.flatMap((ak) => {
+      let result = [];
+      rec(ak, result, ak.kode + ".");
+
+      return result;
+    });
+
+    setOptions(a);
     if (action != "add") {
       form.setValues({
         saldo: data.saldo,
@@ -212,12 +244,7 @@ const Form = ({ data, action, akun }) => {
                   }}
                 />
                 <Select
-                  data={[
-                    ...akun.result.map((e) => ({
-                      label: `${e.kode} - ${e.nama} - ${e.tipe}`,
-                      value: e.id.toString(),
-                    })),
-                  ]}
+                  data={options}
                   disabled={disabled}
                   onChange={(e) => {
                     form.setFieldValue("akunId", e.value);
