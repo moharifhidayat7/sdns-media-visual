@@ -130,7 +130,7 @@ export default function Index({ result }) {
                   <CustomTable.Col>
                     <Text className="">
                       {row.akun && row.akun.tipe == "DEBET"
-                        ? "Rp." + convertToRupiah(row.saldo)
+                        ? convertToRupiah(row.saldo)
                         : ""}
                     </Text>
                   </CustomTable.Col>
@@ -138,7 +138,7 @@ export default function Index({ result }) {
                   <CustomTable.Col>
                     <Text className=" text-red-500">
                       {row.akun && row.akun.tipe == "KREDIT"
-                        ? "Rp." + convertToRupiah(row.saldo)
+                        ? convertToRupiah(row.saldo)
                         : ""}
                     </Text>
                   </CustomTable.Col>

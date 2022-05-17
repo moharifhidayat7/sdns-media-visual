@@ -136,9 +136,9 @@ const Perencanaan = ({ result }) => {
             </td>
             <td>
               {row.akun && row.akun.tipe == "DEBET" ? (
-                <Text color="green">{"Rp. " + convertToRupiah(row.saldo)}</Text>
+                <Text color="green">{convertToRupiah(row.saldo)}</Text>
               ) : (
-                <Text color="red">{"Rp. " + convertToRupiah(row.saldo)}</Text>
+                <Text color="red">{convertToRupiah(row.saldo)}</Text>
               )}
             </td>
             <td>
@@ -178,9 +178,9 @@ const Perencanaan = ({ result }) => {
             </td>
             <td>
               {row.akun && row.akun.tipe == "DEBET" ? (
-                <Text color="green">{"Rp. " + convertToRupiah(row.saldo)}</Text>
+                <Text color="green">{convertToRupiah(row.saldo)}</Text>
               ) : (
-                <Text color="red">{"Rp. " + convertToRupiah(row.saldo)}</Text>
+                <Text color="red">{convertToRupiah(row.saldo)}</Text>
               )}
             </td>
             <td>
