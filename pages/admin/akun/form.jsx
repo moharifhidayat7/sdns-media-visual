@@ -105,7 +105,6 @@ const Form = ({ data, action, parentakun }) => {
         res.push({
           label: par.kode + " - " + par.nama,
           value: par.id.toString(),
-          disabled: true,
         });
       }
       if (par.children) {
