@@ -10,7 +10,8 @@ import {
 import { Pencil, Trash } from "tabler-icons-react";
 import { useModals } from "@mantine/modals";
 import { useRouter } from "next/router";
-import { route } from "next/dist/server/router";
+import ArrayToTree from "array-to-tree";
+
 const useStyles = createStyles((theme) => ({
   header: {
     position: "sticky",
@@ -25,20 +26,21 @@ const useStyles = createStyles((theme) => ({
       left: 0,
       right: 0,
       bottom: 0,
-      borderBottom: `1px solid ${theme.colorScheme === "dark"
-        ? theme.colors.dark[3]
-        : theme.colors.gray[2]
-        }`,
+      borderBottom: `1px solid ${
+        theme.colorScheme === "dark"
+          ? theme.colors.dark[3]
+          : theme.colors.gray[2]
+      }`,
     },
   },
-
   rows: {
     td: {
       borderLeft: "none",
-      borderRight: `1px solid ${theme.colorScheme === "dark"
-        ? theme.colors.dark[3]
-        : theme.colors.gray[2]
-        }`,
+      borderRight: `1px solid ${
+        theme.colorScheme === "dark"
+          ? theme.colors.dark[3]
+          : theme.colors.gray[2]
+      }`,
     },
   },
 
@@ -47,18 +49,18 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const Row = ({ item, parent = "0", children, parentId = 0, level = 0, manageItem }) => {
+const Tree = ({ data, level = 0, parentKode = "" }) => {
   const modals = useModals();
-  const router = useRouter()
+  const router = useRouter();
   const openDeleteModal = (name, id, childDeleted = false) => {
     return modals.openConfirmModal({
-      title: `Delete akunting`,
+      title: `Delete akun`,
       centered: true,
       children: (
         <Text size="sm">
           Anda yakin ingin menghapus
-          <strong> {name}</strong>?
-          Data akun tidak dapat dipulihkan ketika dihapus!
+          <strong> {name}</strong>? Data akun tidak dapat dipulihkan ketika
+          dihapus!
         </Text>
       ),
       labels: { confirm: "Delete", cancel: "Batalkan" },
@@ -72,75 +74,86 @@ const Row = ({ item, parent = "0", children, parentId = 0, level = 0, manageItem
           },
           body: JSON.stringify(id),
         }).then((res) => {
-          router.reload()
+          router.reload();
         });
       },
     });
   };
   return (
     <>
-      <tr key={item.id}>
-        {level > 0 && (
-          <td
-            style={{
-              width: "5rem",
-              textAlign: "center",
-            }}
-          ></td>
-        )}
+      <tr>
         <td
           style={{
             width: "5rem",
-            textAlign: parentId != 0 ? "left" : "center",
-            fontWeight: level == 0 ? 700 : 400,
+            textAlign: "center",
+            fontWeight: level == 0 && 500,
           }}
         >
-          {parentId != 0 ? parent + "." + item.kode : item.kode}
+          {level == 0 && parentKode + data.kode}
         </td>
-        <td
-          style={{ fontWeight: level == 0 ? 700 : 400 }}
-          colSpan={parentId == 0 ? 2 : 1}
-        >
-          {item.nama}
-        </td>
-        <td>
+        {level == 0 ? (
+          <>
+            <td style={{ fontWeight: 500 }} colSpan={2}>
+              {data.nama}
+            </td>
+          </>
+        ) : (
+          <>
+            <td
+              style={{
+                width: "5rem",
+              }}
+            >
+              {parentKode}
+              {data.kode}
+            </td>
+            <td>{data.nama}</td>
+          </>
+        )}
+        <td style={{ width: "5rem" }}>
           <Text
             sx={(theme) => ({
               color:
-                item.tipe == "DEBET"
+                data.tipe == "DEBET"
                   ? theme.colors.green[5]
                   : theme.colors.red[5],
             })}
           >
-            {item.tipe}
+            {data.tipe}
           </Text>
         </td>
         <td>
           <Group spacing="xs" noWrap className="justify-end">
-            <ActionIcon color="yellow" variant="filled" onClick={() => { router.push("/admin/akun/form?id="+item.id) }}>
+            <ActionIcon
+              color="yellow"
+              variant="filled"
+              onClick={() => {
+                router.push("/admin/akun/form?id=" + data.id);
+              }}
+            >
               <Pencil size={16} />
             </ActionIcon>
-            <ActionIcon color="red" variant="filled" onClick={() => openDeleteModal(item.nama, item.id)}>
+            <ActionIcon
+              color="red"
+              variant="filled"
+              onClick={() => openDeleteModal(data.nama, data.id)}
+            >
               <Trash size={16} />
             </ActionIcon>
           </Group>
         </td>
       </tr>
-      {item.child &&
-        item.child.map((child) => (
-          <>
-            <Row
-              item={child}
-              parent={
-                child.parentId != 0 ? parent + "." + item.kode : item.kode
-              }
-              manageItem={{ ...manageItem }}
-              parentId={item.id}
-              level={level + 1}
+      {data.children &&
+        data.children.map((child) => {
+          return (
+            <Tree
+              data={child}
               key={child.id}
-            ></Row>
-          </>
-        ))}
+              parentKode={parentKode + data.kode + "."}
+              level={level + 1}
+            />
+          );
+        })}
     </>
   );
 };
@@ -150,35 +163,34 @@ export function AkunTable({ data }) {
   const [scrolled, setScrolled] = useState(false);
   const [newData, setNewData] = useState([]);
   useEffect(() => {
-    setNewData(data);
-  }, [])
+    const tree = ArrayToTree(data, {
+      parentProperty: "parentId",
+    });
+    console.log(tree);
+    setNewData(tree);
+  }, []);
   return (
-    <ScrollArea
-      sx={{ height: 500 }}
-      onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
+    <Table
+      sx={{
+        borderCollapse: "collapse",
+        minWidth: 700,
+      }}
     >
-      <Table
-        sx={{
-          borderCollapse: "collapse",
-          minWidth: 700,
-        }}
-      >
-        <thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
-          <tr>
-            <th style={{ width: "5rem" }}>Kode</th>
-            <th style={{ width: "5rem" }} colSpan={2}>
-              Nama
-            </th>
-            <th style={{ width: "10rem" }}>Tipe</th>
-            <th style={{ textAlign: "right", width: "10rem" }}>Action</th>
-          </tr>
-        </thead>
-        <tbody className={classes.rows}>
-          {data.map((item) => (
-            <Row item={item} key={item.id} manageItem={{ newData, setNewData }}></Row>
-          ))}
-        </tbody>
-      </Table>
-    </ScrollArea>
+      <thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
+        <tr>
+          <th style={{ width: "5rem" }}>Kode</th>
+          <th style={{ width: "5rem" }} colSpan={2}>
+            Nama
+          </th>
+          <th style={{ width: "5rem" }}>Tipe</th>
+          <th style={{ textAlign: "right", width: "5rem" }}>Action</th>
+        </tr>
+      </thead>
+      <tbody className={classes.rows}>
+        {newData.map((row) => (
+          <Tree data={row} key={row.id} />
+        ))}
+      </tbody>
+    </Table>
   );
 }
