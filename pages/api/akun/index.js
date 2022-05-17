@@ -12,8 +12,7 @@ const Index = async (req, res) => {
         data: {
           ...data,
           kode: data.kode,
-          parentId: parseInt(data.parentId) || 0,
-          akunId: parseInt(data.parentId) || null,
+          parentId: parseInt(data.parentId) || null,
           createdId: session.user.id,
           updatedId: session.user.id,
         },
@@ -37,6 +36,9 @@ const Index = async (req, res) => {
       const result = await prisma.akun.findMany({
         skip,
         take: limit,
+        include: {
+          parent: true,
+        },
         where: {
           isDeleted: false,
         },

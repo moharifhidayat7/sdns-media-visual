@@ -21,6 +21,7 @@ import Layout from "@components/views/Layout";
 import { useState, useEffect, forwardRef } from "react";
 import { useRouter } from "next/router";
 import { formList, useForm } from "@mantine/form";
+import ArrayToTree from "array-to-tree";
 import {
   convertToRupiah,
   generateCode,
@@ -58,7 +59,8 @@ export async function getServerSideProps(context) {
   } else {
     let res = await fetch(`${process.env.API_URL}/api/akun`, OPTIONFETCH);
     const results = await res.json();
-    result = results.result.length > 0 ? results.result[results.total - 1] : results;
+    result =
+      results.result.length > 0 ? results.result[results.total - 1] : results;
     action = "add";
   }
   if (read) {
@@ -73,7 +75,9 @@ export async function getServerSideProps(context) {
     props: {
       action,
       session,
-      parentakun,
+      parentakun: ArrayToTree(parentakun.result, {
+        parentProperty: "parentId",
+      }),
       data: result || [],
     },
   };
@@ -94,15 +98,43 @@ const Form = ({ data, action, parentakun }) => {
   const [modal, setModal] = useState(false);
   const router = useRouter();
   const { data: session, status } = useSession();
-  const [parent, setParent] = useState([])
+  const [options, setOptions] = useState([]);
   useEffect(() => {
-    if (action != "add") {
+    const rec = (par, res, parentKode = "", level = 0) => {
+      if (par.parentId == null) {
+        res.push({
+          label: par.kode + " - " + par.nama,
+          value: par.id.toString(),
+          disabled: true,
+        });
+      }
+      if (par.children) {
+        for (let i = 0; i < par.children.length; i++) {
+          const element = par.children[i];
+          res.push({
+            label: parentKode + element.kode + " - " + element.nama,
+            value: element.id.toString(),
+          });
+          rec(element, res, parentKode + element.kode + ".", level + 1);
+        }
+      }
+    };
+    const a = parentakun.flatMap((akun) => {
+      let result = [];
+      rec(akun, result, akun.kode + ".");
 
-      const coba = parentakun && parentakun.result.filter((x) => {
-        return x.id != data.id
-      })
-      setParent(coba)
-      form.setValues({ kode: data.kode, nama: data.nama, tipe: data.tipe, parentId: data.parentId });
+      return result;
+    });
+
+    setOptions(a);
+
+    if (action != "add") {
+      form.setValues({
+        kode: data.kode,
+        nama: data.nama,
+        tipe: data.tipe,
+        parentId: data.parentId,
+      });
       if (action == "read") {
         setDisabled(true);
       }
@@ -227,10 +259,7 @@ const Form = ({ data, action, parentakun }) => {
                 />
                 <Select
                   searchable
-                  data={parent&&parent.map((ak) => ({
-                    label: `${ak.kode} - ${ak.nama}`,
-                    value: ak.id.toString(),
-                  }))}
+                  data={options}
                   {...form.getInputProps("parentId")}
                   onChange={(e) => {
                     form.setFieldValue("parentId", e);
