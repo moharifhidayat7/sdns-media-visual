@@ -82,6 +82,7 @@ const menu = [
     label: "Laporan",
     icon: Report,
     links: [
+      { label: "Laporan Kas", link: "/admin/laporan/kas" },
       { label: "Faktur Stok Masuk", link: "/admin/faktur-stok-masuk" },
       { label: "Faktur Stok Keluar", link: "/faktur-stok-keluar" },
       { label: "Faktur Stok Opname", link: "/faktur-stok-opname" },

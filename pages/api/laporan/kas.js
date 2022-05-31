@@ -1,0 +1,165 @@
+import prisma from "lib/prisma";
+import { getSession } from "next-auth/react";
+import ExcelJS from "exceljs";
+import stream from "stream";
+import dateFormat from "dateformat";
+
+export default async function handler(req, res) {
+  const session = await getSession({ req });
+
+  if (req.method === "GET") {
+    const search = req.query.search || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const start = req.query.start;
+    const end = req.query.end;
+    const prismaQuery = {
+      skip,
+      take: limit,
+      include: {
+        akun: true,
+      },
+      where: {
+        isDeleted: false,
+        createdAt: {
+          lte: new Date(end),
+          gte: new Date(start),
+        },
+        OR: [
+          {
+            keterangan: {
+              contains: search,
+            },
+          },
+        ],
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    };
+    try {
+      const [result, totalResult] = await prisma.$transaction([
+        prisma.kas.findMany(prismaQuery),
+        prisma.kas.count({
+          where: {
+            isDeleted: false,
+            createdAt: {
+              lte: new Date(end),
+              gte: new Date(start),
+            },
+            OR: [
+              {
+                keterangan: {
+                  contains: search,
+                },
+              },
+            ],
+          },
+        }),
+      ]);
+
+      const pages = Math.ceil(totalResult / limit);
+
+      res.status(200).json({
+        status: "success",
+        message: "Berhasil mengambil data kas",
+        result: result,
+        total: totalResult,
+        pages,
+        page,
+        limit,
+      });
+    } catch (error) {
+      res.status(400).json({ err: "Error occured." });
+    }
+  }
+  if (req.method === "POST") {
+    const akun = await prisma.akun.findMany({
+      include: {
+        parent: true,
+      },
+      where: {
+        isDeleted: false,
+      },
+      orderBy: {
+        kode: "asc",
+      },
+    });
+
+    const noAkun = (v, kode = "") => {
+      if (v.parentId != null) {
+        const newKode = v.kode + "." + kode;
+        return noAkun(
+          akun.filter((a) => a.id == v.parentId)[0],
+          kode == "" ? v.kode : newKode
+        );
+      }
+      return v.kode + "." + kode;
+    };
+
+    const workbook = new ExcelJS.Workbook();
+    const resp = await fetch(
+      new Request(process.env.API_URL + "/template-kas.xlsx")
+    );
+    const buff = await resp.arrayBuffer();
+    const buffer = Buffer.from(buff);
+    const readStream = new stream.PassThrough();
+    readStream.end(buffer);
+
+    await workbook.xlsx.read(readStream);
+
+    const sheet = workbook.worksheets[0];
+
+    const prismaQ = {
+      include: {
+        akun: true,
+      },
+      where: {
+        isDeleted: false,
+        createdAt: {
+          lte: new Date(req.query.end),
+          gte: new Date(req.query.start),
+        },
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
+    };
+    const data = await prisma.kas.findMany(prismaQ);
+    let rowStart = 4;
+
+    sheet.getRow(1).getCell(1).value +=
+      " " +
+      dateFormat(req.query.start, "dd/mm/yyyy") +
+      " - " +
+      dateFormat(req.query.end, "dd/mm/yyyy");
+
+    for (let i = 0; i < data.length; i++) {
+      const row = sheet.getRow(rowStart);
+      const kas = data[i];
+
+      row.getCell(1).value = new Date(kas.createdAt);
+      row.getCell(2).value = noAkun(kas.akun);
+      row.getCell(3).value = kas.keterangan;
+      row.getCell(4).value =
+        kas.akun.tipe == "DEBET" ? parseInt(kas.saldo) : "";
+      row.getCell(5).value =
+        kas.akun.tipe == "KREDIT" ? parseInt(kas.saldo) : "";
+      rowStart++;
+    }
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=" + `laporan-kas.xlsx`
+    );
+
+    return workbook.xlsx.write(res).then(function () {
+      res.status(200).end();
+    });
+  }
+}
