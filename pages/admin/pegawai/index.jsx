@@ -86,6 +86,15 @@ export default function Index({ user }) {
       label: "Created At",
     },
   ];
+
+  const CustomAction = () => (
+    <>
+      <Button compact variant="default">
+        Reset password
+      </Button>
+    </>
+  );
+
   return (
     <Layout session={session}>
       <Head>
@@ -118,6 +127,7 @@ export default function Index({ user }) {
                 <CustomTable.Row
                   key={row.id}
                   id={row.id}
+                  customAction={<CustomAction />}
                   readLink={`/form?id=${row.id}&readOnly`}
                   editLink={`/form?id=${row.id}`}
                   deleteField={row.nama}
