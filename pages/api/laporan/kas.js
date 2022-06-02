@@ -3,6 +3,8 @@ import { getSession } from "next-auth/react";
 import ExcelJS from "exceljs";
 import stream from "stream";
 import dateFormat from "dateformat";
+import ArrayToTree from "array-to-tree";
+import _ from "lodash";
 
 export default async function handler(req, res) {
   const session = await getSession({ req });
@@ -110,6 +112,7 @@ export default async function handler(req, res) {
     await workbook.xlsx.read(readStream);
 
     const sheet = workbook.worksheets[0];
+    const sheet1 = workbook.worksheets[1];
 
     const prismaQ = {
       include: {
@@ -147,6 +150,50 @@ export default async function handler(req, res) {
       row.getCell(5).value =
         kas.akun.tipe == "KREDIT" ? parseInt(kas.saldo) : "";
       rowStart++;
+    }
+
+    let rowStart2 = 5;
+
+    const recAkun = (ak, level = 1, parentKode = "") => {
+      const row = sheet1.getRow(rowStart2);
+
+      if (ak.parentId == null) {
+        row.getCell(1).value = ak.kode;
+        row.getCell(2).value = ak.nama;
+
+        row.font = {
+          bold: true,
+        };
+      } else {
+        row.getCell(level).value = parentKode + ak.kode;
+        row.getCell(4).value = ak.nama;
+        row.font = {
+          bold: false,
+        };
+      }
+      rowStart2++;
+
+      if (ak.children) {
+        for (let k = 0; k < ak.children.length; k++) {
+          recAkun(ak.children[k], level + 1, parentKode + ak.kode + ".");
+        }
+      } else {
+        row.getCell(5).value = parseInt(
+          _.sumBy(data, (o) => {
+            if (o.akun.id == ak.id) {
+              return o.saldo;
+            }
+            return 0;
+          })
+        );
+      }
+    };
+
+    const newAkun = ArrayToTree(akun, {
+      parentProperty: "parentId",
+    });
+    for (let j = 0; j < newAkun.length; j++) {
+      recAkun(newAkun[j]);
     }
 
     res.setHeader(
