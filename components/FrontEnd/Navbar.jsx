@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { createStyles, Header, Container, Group, Burger, Paper, Transition, Button } from '@mantine/core';
 import { useBooleanToggle } from '@mantine/hooks';
+import Link from 'next/link';
 
 const HEADER_HEIGHT = 80;
 
@@ -21,8 +22,9 @@ const useStyles = createStyles((theme) => ({
           borderTopRightRadius: 0,
           borderTopLeftRadius: 0,
           borderTopWidth: 0,
+          borderLeft:"none",
           overflow: 'hidden',
-
+          backgroundColor: "rgba(0,0,0,0.8)",
           [theme.fn.largerThan('sm')]: {
                display: 'none',
           },
@@ -53,11 +55,12 @@ const useStyles = createStyles((theme) => ({
           padding: '8px 12px',
           borderRadius: theme.radius.sm,
           textDecoration: 'none',
-          color: theme.colors.gray[6],
+          color: theme.colors.gray[2],
           fontSize: theme.fontSizes.sm,
           fontWeight: 500,
 
           '&:hover': {
+               color: theme.colors.gray[8],
                backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
           },
 
@@ -139,12 +142,20 @@ export function Navbar() {
                          {(styles) => (
                               <Paper className={classes.dropdown} withBorder style={styles}>
                                    {items}
+                                   <Link href="/login" >
+                                   <Button className='my-3 ml-3' radius="xl" sx={{ height: 30 }}>
+                                        Login
+                                   </Button>
+                                   </Link>
                               </Paper>
                          )}
+
                     </Transition>
-                    <Button radius="xl" sx={{ height: 30 }}>
-                         Login
-                    </Button>
+                    <Link href="/login" >
+                         <Button className='hidden md:block' radius="xl" sx={{ height: 30 }}>
+                              Login
+                         </Button>
+                    </Link>
                </Container>
           </Header>
      );

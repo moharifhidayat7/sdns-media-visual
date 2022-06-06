@@ -15,6 +15,7 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import { CircleCheck, CircleDashed } from 'tabler-icons-react';
+import { useEffect } from "react";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -54,15 +55,16 @@ export const datas = {
     },
   ],
 };
-export default function Home() {
+export default function Home({notifikasi,pelanggan}) {
   const theme = useMantineTheme();
   const SECONDARY_COL_HEIGHT = PRIMARY_COL_HEIGHT / 2 - theme.spacing.md / 2;
   const { data: session } = useSession();
+
   const Card = [
     {
       "title": "Pelanggan",
       "icon": "users",
-      "value": "4,145",
+      "value": pelanggan.total,
       "diff": -13
     },
     {
@@ -84,6 +86,7 @@ export default function Home() {
       "diff": 1
     }
   ]
+
   return (
     <Layout session={session}>
       <Head>
@@ -116,9 +119,11 @@ export default function Home() {
                   </ThemeIcon>
                 }
               >
-                <List.Item>Permintaan installasi baru</List.Item>
-                <List.Item>Pelanggan baru</List.Item>
-                <List.Item>Stok kabel dibawah batas minimum</List.Item>
+                {notifikasi.result&&notifikasi.result.map((item, index) => (
+                  <List.Item key={index}>
+                    <Text size="xs" color="dimmed">{item.title}</Text>
+                  </List.Item>
+                ))}
               </List>
             </Paper>
           </Grid.Col>
@@ -137,9 +142,18 @@ export default function Home() {
 }
 
 export async function getServerSideProps(context) {
+  const OPTION = {
+    headers: {
+      Cookie: context.req.headers.cookie,
+    },
+  };
+  const notifikasi = await fetch(`${process.env.API_URL}/api/notifikasi`, OPTION);
+  const pelanggan= await fetch(`${process.env.API_URL}/api/pelanggan`, OPTION);
   return {
     props: {
       session: await getSession(context),
+      notifikasi: await notifikasi.json(),
+      pelanggan: await pelanggan.json(),
     },
   };
 }

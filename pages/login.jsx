@@ -17,6 +17,7 @@ import { useNotifications } from "@mantine/notifications";
 import { Check } from "tabler-icons-react";
 
 import { getSession } from "next-auth/react";
+import Link from "next/link";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -148,6 +149,9 @@ export default function Login() {
             <Button fullWidth mt="xl" size="md" type="submit">
               Login
             </Button>
+            <Link href="/register"><Button type="button" fullWidth mt="xl" size="md"  variant="subtle"  >
+             Pelanggan baru
+            </Button></Link>
           </form>
         </Paper>
       </div>
