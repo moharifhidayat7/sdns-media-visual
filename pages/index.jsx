@@ -1,6 +1,7 @@
 import React from 'react';
 import { createStyles, Overlay, Container, Title, Button, Text } from '@mantine/core';
 import { Navbar } from '@components/FrontEnd/Navbar';
+import Link from 'next/link';
 
 const useStyles = createStyles((theme) => ({
   hero: {
@@ -69,7 +70,7 @@ const Index = () => {
 
   return (
     <div className={classes.hero}>
-      <Navbar/>
+      <Navbar />
       <Overlay
         gradient="linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, .65) 40%)"
         opacity={1}
@@ -78,12 +79,13 @@ const Index = () => {
       <Container className={classes.container}>
         <Title className={classes.title}>Be a Leading Star to Lead Indonesia’s Digital Ecosystem</Title>
         <Text className={classes.description} size="xl" mt="xl">
-        Kami terus berinovasi mengikuti perkembangan digital pada sektor-sektor penting di Indonesia agar tetap relevan dan akan memberikan dampak yang berarti bagi masyarakat.
+          Kami terus berinovasi mengikuti perkembangan digital pada sektor-sektor penting di Indonesia agar tetap relevan dan akan memberikan dampak yang berarti bagi masyarakat.
         </Text>
 
-        <Button variant="gradient" size="xl" radius="xl" className={classes.control}>
-        Bergabung
-        </Button>
+       <Link href="/register"> 
+       <Button variant="gradient" size="xl" radius="xl" className={classes.control}>
+          Bergabung
+        </Button></Link>
       </Container>
     </div>
   );

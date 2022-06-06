@@ -115,6 +115,22 @@ model User {
   createdGajiKaryawan    GajiKaryawan[]    @relation("GajiKaryawancreatedBy")
   updatedGajiKaryawan    GajiKaryawan[]    @relation("GajiKaryawanupdatedBy")
   gajiKaryawan           GajiKaryawan[]    @relation("GajiKaryawan")
+  Notifikasi             Notifikasi[]      @relation("userNotifikasi")
+}
+
+model Notifikasi {
+  id        Int       @id @default(autoincrement())
+  user      User?     @relation("userNotifikasi", references: [id], fields: [userId])
+  userId    Int?
+  title     String
+  body      String
+  icon      String?
+  link      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  isDeleted Boolean?  @default(false)
+  read      Boolean?  @default(false)
 }
 
 model GajiKaryawan {

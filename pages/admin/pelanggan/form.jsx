@@ -116,7 +116,6 @@ const Form = ({ data, action, kecamatan, desa }) => {
   useEffect(() => {
     if (action != "add") {
       form.setValues({ no_pelanggan: data.no_pelanggan, no_telp: data.no_telp, nama: data.nama, alamat: data.alamat, kecamatan: data.kecamatan, kelurahan: data.kelurahan, email: data.email, password: '' });
-      console.log(desa)
       setKelurahan(desa.kelurahan)
       if (action == "read") {
         setDisabled(true);
