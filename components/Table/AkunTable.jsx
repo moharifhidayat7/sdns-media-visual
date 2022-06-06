@@ -166,7 +166,6 @@ export function AkunTable({ data }) {
     const tree = ArrayToTree(data, {
       parentProperty: "parentId",
     });
-    console.log(tree);
     setNewData(tree);
   }, []);
   return (
