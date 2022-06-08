@@ -1,13 +1,19 @@
 import { PrismaClient } from "@prisma/client";
+import { getSession } from "next-auth/react";
 
 const prisma = new PrismaClient({
   rejectOnNotFound: true,
 });
 export default async (req, res) => {
   const id = req.query.id;
+  const session = await getSession({ req });
   if (req.method == "GET") {
     try {
-      const result = await prisma.akun.findFirst({
+      const result = await prisma.fitur.findFirst({
+        include: {
+          updatedBy: true,
+          createdBy: true,
+        },
         where: {
           id: parseInt(id),
           isDeleted: false,
@@ -20,12 +26,13 @@ export default async (req, res) => {
   } else if (req.method == "PUT") {
     try {
       const data = req.body;
-      const result = await prisma.akun.update({
+      const result = await prisma.fitur.update({
         where: {
           id: parseInt(id),
         },
         data: {
           ...data,
+          updatedId: session.user.id,
         },
       });
       res.status(200).json({
@@ -33,25 +40,26 @@ export default async (req, res) => {
         result,
       });
     } catch (err) {
+      console.log(err);
       res.status(403).json({ message: err.message });
     }
   } else if (req.method == "DELETE") {
     try {
-      const result = await prisma.akun.delete({
+      const result = await prisma.fitur.update({
         where: {
           id: parseInt(id),
         },
-      });
-      await prisma.akun.deleteMany({
-        where: {
-          parentId: parseInt(id),
+        data: {
+          isDeleted: true,
+          deletedAt: new Date(),
         },
       });
       res.status(200).json({
-        message: "Data deleted",
+        message: "fitur deleted",
         result,
       });
     } catch (err) {
+      console.log(err);
       res.status(403).json({ err: err.message });
     }
   }

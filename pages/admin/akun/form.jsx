@@ -21,6 +21,7 @@ import Layout from "@components/views/Layout";
 import { useState, useEffect, forwardRef } from "react";
 import { useRouter } from "next/router";
 import { formList, useForm } from "@mantine/form";
+import ArrayToTree from "array-to-tree";
 import {
   convertToRupiah,
   generateCode,
@@ -65,7 +66,7 @@ export async function getServerSideProps(context) {
   if (read) {
     action = "read";
   }
-  const parentakun = await fetch(
+  let parentakun = await fetch(
     `${process.env.API_URL}/api/akun`,
     OPTIONFETCH
   ).then((res) => res.json());
@@ -74,30 +75,13 @@ export async function getServerSideProps(context) {
     props: {
       action,
       session,
-      parentakun,
+      parentakun: ArrayToTree(parentakun.result, {
+        parentProperty: "parentId",
+      }),
       data: result || [],
     },
   };
 }
-
-// const SelectItem = forwardRef(({ ...akun }, ref) => {
-//   return (
-//     <div ref={ref} {...akun}>
-//       <Group noWrap>
-//         <Text size="sm">
-//           {akun.akunId ? akun.parentId + "." : ""}
-//           {akun.kode}
-//         </Text>
-//         -
-//         <div>
-//           <Text size="sm">{akun.nama}</Text>
-//         </div>
-//       </Group>
-//     </div>
-//   );
-// });
-
-// SelectItem.displayName = "SelectItem";
 
 const Form = ({ data, action, parentakun }) => {
   const form = useForm({
@@ -114,9 +98,42 @@ const Form = ({ data, action, parentakun }) => {
   const [modal, setModal] = useState(false);
   const router = useRouter();
   const { data: session, status } = useSession();
+  const [options, setOptions] = useState([]);
   useEffect(() => {
+    const rec = (par, res, parentKode = "", level = 0) => {
+      if (par.parentId == null) {
+        res.push({
+          label: par.kode + " - " + par.nama,
+          value: par.id.toString(),
+        });
+      }
+      if (par.children) {
+        for (let i = 0; i < par.children.length; i++) {
+          const element = par.children[i];
+          res.push({
+            label: parentKode + element.kode + " - " + element.nama,
+            value: element.id.toString(),
+          });
+          rec(element, res, parentKode + element.kode + ".", level + 1);
+        }
+      }
+    };
+    const a = parentakun.flatMap((akun) => {
+      let result = [];
+      rec(akun, result, akun.kode + ".");
+
+      return result;
+    });
+
+    setOptions(a);
+
     if (action != "add") {
-      form.setValues({ kode: "", nama: "", tipe: "", parentId: "" });
+      form.setValues({
+        kode: data.kode,
+        nama: data.nama,
+        tipe: data.tipe,
+        parentId: data.parentId,
+      });
       if (action == "read") {
         setDisabled(true);
       }
@@ -241,11 +258,7 @@ const Form = ({ data, action, parentakun }) => {
                 />
                 <Select
                   searchable
-                  // itemComponent={SelectItem}
-                  data={parentakun.result.map((ak) => ({
-                    label:`${ak.kode} - ${ak.nama}`,
-                    value: ak.id.toString(),
-                  }))}
+                  data={options}
                   {...form.getInputProps("parentId")}
                   onChange={(e) => {
                     form.setFieldValue("parentId", e);

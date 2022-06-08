@@ -73,12 +73,16 @@ const menu = [
   {
     label: "Akunting",
     icon: CreditCard,
-    links: [{ label: "Kas", link: "/admin/kas" }],
+    links: [
+      { label: "Kas", link: "/admin/kas" },
+      { label: "Perencanaan Kas", link: "/admin/perencanaan" },
+    ],
   },
   {
     label: "Laporan",
     icon: Report,
     links: [
+      { label: "Laporan Kas", link: "/admin/laporan/kas" },
       { label: "Faktur Stok Masuk", link: "/admin/faktur-stok-masuk" },
       { label: "Faktur Stok Keluar", link: "/faktur-stok-keluar" },
       { label: "Faktur Stok Opname", link: "/faktur-stok-opname" },

@@ -118,6 +118,22 @@ model User {
   gajiKaryawan           GajiKaryawan[]    @relation("GajiKaryawan")
   createdTagihan         Tagihan[]         @relation("tagihancreatedBy")
   updatedTagihan         Tagihan[]         @relation("tagihanupdatedBy")
+  Notifikasi             Notifikasi[]      @relation("userNotifikasi")
+}
+
+model Notifikasi {
+  id        Int       @id @default(autoincrement())
+  user      User?     @relation("userNotifikasi", references: [id], fields: [userId])
+  userId    Int?
+  title     String
+  body      String
+  icon      String?
+  link      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  isDeleted Boolean?  @default(false)
+  read      Boolean?  @default(false)
 }
 
 model GajiKaryawan {
@@ -387,10 +403,9 @@ model Akun {
   kode      String
   nama      String
   tipe      TipeAkun
-  parentId  Int?      @default(0)
-  akunId    Int?
-  akun      Akun?     @relation(name: "SubAkun", references: [id], fields: [akunId])
-  child     Akun[]    @relation(name: "SubAkun")
+  parentId  Int?
+  child     Akun[]    @relation(name: "Sub")
+  parent    Akun?     @relation(name: "Sub", references: [id], fields: [parentId])
   isDeleted Boolean?  @default(false)
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
@@ -409,6 +424,9 @@ model Kas {
   saldo      String
   akun       Akun?     @relation(name: "KasAkun", references: [id], fields: [akunId])
   akunId     Int?
+  noBukti    String?
+  status     StatusKas @default(PENDING)
+  validated  Boolean?  @default(false)
   isDeleted  Boolean?  @default(false)
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @updatedAt
@@ -433,4 +451,10 @@ model Tagihan {
   createdBy   User?      @relation(fields: [createdId], references: [id], name: "tagihancreatedBy")
   updatedId   Int?
   createdId   Int?
+}
+
+enum StatusKas {
+  PENDING
+  SUKSES
+  DIBATALKAN
 }

@@ -21,8 +21,6 @@ import Layout from "@components/views/Layout";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { formList, useForm } from "@mantine/form";
-import ArrayToTree from "array-to-tree";
-
 import {
   convertToRupiah,
   generateCode,
@@ -33,8 +31,10 @@ import { useNotifications } from "@mantine/notifications";
 import { Check, Trash, X } from "tabler-icons-react";
 import { getSession, useSession } from "next-auth/react";
 import { DatePicker, Month } from "@mantine/dates";
-const PATHNAME = "kas";
-const PAGENAME = "Kas";
+import ArrayToTree from "array-to-tree";
+
+const PATHNAME = "perencanaan";
+const PAGENAME = "Perencanaan";
 export async function getServerSideProps(context) {
   const id = context.query.id;
   const read = context.query.read;
@@ -83,18 +83,24 @@ export async function getServerSideProps(context) {
 
 const Form = ({ data, action, akun }) => {
   const form = useForm({
-    initialValues: { saldo: "", keterangan: "", akunId: "", status: "SUKSES" },
+    initialValues: {
+      saldo: "",
+      keterangan: "",
+      akunId: "",
+      createdAt: action != "add" && new Date(data.createdAt),
+    },
     validate: {
       akunId: (value) => (value.length < 1 ? "Plese input value." : null),
       saldo: (value) => (value.length < 1 ? "Plese input value." : null),
+      createdAt: (v) => (v == "" ? "Pilih tanggal" : null),
     },
   });
   const notifications = useNotifications();
   const [loading, setLoading] = useState(true);
   const [disabled, setDisabled] = useState(false);
   const [modal, setModal] = useState(false);
-  const router = useRouter();
   const [options, setOptions] = useState([]);
+  const router = useRouter();
   const { data: session, status } = useSession();
   useEffect(() => {
     const rec = (par, res, parentKode = "", level = 0) => {
@@ -123,12 +129,12 @@ const Form = ({ data, action, akun }) => {
     });
 
     setOptions(a);
-
     if (action != "add") {
       form.setValues({
         saldo: data.saldo,
         keterangan: data.keterangan,
         akunId: data.akunId && data.akunId.toString(),
+        createdAt: new Date(data.createdAt),
       });
       if (action == "read") {
         setDisabled(true);
@@ -145,8 +151,7 @@ const Form = ({ data, action, akun }) => {
     setLoading(false);
     const FORMDATA = form.values;
     const method = action === "edit" ? "PUT" : "POST";
-    const url =
-      action === "edit" ? `/api/${PATHNAME}/${data.id}` : `/api/${PATHNAME}`;
+    const url = action === "edit" ? `/api/kas/${data.id}` : `/api/kas`;
     const notifTitle = action.charAt(0).toUpperCase() + action.slice(1);
     await fetch(url, {
       method,
@@ -217,6 +222,14 @@ const Form = ({ data, action, akun }) => {
           <Grid>
             <Grid.Col sm={12} md={6}>
               <Group direction="column" grow spacing="lg">
+                <DatePicker
+                  placeholder="Pick date"
+                  label="Tanggal"
+                  disabled={disabled}
+                  excludeDate={(date) => date < new Date()}
+                  required
+                  {...form.getInputProps("createdAt")}
+                />
                 <TextInput
                   label="Saldo"
                   disabled={disabled}

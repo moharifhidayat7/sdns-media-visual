@@ -4,9 +4,14 @@ import { getToken } from "next-auth/jwt";
 
 export async function middleware(req) {
   const token = await getToken({ req });
+  //tambahkan api yang tidak perlu login
+  const allowedUrls = ["/auth/", "/pelanggan/pendaftaran"];
 
-  if (req.url.includes("/auth/")) {
-    return NextResponse.next();
+
+  for (let i = 0; i < allowedUrls.length; i++) {
+    if (req.url.includes(allowedUrls[i])) {
+      return NextResponse.next();
+    }
   }
 
   if (token) {
