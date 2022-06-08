@@ -9,9 +9,11 @@ import {
   Group,
   TextInput,
   Select,
+  SimpleGrid,
   Table,
   Text,
   Input,
+  Stack,
   InputWrapper,
   Button,
 } from "@mantine/core";
@@ -53,10 +55,9 @@ const BayarTagihan = () => {
         <Grid>
           <Grid.Col sm={12} md={6}>
             <Group direction="column" grow spacing="lg">
-              <InputWrapper required label="ID Pelanggan">
+              <InputWrapper required>
                 <Group direction="row">
                   <Input
-                    label="ID Pelanggan"
                     name="ID Pelanggan"
                     placeholder="ID Pelanggan"
                     className="flex-grow"
@@ -92,22 +93,121 @@ const BayarTagihan = () => {
                     </td>
                     <td>{elements.name}</td>
                   </tr>
+                  <tr>
+                    <td style={{ width: "200px" }}>
+                      <Text weight={500} size="sm">
+                        Tanggal Pendaftaran
+                      </Text>
+                    </td>
+                    <td>{elements.name}</td>
+                  </tr>
+                  <tr>
+                    <td style={{ width: "200px" }}>
+                      <Text weight={500} size="sm">
+                        Paket
+                      </Text>
+                    </td>
+                    <td>{elements.name}</td>
+                  </tr>
+                  <tr>
+                    <td style={{ width: "200px" }}>
+                      <Text weight={500} size="sm">
+                        Kolektor
+                      </Text>
+                    </td>
+                    <td>{elements.name}</td>
+                  </tr>
                 </tbody>
               </Table>
             </Group>
           </Grid.Col>
-        </Grid>
+          <Grid.Col sm={12} md={6}>
+            <Group direction="column" grow spacing="lg">
+              <Title order={4}>Tagihan</Title>
+              <Stack spacing="xs">
+                <Box
+                  sx={(theme) => ({
+                    padding: theme.spacing.md,
+                    border: "1px solid",
+                    borderColor: theme.colors.dark[2],
+                    borderRadius: theme.radius.sm,
+                  })}
+                >
+                  <SimpleGrid cols={2}>
+                    <div>
+                      <Text weight={500}>Maret 2022</Text>
+                      <Text size="sm">Paket Rumahan</Text>
+                    </div>
 
-        <div className="space-x-2 mt-10">
-          <Button
-            type="button"
-            onClick={() => router.push(`/admin/${PATHNAME}`)}
-            color="red"
-          >
-            Back
-          </Button>
-          <Button type="submit">Submit</Button>
-        </div>
+                    <div className="text-right">
+                      <Text weight={500}>Rp. 20.000</Text>
+                    </div>
+                  </SimpleGrid>
+                </Box>
+                <Box
+                  sx={(theme) => ({
+                    padding: theme.spacing.md,
+                    border: "1px solid",
+                    borderColor: theme.colors.dark[2],
+                    borderRadius: theme.radius.sm,
+                  })}
+                >
+                  <SimpleGrid cols={2}>
+                    <div>
+                      <Text weight={500}>Maret 2022</Text>
+                      <Text size="sm">Paket Rumahan</Text>
+                    </div>
+
+                    <div className="text-right">
+                      <Text weight={500}>Rp. 20.000</Text>
+                    </div>
+                  </SimpleGrid>
+                </Box>
+                <Box
+                  sx={(theme) => ({
+                    padding: theme.spacing.md,
+                    border: "1px solid",
+                    borderColor: theme.colors.dark[2],
+                    borderRadius: theme.radius.sm,
+                  })}
+                >
+                  <SimpleGrid cols={2}>
+                    <div>
+                      <Text weight={500}>Maret 2022</Text>
+                      <Text size="sm">Paket Rumahan</Text>
+                    </div>
+
+                    <div className="text-right">
+                      <Text weight={500}>Rp. 20.000</Text>
+                    </div>
+                  </SimpleGrid>
+                </Box>
+              </Stack>
+              <Table>
+                <tbody>
+                  <tr className="text-right">
+                    <td>Diskon :</td>
+                    <td style={{ width: "150px" }}>Rp. 0</td>
+                  </tr>
+                  <tr>
+                    <td className="text-right">
+                      <Text weight={500} size="xl" className="text-right">
+                        Total :
+                      </Text>
+                    </td>
+                    <td style={{ width: "150px", textAlign: "right" }}>
+                      <Text weight={500} size="xl" className="text-right">
+                        Rp. 200.000
+                      </Text>
+                    </td>
+                  </tr>
+                </tbody>
+              </Table>
+
+              <Button type="submit">Bayar</Button>
+            </Group>
+          </Grid.Col>
+        </Grid>
       </Box>
     </Layout>
   );
