@@ -125,7 +125,8 @@ export function Navbar() {
      return (
           <Header height={HEADER_HEIGHT} mb={120} className={classes.root}>
                <Container className={classes.header} size="lg">
-                    <img src="/mvb_head.png" width={400} />
+                    <img src="/mvb_head.png" width={400} className="hidden md:block" />
+                    <img src="/mvb_icon.png" width={60} className="block md:hidden" />
                     <Group spacing={5} className={classes.links}>
                          {items}
                     </Group>
