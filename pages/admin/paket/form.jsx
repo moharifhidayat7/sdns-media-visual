@@ -21,6 +21,7 @@ import { useForm } from "@mantine/form";
 import { generateCode, getTitle, inputNumberOnly } from "helpers/functions";
 import { useNotifications } from "@mantine/notifications";
 import { Check, X } from "tabler-icons-react";
+import { getSession,useSession } from "next-auth/react";
 const PAGENAME = "paket";
 export async function getServerSideProps(context) {
   const id = context.query.id;
@@ -61,13 +62,15 @@ export async function getServerSideProps(context) {
   return {
     props: {
       action,
+      session:await getSession(context),
       data: { ...paket },
       produk, fitur
     },
   };
 }
 
-function Form({ data, action, produk, fitur }) {
+function Form({ data, action, produk, fitur}) {
+  const {data:session,status}=useSession();
   const form = useForm({
     initialValues: { kode: "", nama: "", harga: "", produkId: 0, fiturs: [], status: "" },
     validate: {
@@ -162,7 +165,7 @@ function Form({ data, action, produk, fitur }) {
     });
   };
   return (
-    <Layout>
+    <Layout session={session}>
       <div className="loader" hidden={loading}>
         <Loader size="xl" variant="bars" color="orange" />;
       </div>

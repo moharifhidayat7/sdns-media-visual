@@ -1,7 +1,8 @@
 import React from 'react';
-import { createStyles, Overlay, Container, Title, Button, Text } from '@mantine/core';
+import { createStyles, Overlay, Container, Title, Button, Text, Box, Checkbox, Group } from '@mantine/core';
 import { Navbar } from '@components/FrontEnd/Navbar';
 import Link from 'next/link';
+import { FooterSocial } from '@components/FrontEnd/Footer';
 
 const useStyles = createStyles((theme) => ({
   hero: {
@@ -54,7 +55,18 @@ const useStyles = createStyles((theme) => ({
       fontSize: theme.fontSizes.sm,
     },
   },
+  produkFilter: {
+    borderTop: '1.5px solid #d4cfcf',
+    borderBottom: '1.5px solid #d4cfcf',
+    padding: '10px 0',
+    marginTop: '20px',
 
+    span: {
+      color: '#4f4d4d',
+      fontSize: '17px',
+      fontWeight: 'bold',
+    }
+  },
   control: {
     marginTop: theme.spacing.xl * 1.5,
     // padding: theme.spacing.xl ,
@@ -69,25 +81,39 @@ const Index = () => {
   const { classes } = useStyles();
 
   return (
-    <div className={classes.hero}>
-      <Navbar />
-      <Overlay
-        gradient="linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, .65) 40%)"
-        opacity={1}
-        zIndex={1}
-      />
-      <Container className={classes.container}>
-        <Title className={classes.title}>Be a Leading Star to Lead Indonesia’s Digital Ecosystem</Title>
-        <Text className={classes.description} size="xl" mt="xl">
-          Kami terus berinovasi mengikuti perkembangan digital pada sektor-sektor penting di Indonesia agar tetap relevan dan akan memberikan dampak yang berarti bagi masyarakat.
-        </Text>
+    <>
+      <div className={classes.hero}>
+        <Navbar />
+        <Overlay
+          gradient="linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, .65) 40%)"
+          opacity={1}
+          zIndex={1}
+        />
+        <Container className={classes.container}>
+          <Title className={classes.title}>Be a Leading Star to Lead Indonesia’s Digital Ecosystem</Title>
+          <Text className={classes.description} size="xl" mt="xl">
+            Kami terus berinovasi mengikuti perkembangan digital pada sektor-sektor penting di Indonesia agar tetap relevan dan akan memberikan dampak yang berarti bagi masyarakat.
+          </Text>
 
-       <Link href="/register"> 
-       <Button variant="gradient" size="xl" radius="xl" className={classes.control}>
-          Bergabung
-        </Button></Link>
+          <Link href="/register">
+            <Button variant="gradient" size="xl" radius="xl" className={classes.control}>
+              Bergabung
+            </Button>
+          </Link>
+        </Container>
+      </div>
+      <Container mt={20}>
+        <Title className='text-gray-800 text-center'>Produk</Title>
+        <div className={classes.produkFilter}>
+     <Group>
+          <span >Filter</span>
+     <Checkbox label="Analog" />
+            <Checkbox label="Digital" />
+     </Group>
+        </div>
       </Container>
-    </div>
+      <FooterSocial />
+    </>
   );
 }
 export default Index;
