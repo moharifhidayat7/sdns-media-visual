@@ -1,5 +1,7 @@
 const prisma = require("../lib/prisma");
 
+const akunSeeder = require("./seeds/akun");
+
 async function main() {
   const administrator = await prisma.role.upsert({
     where: { nama: "ADMINISTRATOR" },
@@ -34,7 +36,8 @@ async function main() {
       },
     },
   });
-  console.log({ administrator });
+  const akun = await akunSeeder();
+  console.log({ administrator, akun });
 }
 
 main()
