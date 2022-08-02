@@ -1,29 +1,45 @@
-import React from 'react';
-import { createStyles, Overlay, Container, Title, Button, Text, Box, Checkbox, Group } from '@mantine/core';
-import { Navbar } from '@components/FrontEnd/Navbar';
-import Link from 'next/link';
-import { FooterSocial } from '@components/FrontEnd/Footer';
+import React from "react";
+import {
+  createStyles,
+  Overlay,
+  Container,
+  Title,
+  Button,
+  Text,
+  Box,
+  Checkbox,
+  Group,
+  Card,
+  Badge,
+  List,
+  ThemeIcon,
+} from "@mantine/core";
+import { Navbar } from "@components/FrontEnd/Navbar";
+import { CircleCheck } from "tabler-icons-react";
+import Link from "next/link";
+import { FooterSocial } from "@components/FrontEnd/Footer";
+import { convertToRupiah } from "helpers/functions";
 
 const useStyles = createStyles((theme) => ({
   hero: {
-    position: 'relative',
+    position: "relative",
     backgroundImage:
-      'url(https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80)',
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
+      "url(https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80)",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
   },
 
   container: {
     height: "500px",
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'flex-end',
-    alignItems: 'flex-start',
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "flex-end",
+    alignItems: "flex-start",
     paddingBottom: theme.spacing.xl * 6,
     zIndex: 1,
-    position: 'relative',
+    position: "relative",
 
-    [theme.fn.smallerThan('sm')]: {
+    [theme.fn.smallerThan("sm")]: {
       height: 500,
       paddingBottom: theme.spacing.xl * 1,
     },
@@ -35,12 +51,12 @@ const useStyles = createStyles((theme) => ({
     fontWeight: 900,
     lineHeight: 1.1,
 
-    [theme.fn.smallerThan('sm')]: {
+    [theme.fn.smallerThan("sm")]: {
       fontSize: 40,
       lineHeight: 1.2,
     },
 
-    [theme.fn.smallerThan('xs')]: {
+    [theme.fn.smallerThan("xs")]: {
       fontSize: 28,
       lineHeight: 1.3,
     },
@@ -50,36 +66,51 @@ const useStyles = createStyles((theme) => ({
     color: theme.white,
     maxWidth: 600,
 
-    [theme.fn.smallerThan('sm')]: {
-      maxWidth: '100%',
+    [theme.fn.smallerThan("sm")]: {
+      maxWidth: "100%",
       fontSize: theme.fontSizes.sm,
     },
   },
   produkFilter: {
-    borderTop: '1.5px solid #d4cfcf',
-    borderBottom: '1.5px solid #d4cfcf',
-    padding: '10px 0',
-    marginTop: '20px',
+    borderTop: "1.5px solid #d4cfcf",
+    borderBottom: "1.5px solid #d4cfcf",
+    padding: "10px 0",
+    marginTop: "20px",
 
     span: {
-      color: '#4f4d4d',
-      fontSize: '17px',
-      fontWeight: 'bold',
-    }
+      color: "#4f4d4d",
+      fontSize: "17px",
+      fontWeight: "bold",
+    },
   },
   control: {
     marginTop: theme.spacing.xl * 1.5,
     // padding: theme.spacing.xl ,
     // height:'auto',
-    [theme.fn.smallerThan('sm')]: {
-      width: '100%',
+    [theme.fn.smallerThan("sm")]: {
+      width: "100%",
     },
   },
 }));
+export const getServerSideProps = async (ctx) => {
+  const option = { headers: { Cookie: ctx.req.headers.cookie } };
+  const pakets = await fetch(`${process.env.API_URL}/api/paket`, option).then(
+    (res) => res.json()
+  );
+  const products = await fetch(
+    `${process.env.API_URL}/api/produk`,
+    option
+  ).then((res) => res.json());
+  return {
+    props: {
+      pakets,
+      products,
+    },
+  };
+};
 
-const Index = () => {
+const Index = ({ products, pakets }) => {
   const { classes } = useStyles();
-
   return (
     <>
       <div className={classes.hero}>
@@ -90,30 +121,87 @@ const Index = () => {
           zIndex={1}
         />
         <Container className={classes.container}>
-          <Title className={classes.title}>Be a Leading Star to Lead Indonesia’s Digital Ecosystem</Title>
+          <Title className={classes.title}>
+            Be a Leading Star to Lead Indonesia’s Digital Ecosystem
+          </Title>
           <Text className={classes.description} size="xl" mt="xl">
-            Kami terus berinovasi mengikuti perkembangan digital pada sektor-sektor penting di Indonesia agar tetap relevan dan akan memberikan dampak yang berarti bagi masyarakat.
+            Kami terus berinovasi mengikuti perkembangan digital pada
+            sektor-sektor penting di Indonesia agar tetap relevan dan akan
+            memberikan dampak yang berarti bagi masyarakat.
           </Text>
 
           <Link href="/register">
-            <Button variant="gradient" size="xl" radius="xl" className={classes.control}>
+            <Button
+              variant="gradient"
+              size="xl"
+              radius="xl"
+              className={classes.control}
+            >
               Bergabung
             </Button>
           </Link>
         </Container>
       </div>
       <Container mt={20}>
-        <Title className='text-gray-800 text-center'>Produk</Title>
+        <Title className="text-gray-800 text-center">Produk</Title>
         <div className={classes.produkFilter}>
-     <Group>
-          <span >Filter</span>
-     <Checkbox label="Analog" />
-            <Checkbox label="Digital" />
-     </Group>
+          <Group>
+            <span>Filter</span>
+            {products &&
+              products.result.map((e, k) => {
+                return <Checkbox label={e.nama} key={k} />;
+              })}
+          </Group>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 my-5">
+          {pakets &&
+            pakets.result.map((e, k) => {
+              return (
+                <Card
+                  key={k}
+                  withBorder
+                  className="pb-10 relative"
+                  shadow="sm"
+                  p="sm"
+                  radius="md"
+                >
+                  <Group position="apart">
+                    <h3>{e.nama}</h3>
+                    <Badge>{e.produk.nama}</Badge>
+                  </Group>
+                  {convertToRupiah(e.harga)}
+                  <List
+                    spacing="xs"
+                    size="sm"
+                    p="sm"
+                    icon={
+                      <ThemeIcon color="teal" size={24} radius="xl">
+                        <CircleCheck size={16} />
+                      </ThemeIcon>
+                    }
+                  >
+                    {e.fiturs.map((x, xk) => {
+                      return <List.Item key={xk}>{x.fitur.nama}</List.Item>;
+                    })}
+                  </List>
+                  <div className="absolute bottom-0 w-full left-0 right-0">
+                    <Button
+                      variant="light"
+                      color="blue"
+                      fullWidth
+                      className=""
+                      mt="md"
+                    >
+                      Berlangganan
+                    </Button>
+                  </div>
+                </Card>
+              );
+            })}
         </div>
       </Container>
       <FooterSocial />
     </>
   );
-}
+};
 export default Index;

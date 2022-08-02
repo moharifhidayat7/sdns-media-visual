@@ -13,7 +13,6 @@ import Loading from "../components/Loading";
 
 // import 'tailwindcss/tailwind.css'
 import "@styles/globals.css";
-import "@styles/custom.css";
 export default function App({
   Component,
   pageProps: { session, ...pageProps },
