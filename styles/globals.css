@@ -1,32 +1,29 @@
 @tailwind components;
 @tailwind utilities;
-
 html,
 body {
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
 a {
   color: inherit;
-  text-decoration: none ;
+  text-decoration: none;
 }
 
 * {
   box-sizing: border-box;
 }
 
-
 /* span error text sm*/
 .error {
   font-size: small;
-  color: rgb(219, 14, 14);
+  color: #db0e0e;
 }
 
 .loader {
- position: fixed;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
@@ -37,4 +34,56 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+table.table-bordered {
+  border: 1px solid #ddd;
+  border-spacing: 0;
+  border-radius: 5px;
+}
+
+table.table-bordered tfoot td {
+  border-top: 1px solid #ddd;
+  font-weight: 600;
+}
+
+table.table-bordered th {
+  border-right: 1px solid #ddd;
+  font-weight: 600;
+  padding: 5px;
+  border-bottom: 1px solid #ddd;
+}
+
+table.table-bordered th:last-child {
+  border-right: none;
+}
+
+table.table-bordered td {
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  padding: 5px;
+}
+
+table.table-bordered td:last-child {
+  border-right: none;
+}
+
+table.table-bordered tr:last-child td {
+  border-bottom: none;
+}
+
+.input-border-none {
+  border: none;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+.input-border-none:focus {
+  outline: none;
+  border: none;
+}
+
+.input-border-none:hover {
+  border: none;
 }

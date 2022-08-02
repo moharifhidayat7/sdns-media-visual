@@ -5,7 +5,7 @@ import dateFormat from "dateformat";
 //prisma create produk
 export default async (req, res) => {
   const data = req.body;
-  const kodeDate = dateFormat(new Date(), "ddmmyy")
+  const kodeDate = dateFormat(new Date(), "ddmmyy");
   const code = generateCode(`CUST${kodeDate}`, 0, 1);
   const lastUser = await prisma.pelanggan.findMany({
     orderBy: {
@@ -17,16 +17,16 @@ export default async (req, res) => {
     const result = await prisma.pelanggan.create({
       data: {
         ...data,
-        no_pelanggan: code + lastUser[0].id,
+        no_pelanggan: code,
         createdId: null,
         updatedId: null,
-      }
+      },
     });
     await prisma.notifikasi.create({
       data: {
         title: "Pelanggan Baru",
         body: `Pelanggan Baru ${result.nama}`,
-      }
+      },
     });
 
     res.statusCode = 200;
@@ -38,5 +38,4 @@ export default async (req, res) => {
     res.statusCode = 400;
     res.json({ message: error.message, result: [], status: 400 });
   }
-
 };
