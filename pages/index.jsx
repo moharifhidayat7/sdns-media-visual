@@ -219,15 +219,17 @@ const Index = ({ products, pakets }) => {
                     })}
                   </List>
                   <div className="absolute bottom-0 w-full left-0 right-0">
-                    <Button
-                      variant="light"
-                      color="blue"
-                      fullWidth
-                      className=""
-                      mt="md"
-                    >
-                      Berlangganan
-                    </Button>
+                    <Link href="/pelanggan">
+                      <Button
+                        variant="light"
+                        color="blue"
+                        fullWidth
+                        className=""
+                        mt="md"
+                      >
+                        Berlangganan
+                      </Button>
+                    </Link>
                   </div>
                 </Card>
               );

@@ -20,7 +20,7 @@ const Layout = ({ children }) => {
           {/* <IconSearch color="gray" /> */}
         </div>
       </nav>
-      <section className="content mt-20">{children}</section>
+      <section className="content-mobile mt-20">{children}</section>
       <footer className="footer-mobile flex justify-between w-full">
         <Link href="/pelanggan">
           <a className="nav-link-item">

@@ -94,9 +94,13 @@ table.table-bordered {
   @apply p-5 justify-between flex fixed top-0 left-0 right-0 bg-[#f9f9f9];
   max-width: 640px;
   margin: auto;
+  z-index: 10;
   .navbar-action {
     @apply flex gap-4;
   }
+}
+.content-mobile {
+  z-index: 1;
 }
 .text-dimmed {
   color: #878787;
@@ -108,6 +112,7 @@ table.table-bordered {
 }
 .footer-mobile {
   position: fixed;
+  background-color: white;
   bottom: 0;
   max-width: 640px;
   padding: 1.25rem;
