@@ -100,5 +100,5 @@ const menu = [
     ],
   },
 ];
-
-export { menu };
+const menuPelanngan = [{ label: "Dashboard", icon: Gauge, link: "/pelanggan" }];
+export { menu, menuPelanngan };

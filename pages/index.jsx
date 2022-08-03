@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   createStyles,
   Overlay,
@@ -111,6 +111,32 @@ export const getServerSideProps = async (ctx) => {
 
 const Index = ({ products, pakets }) => {
   const { classes } = useStyles();
+  const [fproduk, setfproduk] = useState([]);
+  const [paket, setpaket] = useState([]);
+  useEffect(() => {
+    setpaket(
+      pakets.result.filter((e) => {
+        if (fproduk.length > 0) {
+          return fproduk.includes(e.produk.id);
+        }
+        return e;
+      })
+    );
+  }, [fproduk]);
+
+  const productFilter = async (e) => {
+    const checked = e.target.checked;
+    const value = parseInt(e.target.value);
+    if (!checked) {
+      setfproduk([
+        ...fproduk.filter((e) => {
+          return e != value;
+        }),
+      ]);
+    } else {
+      setfproduk([...fproduk, value]);
+    }
+  };
   return (
     <>
       <div className={classes.hero}>
@@ -149,13 +175,21 @@ const Index = ({ products, pakets }) => {
             <span>Filter</span>
             {products &&
               products.result.map((e, k) => {
-                return <Checkbox label={e.nama} key={k} />;
+                return (
+                  <Checkbox
+                    label={e.nama}
+                    key={k}
+                    name="products"
+                    value={e.id}
+                    onChange={(e) => productFilter(e)}
+                  />
+                );
               })}
           </Group>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 my-5">
-          {pakets &&
-            pakets.result.map((e, k) => {
+          {paket &&
+            paket.map((e, k) => {
               return (
                 <Card
                   key={k}

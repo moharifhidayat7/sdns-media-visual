@@ -3,19 +3,6 @@ import CustomNavbar from "./CustomNavbar";
 
 import { AppShell, Container, Loader } from "@mantine/core";
 
-import {
-  Gauge,
-  BuildingCottage,
-  Receipt2,
-  ReportMoney,
-  Report,
-  Notification,
-  Server,
-  Users,
-  Adjustments,
-  Lock,
-} from "tabler-icons-react";
-
 import { useGlobalContext } from "@components/contexts/GlobalContext";
 import { useState } from "react";
 import { menu } from "./Menu";

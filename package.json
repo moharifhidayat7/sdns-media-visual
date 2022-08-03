@@ -26,6 +26,7 @@
     "@mantine/rte": "^4.1.4",
     "@mantine/spotlight": "^4.1.4",
     "@prisma/client": "^4.1.1",
+    "@tabler/icons": "^1.78.1",
     "@tanem/react-nprogress": "^5.0.0",
     "array-to-tree": "^3.3.2",
     "bcrypt": "^5.0.1",

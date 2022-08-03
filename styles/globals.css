@@ -87,3 +87,41 @@ table.table-bordered tr:last-child td {
 .input-border-none:hover {
   border: none;
 }
+
+.container-sm {
+  max-width: 640px;
+  margin: auto;
+  position: relative;
+}
+
+.navbar-mobile {
+  @apply p-5 justify-between flex fixed top-0 left-0 right-0 bg-[#f9f9f9];
+  max-width: 640px;
+  margin: auto;
+}
+
+.navbar-mobile .navbar-action {
+  @apply flex gap-4;
+}
+
+.text-dimmed {
+  color: #878787;
+  margin: 0px;
+  padding: 0px;
+}
+
+.text-color-primary {
+  color: #53c2c5;
+}
+
+.footer-mobile {
+  position: fixed;
+  bottom: 0;
+  max-width: 640px;
+  padding: 1.25rem;
+  box-shadow: 0px 0px 5px #dbdbdb;
+}
+
+.footer-mobile .nav-link-item {
+  @apply text-[#878787] focus:text-[#53c2c5] hover:text-[#53c2c5];
+}
