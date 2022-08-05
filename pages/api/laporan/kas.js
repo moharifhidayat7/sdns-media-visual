@@ -235,7 +235,7 @@ export default async function handler(req, res) {
       const sumSaldo = parseInt(
         _.sumBy(data, (o) => {
           if (o.akun.id == ak.id) {
-            return o.saldo;
+            return parseInt(o.saldo);
           }
           return 0;
         })
