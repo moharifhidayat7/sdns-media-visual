@@ -37,18 +37,20 @@ function Form({ user, role, action }) {
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
       roleId: (value) => (value == "" ? "Pilih Role" : null),
-      password: (v) =>
-        v == ""
-          ? "Masukkan Password"
-          : v.length < 8
-          ? "Password minimal 8 karakter"
-          : null,
+      password:
+        user.id ??
+        function (v) {
+          v == ""
+            ? "Masukkan Password"
+            : v.length < 8
+            ? "Password minimal 8 karakter"
+            : null;
+        },
     },
   });
   const notifications = useNotifications();
   const [loading, setLoading] = useState(true);
   const [disabled, setDisabled] = useState(false);
-
   const { data: session, status } = useSession();
   const [select, setSelect] = useState("");
   const router = useRouter();
@@ -67,8 +69,8 @@ function Form({ user, role, action }) {
         notifications.showNotification({
           disallowClose: true,
           autoClose: 5000,
-          title: "Tambah Pegawai",
-          message: "Tambah pegawai berhasil",
+          title: user.id ? "Update" : "Tambah",
+          message: user.id ? "Update" : "Tambah",
           color: "green",
           icon: <Check />,
           loading: false,

@@ -42,7 +42,13 @@ const Index = ({ paket }) => {
           </div>
         </div>
       </article>
-      <article className="grid grid-cols-1 gap-5 mt-5">
+      <article className="">
+        <img
+          src="https://img.freepik.com/free-vector/3d-earth-graphic-symbolizing-global-trade-illustration_456031-127.jpg?t=st=1659498062~exp=1659498662~hmac=e582aa47fe952cc0b864dfc70866081b6dd72fb2ba0fd709d43b645fcdf816f5"
+          alt="bumi"
+        />
+      </article>
+      <article className="grid grid-cols-1 gap-5 ">
         {paket.result &&
           paket.result.map((e, k) => {
             return (
