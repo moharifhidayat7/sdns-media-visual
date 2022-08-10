@@ -36,3 +36,4 @@ jobs:
           user: app.mvb.co.id
           port: 22
           pass: app654321
+      - run: echo "OK"
