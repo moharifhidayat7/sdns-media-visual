@@ -22,8 +22,8 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Remote SSH Commands
       - uses: fifsky/ssh-action@v0.0.6
+      - name: Remote SSH Commands
         with:
           command: |
             #cd www
