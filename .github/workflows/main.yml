@@ -23,7 +23,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - uses: fifsky/ssh-action@v0.0.6
-      - name: Remote SSH Commands
+        name: Remote SSH Commands
         with:
           command: |
             #cd www
@@ -36,4 +36,3 @@ jobs:
           user: app.mvb.co.id
           port: 22
           pass: app654321
-      - run: echo "OK"
