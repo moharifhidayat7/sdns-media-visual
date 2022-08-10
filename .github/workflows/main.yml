@@ -31,7 +31,7 @@ jobs:
             git pull -f
             npm run build
             pm2 restart all
-          host: app.mvb.co.id
-          user: app.mvb.co.id
-          port: 22
-          pass: app654321
+          host: ${{ secrets.SSH_HOST }}
+          user: ${{ secrets.SSH_USER }}
+          port: ${{ secrets.SSH_PORT }}
+          pass: ${{ secrets.SSH_PASSWORD }}
