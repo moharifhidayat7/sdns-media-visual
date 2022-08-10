@@ -26,12 +26,11 @@ jobs:
         name: Remote SSH Commands
         with:
           command: |
-            #cd www
-            echo "TES" >> TES.txt
-            #git fetch
-            #git pull
-            #npm run build
-            #pm2 restart all
+            cd www
+            git fetch
+            git pull -f
+            npm run build
+            pm2 restart all
           host: app.mvb.co.id
           user: app.mvb.co.id
           port: 22
